@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <!-- Bottom drop edge (Duolingo 3D depth) -->
+  <path d="M 50 16
+           L 78 54
+           A 32 32 0 1 1 22 54
+           Z"
+        fill="#E04000" />
+
+  <!-- Outer flame -->
+  <path d="M 50 8
+           L 78 46
+           A 32 32 0 1 1 22 46
+           Z"
+        fill="#FF9600" />
+
+  <!-- Inner core flame -->
+  <path d="M 50 42
+           L 66 62
+           A 18 18 0 1 1 34 62
+           Z"
+        fill="#FFDE00" />
+</svg>
