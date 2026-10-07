@@ -12,7 +12,7 @@
 </head>
 
 <body class="bg-base-200 min-h-screen flex items-center justify-center font-sans antialiased"
-    x-data="{ ...themeHandler(), activeTab: 'home', streak: 3, hasStartedLesson: true }">
+    x-data="{ ...themeHandler(), activeTab: 'home', streak: 3, hasStartedLesson: true, completedLessons: 1 }">
     <div
         class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
 
@@ -191,9 +191,270 @@
                 </div>
 
             </div>
+
             <!-- Уроки -->
-            <div x-show="activeTab === 'lessons'">
-                <h2 class="text-center font-bold text-3xl">Уроки</h2>
+            <div x-show="activeTab === 'lessons'" class="space-y-4 pb-4">
+                <div class="flex items-center justify-between pt-1">
+                    <div>
+                        <p class="text-xs font-semibold text-base-content/60 tracking-wider uppercase">Обучение</p>
+                        <h2 class="text-2xl font-black tracking-tight text-base-content">Все уроки</h2>
+                    </div>
+
+                    <button @click="completedLessons = (completedLessons + 1) % 5"
+                        class="badge badge-soft badge-primary font-bold text-xs gap-1.5 py-3.5 px-3 hover:scale-105 transition-transform cursor-pointer"
+                        title="Нажмите, чтобы переключить демо-прогресс (0-4 уроков)">
+                        <span class="material-symbols-rounded text-base text-sky-500 filled">school</span>
+                        <span x-text="completedLessons + ' / 4 пройдено'"></span>
+                    </button>
+                </div>
+
+                <!-- Повторение -->
+                <button :disabled="completedLessons < 4"
+                    class="btn w-full rounded-2xl h-auto py-3 px-4 flex items-center justify-between transition-all"
+                    :class="completedLessons >= 4 
+                        ? 'btn-primary text-white shadow-md hover:shadow-lg hover:scale-[1.01]' 
+                        : 'bg-base-200/50 border border-base-300/60 text-base-content/40 cursor-not-allowed opacity-60 shadow-none select-none'">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                            :class="completedLessons >= 4 ? 'bg-white/20 text-white' : 'bg-base-300/50 text-base-content/40'">
+                            <span class="material-symbols-rounded text-xl">psychology</span>
+                        </div>
+                        <div class="text-left">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-sm tracking-tight"
+                                    :class="completedLessons >= 4 ? 'text-white' : 'text-base-content/70'">Повторение</span>
+                            </div>
+                            <p class="text-[11px] mt-0.5"
+                                :class="completedLessons >= 4 ? 'text-white/80' : 'text-base-content/50'">
+                                <span x-show="completedLessons >= 4">Закрепить знания по всем темам</span>
+                                <span x-show="completedLessons < 4"
+                                    x-text="'Пройдите все 4 урока для открытия (' + completedLessons + '/4)'"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="material-symbols-rounded text-xl"
+                            :class="completedLessons >= 4 ? 'text-white' : 'text-base-content/30'"
+                            x-text="completedLessons >= 4 ? 'play_arrow' : 'lock'">
+                        </span>
+                    </div>
+                </button>
+
+                <!-- 1. Базовое движение (вперед, назад, вправо, влево) -->
+                <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
+                    <div class="card-body p-4.5 gap-3.5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-soft font-bold text-[11px] px-2 rounded-full"
+                                    :class="completedLessons >= 1 ? 'badge-success' : 'badge-primary'">Урок 1</span>
+                            </div>
+                            <span x-show="completedLessons >= 1" class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
+                                <span class="material-symbols-rounded text-xs filled">check</span>
+                                <span>Пройдено</span>
+                            </span>
+                            <span x-show="completedLessons === 0" class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
+                                Доступно
+                            </span>
+                        </div>
+
+                        <div>
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Базовое движение</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Команды: вперед, назад, вправо, влево</p>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
+                                <span class="font-bold" :class="completedLessons >= 1 ? 'text-success' : 'text-sky-500'"
+                                    x-text="completedLessons >= 1 ? '100%' : '0%'"></span>
+                            </div>
+                            <progress class="progress w-full h-2.5 rounded-full"
+                                :class="completedLessons >= 1 ? 'progress-success' : 'progress-primary'"
+                                :value="completedLessons >= 1 ? 100 : 0" max="100"></progress>
+                        </div>
+
+                        <button @click="completedLessons = Math.max(completedLessons, 1)"
+                            class="btn rounded-2xl w-full font-bold gap-2 mt-1"
+                            :class="completedLessons >= 1 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
+                            <span x-text="completedLessons >= 1 ? 'Пройти заново' : 'Начать урок'"></span>
+                            <span class="material-symbols-rounded text-lg" x-text="completedLessons >= 1 ? 'replay' : 'play_arrow'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Цикл со счетчиком (сделать A x раз) -->
+                <div class="card card-border rounded-3xl transition-all"
+                    :class="completedLessons >= 1 
+                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
+                        : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
+                    <div class="card-body p-4.5 gap-3.5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-soft font-bold text-[11px] px-2 rounded-full"
+                                    :class="completedLessons >= 2 ? 'badge-success' : (completedLessons >= 1 ? 'badge-primary' : 'badge-ghost')">Урок 2</span>
+                            </div>
+                            <div x-show="completedLessons < 1" class="flex items-center gap-1 text-base-content/50">
+                                <span class="material-symbols-rounded text-lg">lock</span>
+                            </div>
+                            <span x-show="completedLessons >= 2" class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
+                                <span class="material-symbols-rounded text-xs filled">check</span>
+                                <span>Пройдено</span>
+                            </span>
+                            <span x-show="completedLessons === 1" class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
+                                В процессе
+                            </span>
+                        </div>
+
+                        <div>
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Цикл со счетчиком</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Конструкция: сделать A x раз</p>
+                        </div>
+
+                        <div x-show="completedLessons >= 1" class="space-y-1.5">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
+                                <span class="font-bold" :class="completedLessons >= 2 ? 'text-success' : 'text-sky-500'"
+                                    x-text="completedLessons >= 2 ? '100%' : '60%'"></span>
+                            </div>
+                            <progress class="progress w-full h-2.5 rounded-full"
+                                :class="completedLessons >= 2 ? 'progress-success' : 'progress-primary'"
+                                :value="completedLessons >= 2 ? 100 : 60" max="100"></progress>
+                        </div>
+
+                        <div x-show="completedLessons < 1" class="py-1">
+                            <p class="text-xs text-base-content/50">
+                                <span>Пройдите предыдущий урок, чтобы открыть</span>
+                            </p>
+                        </div>
+
+                        <button x-show="completedLessons >= 1"
+                            @click="completedLessons = Math.max(completedLessons, 2)"
+                            class="btn rounded-2xl w-full font-bold gap-2 mt-1"
+                            :class="completedLessons >= 2 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
+                            <span x-text="completedLessons >= 2 ? 'Пройти заново' : 'Продолжить урок'"></span>
+                            <span class="material-symbols-rounded text-lg" x-text="completedLessons >= 2 ? 'replay' : 'play_arrow'"></span>
+                        </button>
+                        <button x-show="completedLessons < 1" disabled class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
+                            <span>Заблокировано</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. Условия (если A, то сделать Б) -->
+                <div class="card card-border rounded-3xl transition-all"
+                    :class="completedLessons >= 2 
+                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
+                        : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
+                    <div class="card-body p-4.5 gap-3.5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-soft font-bold text-[11px] px-2 rounded-full"
+                                    :class="completedLessons >= 3 ? 'badge-success' : (completedLessons >= 2 ? 'badge-primary' : 'badge-ghost')">Урок 3</span>
+                            </div>
+                            <div x-show="completedLessons < 2" class="flex items-center gap-1 text-base-content/50">
+                                <span class="material-symbols-rounded text-lg">lock</span>
+                            </div>
+                            <span x-show="completedLessons >= 3" class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
+                                <span class="material-symbols-rounded text-xs filled">check</span>
+                                <span>Пройдено</span>
+                            </span>
+                            <span x-show="completedLessons === 2" class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
+                                Доступно
+                            </span>
+                        </div>
+
+                        <div>
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Условия</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Конструкция: если A, то сделать Б</p>
+                        </div>
+
+                        <div x-show="completedLessons >= 2" class="space-y-1.5">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
+                                <span class="font-bold" :class="completedLessons >= 3 ? 'text-success' : 'text-sky-500'"
+                                    x-text="completedLessons >= 3 ? '100%' : '0%'"></span>
+                            </div>
+                            <progress class="progress w-full h-2.5 rounded-full"
+                                :class="completedLessons >= 3 ? 'progress-success' : 'progress-primary'"
+                                :value="completedLessons >= 3 ? 100 : 0" max="100"></progress>
+                        </div>
+
+                        <div x-show="completedLessons < 2" class="py-1">
+                            <p class="text-xs text-base-content/50">
+                                <span>Пройдите предыдущий урок, чтобы открыть</span>
+                            </p>
+                        </div>
+
+                        <button x-show="completedLessons >= 2"
+                            @click="completedLessons = Math.max(completedLessons, 3)"
+                            class="btn rounded-2xl w-full font-bold gap-2 mt-1"
+                            :class="completedLessons >= 3 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
+                            <span x-text="completedLessons >= 3 ? 'Пройти заново' : 'Начать урок'"></span>
+                            <span class="material-symbols-rounded text-lg" x-text="completedLessons >= 3 ? 'replay' : 'play_arrow'"></span>
+                        </button>
+                        <button x-show="completedLessons < 2" disabled class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
+                            <span>Заблокировано</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. Условный цикл (делать А пока Б) -->
+                <div class="card card-border rounded-3xl transition-all"
+                    :class="completedLessons >= 3 
+                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
+                        : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
+                    <div class="card-body p-4.5 gap-3.5">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="badge badge-soft font-bold text-[11px] px-2 rounded-full"
+                                    :class="completedLessons >= 4 ? 'badge-success' : (completedLessons >= 3 ? 'badge-primary' : 'badge-ghost')">Урок 4</span>
+                            </div>
+                            <div x-show="completedLessons < 3" class="flex items-center gap-1 text-base-content/50">
+                                <span class="material-symbols-rounded text-lg">lock</span>
+                            </div>
+                            <span x-show="completedLessons >= 4" class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
+                                <span class="material-symbols-rounded text-xs filled">check</span>
+                                <span>Пройдено</span>
+                            </span>
+                            <span x-show="completedLessons === 3" class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
+                                Доступно
+                            </span>
+                        </div>
+
+                        <div>
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Условный цикл</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Конструкция: делать А пока Б</p>
+                        </div>
+
+                        <div x-show="completedLessons >= 3" class="space-y-1.5">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
+                                <span class="font-bold" :class="completedLessons >= 4 ? 'text-success' : 'text-sky-500'"
+                                    x-text="completedLessons >= 4 ? '100%' : '0%'"></span>
+                            </div>
+                            <progress class="progress w-full h-2.5 rounded-full"
+                                :class="completedLessons >= 4 ? 'progress-success' : 'progress-primary'"
+                                :value="completedLessons >= 4 ? 100 : 0" max="100"></progress>
+                        </div>
+
+                        <div x-show="completedLessons < 3" class="py-1">
+                            <p class="text-xs text-base-content/50">
+                                <span>Пройдите предыдущий урок, чтобы открыть</span>
+                            </p>
+                        </div>
+
+                        <button x-show="completedLessons >= 3"
+                            @click="completedLessons = Math.max(completedLessons, 4)"
+                            class="btn rounded-2xl w-full font-bold gap-2 mt-1"
+                            :class="completedLessons >= 4 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
+                            <span x-text="completedLessons >= 4 ? 'Пройти заново' : 'Начать урок'"></span>
+                            <span class="material-symbols-rounded text-lg" x-text="completedLessons >= 4 ? 'replay' : 'play_arrow'"></span>
+                        </button>
+                        <button x-show="completedLessons < 3" disabled class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
+                            <span>Заблокировано</span>
+                        </button>
+                    </div>
+                </div>
             </div>
             <!-- Знания -->
             <div x-show="activeTab === 'knowledge'">
