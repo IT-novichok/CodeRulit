@@ -1,12 +1,107 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>КодРулит</title>
+    <link rel="shortcut icon" href="../static/img/icons/favicon.svg" type="image/x-icon">
+    <link rel="stylesheet" href="../static/css/output-index.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <title>CodeRuilt</title>
+    <script defer src="../static/js/theme-handler.js"></script>
 </head>
-<body>
-    <h1>Lorem ipsum dolor sit amet.</h1>
+
+<body class="bg-base-200 min-h-screen flex items-center justify-center font-sans antialiased" x-data="{
+        theme: localStorage.getItem('coderulit-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+        activeTab: 'home',
+        setTheme(val) {
+            this.theme = val;
+            localStorage.setItem('coderulit-theme', val);
+            document.documentElement.setAttribute('data-theme', val);
+        },
+        toggleTheme() {
+            this.setTheme(this.theme === 'dark' ? 'light' : 'dark');
+        },
+        init() {
+            document.documentElement.setAttribute('data-theme', this.theme);
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+                if (!localStorage.getItem('coderulit-theme')) {
+                    this.setTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+    }">
+    <div
+        class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
+
+        <!-- Верхняя панель -->
+        <header class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none">
+            <div class="navbar-start">
+                <button class="btn btn-ghost btn-circle btn-sm text-base-content" aria-label="Настройки"
+                    title="Настройки">
+                    <span class="material-symbols-rounded text-2xl">settings</span>
+                </button>
+            </div>
+            <div class="navbar-center">
+                <h1 class="text-lg font-bold tracking-tight text-base-content select-none">КодРулит</h1>
+            </div>
+            <div class="navbar-end">
+                <button @click="toggleTheme()" class="btn btn-ghost btn-circle btn-sm text-base-content"
+                    :aria-label="theme === 'dark' ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'"
+                    :title="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'">
+                    <span class="material-symbols-rounded text-2xl"
+                        x-text="theme === 'dark' ? 'light_mode' : 'dark_mode'"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Страница -->
+        <main class="flex-1 overflow-y-auto px-4 py-6 flex flex-col items-center justify-center">
+        </main>
+
+        <!-- Навигация -->
+        <nav class="p-3 sticky bottom-0 z-40 bg-linear-to-t from-base-100 via-base-100/80 to-transparent">
+            <div
+                class="dock dock-sm dock-telegram rounded-2xl shadow-lg border border-base-300 bg-base-200/95 backdrop-blur-md px-1">
+                <!-- Главная -->
+                <button @click="activeTab = 'home'"
+                    :class="activeTab === 'home' ? 'dock-active text-sky-500' : 'text-base-content/60 hover:text-base-content'"
+                    class="transition-colors" aria-label="Главная">
+                    <span class="material-symbols-rounded text-2xl"
+                        :class="{ 'filled': activeTab === 'home' }">home</span>
+                    <span class="dock-label text-[11px] font-medium">Главная</span>
+                </button>
+
+                <!-- Уроки -->
+                <button @click="activeTab = 'lessons'"
+                    :class="activeTab === 'lessons' ? 'dock-active text-sky-500' : 'text-base-content/60 hover:text-base-content'"
+                    class="transition-colors" aria-label="Уроки">
+                    <span class="material-symbols-rounded text-2xl"
+                        :class="{ 'filled': activeTab === 'lessons' }">code</span>
+                    <span class="dock-label text-[11px] font-medium">Уроки</span>
+                </button>
+
+                <!-- Знания -->
+                <button @click="activeTab = 'knowledge'"
+                    :class="activeTab === 'knowledge' ? 'dock-active text-sky-500' : 'text-base-content/60 hover:text-base-content'"
+                    class="transition-colors" aria-label="Знания">
+                    <span class="material-symbols-rounded text-2xl"
+                        :class="{ 'filled': activeTab === 'knowledge' }">menu_book</span>
+                    <span class="dock-label text-[11px] font-medium">Знания</span>
+                </button>
+
+                <!-- Профиль -->
+                <button @click="activeTab = 'profile'"
+                    :class="activeTab === 'profile' ? 'dock-active text-sky-500' : 'text-base-content/60 hover:text-base-content'"
+                    class="transition-colors" aria-label="Профиль">
+                    <span class="material-symbols-rounded text-2xl"
+                        :class="{ 'filled': activeTab === 'profile' }">person</span>
+                    <span class="dock-label text-[11px] font-medium">Профиль</span>
+                </button>
+            </div>
+        </nav>
+
+    </div>
 </body>
+
 </html>

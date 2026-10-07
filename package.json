@@ -1,5 +1,12 @@
 {
+  "scripts": {
+    "dev": "tailwindcss -i ./app/static/css/styles-index.css -o ./app/static/css/output-index.css --watch --minify"
+  },
   "devDependencies": {
     "daisyui": "^5.7.47"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
   }
 }
