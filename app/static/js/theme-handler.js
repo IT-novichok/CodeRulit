@@ -6,6 +6,7 @@ function themeHandler() {
             this.theme = val;
             localStorage.setItem('coderulit-theme', val);
             document.documentElement.setAttribute('data-theme', val);
+            document.documentElement.classList.toggle('dark', val === 'dark');
         },
 
         toggleTheme() {
@@ -14,6 +15,7 @@ function themeHandler() {
 
         init() {
             document.documentElement.setAttribute('data-theme', this.theme);
+            document.documentElement.classList.toggle('dark', this.theme === 'dark');
             window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
                 if (!localStorage.getItem('coderulit-theme')) {
                     this.setTheme(e.matches ? 'dark' : 'light');

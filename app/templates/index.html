@@ -59,12 +59,15 @@
                                     x-text="streak === 1 ? 'верный ответ' : (streak >= 2 && streak <= 4 ? 'верных ответа' : 'верных ответов')"></span>
                             </div>
 
-                            <p x-show="streak > 0" class="text-xs font-bold text-orange-600 dark:text-orange-400 mt-0.5">Так держать!</p>
-                            <p x-show="streak === 0" class="text-xs font-medium text-base-content/60 mt-0.5">Начни урок, чтобы зажечь огонек</p>
+                            <p x-show="streak > 0"
+                                class="text-xs font-bold text-orange-600 dark:text-orange-400 mt-0.5">Так держать!</p>
+                            <p x-show="streak === 0" class="text-xs font-medium text-base-content/60 mt-0.5">Начни урок,
+                                чтобы зажечь огонек</p>
                         </div>
 
                         <!-- Демо -->
-                        <button @click="streak = streak > 0 ? 0 : 3" class="btn btn-ghost btn-circle btn-xs text-base-content/40 hover:text-base-content"
+                        <button @click="streak = streak > 0 ? 0 : 3"
+                            class="btn btn-ghost btn-circle btn-xs text-base-content/40 hover:text-base-content"
                             :title="streak > 0 ? 'Переключить на 0 (демо)' : 'Зажечь огонь (демо)'">
                             <span class="material-symbols-rounded text-sm">sync</span>
                         </button>
@@ -73,18 +76,24 @@
 
                 <!-- Продолжить урок -->
                 <template x-if="hasStartedLesson">
-                    <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
+                    <div
+                        class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
                         <div class="card-body p-4.5 gap-3.5">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
-                                    <span class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Текущий маршрут</span>
+                                    <span
+                                        class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Текущий
+                                        маршрут</span>
                                     <span class="text-[11px] font-medium text-base-content/60">Маршрут #1 · Такси</span>
                                 </div>
-                                <button @click="hasStartedLesson = false" class="text-[10px] font-medium text-base-content/40 hover:text-base-content" title="Сбросить урок (демо)">Сбросить</button>
+                                <button @click="hasStartedLesson = false"
+                                    class="text-[10px] font-medium text-base-content/40 hover:text-base-content"
+                                    title="Сбросить урок (демо)">Сбросить</button>
                             </div>
 
                             <div>
-                                <h3 class="text-base font-bold text-base-content tracking-tight">Основы движения: Вперёд и назад</h3>
+                                <h3 class="text-base font-bold text-base-content tracking-tight">Основы движения: Вперёд
+                                    и назад</h3>
                             </div>
 
                             <div class="space-y-1.5">
@@ -92,10 +101,12 @@
                                     <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
                                     <span class="font-bold text-sky-500">60%</span>
                                 </div>
-                                <progress class="progress progress-primary w-full h-2.5 rounded-full" value="60" max="100"></progress>
+                                <progress class="progress progress-primary w-full h-2.5 rounded-full" value="60"
+                                    max="100"></progress>
                             </div>
 
-                            <button @click="activeTab = 'lessons'" class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1">
+                            <button @click="activeTab = 'lessons'"
+                                class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1">
                                 <span>Продолжить урок</span>
                                 <span class="material-symbols-rounded text-lg">play_arrow</span>
                             </button>
@@ -105,18 +116,25 @@
 
                 <!-- Начать урок -->
                 <template x-if="!hasStartedLesson">
-                    <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
+                    <div
+                        class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
                         <div class="card-body p-4.5 gap-3.5">
                             <div class="flex items-center justify-between">
-                                <span class="badge badge-soft badge-neutral font-bold text-[11px] px-2 rounded-full">Новый старт</span>
-                                <button @click="hasStartedLesson = true" class="text-[10px] font-medium text-base-content/40 hover:text-base-content" title="Включить начатый урок (демо)">Демо</button>
+                                <span
+                                    class="badge badge-soft badge-neutral font-bold text-[11px] px-2 rounded-full">Новый
+                                    старт</span>
+                                <button @click="hasStartedLesson = true"
+                                    class="text-[10px] font-medium text-base-content/40 hover:text-base-content"
+                                    title="Включить начатый урок (демо)">Демо</button>
                             </div>
 
                             <div>
-                                <h3 class="text-base font-bold text-base-content tracking-tight">Основы движения: Вперёд и назад</h3>
+                                <h3 class="text-base font-bold text-base-content tracking-tight">Основы движения: Вперёд
+                                    и назад</h3>
                             </div>
 
-                            <button @click="activeTab = 'lessons'" class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1">
+                            <button @click="activeTab = 'lessons'"
+                                class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1">
                                 <span>Начать урок</span>
                                 <span class="material-symbols-rounded text-lg">flag</span>
                             </button>
@@ -130,9 +148,11 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-rounded text-amber-500 text-lg">crisis_alert</span>
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Задания дня</h4>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Задания дня
+                                </h4>
                             </div>
-                            <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">1/3 выполнено</span>
+                            <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">1/3
+                                выполнено</span>
                         </div>
 
                         <div class="space-y-3.5 divide-y divide-base-300/60">
@@ -140,7 +160,9 @@
                             <div class="space-y-1.5 pt-0">
                                 <div class="flex items-center justify-between">
                                     <p class="text-xs font-bold text-base-content">3 маршрута без столкновений</p>
-                                    <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+50 XP</span>
+                                    <span
+                                        class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+50
+                                        XP</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Пройди уровни без единого столкновения</p>
                                 <div class="space-y-1 pt-0.5">
@@ -148,7 +170,8 @@
                                         <span>Прогресс</span>
                                         <span class="font-semibold">2 / 3</span>
                                     </div>
-                                    <progress class="progress progress-warning w-full h-2 rounded-full" value="2" max="3"></progress>
+                                    <progress class="progress progress-warning w-full h-2 rounded-full" value="2"
+                                        max="3"></progress>
                                 </div>
                             </div>
 
@@ -157,17 +180,22 @@
                                 <div class="flex items-center justify-between">
                                     <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
                                         <span>Идеальный поворот</span>
-                                        <span class="material-symbols-rounded text-success text-sm filled">check_circle</span>
+                                        <span
+                                            class="material-symbols-rounded text-success text-sm filled">check_circle</span>
                                     </p>
-                                    <span class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+30 XP</span>
+                                    <span
+                                        class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+30
+                                        XP</span>
                                 </div>
-                                <p class="text-[11px] text-base-content/60">Используй команды «вправо» и «влево» 10 раз</p>
+                                <p class="text-[11px] text-base-content/60">Используй команды «вправо» и «влево» 10 раз
+                                </p>
                                 <div class="space-y-1 pt-0.5">
                                     <div class="flex justify-between text-[11px] text-base-content/70">
                                         <span class="text-success font-medium">Выполнено!</span>
                                         <span class="font-semibold text-success">10 / 10</span>
                                     </div>
-                                    <progress class="progress progress-success w-full h-2 rounded-full" value="10" max="10"></progress>
+                                    <progress class="progress progress-success w-full h-2 rounded-full" value="10"
+                                        max="10"></progress>
                                 </div>
                             </div>
 
@@ -175,7 +203,9 @@
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <p class="text-xs font-bold text-base-content">Логический маневр</p>
-                                    <span class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+40 XP</span>
+                                    <span
+                                        class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+40
+                                        XP</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Примени условие «если спереди_свободно»</p>
                                 <div class="space-y-1 pt-0.5">
@@ -183,7 +213,8 @@
                                         <span>Прогресс</span>
                                         <span class="font-semibold">1 / 4</span>
                                     </div>
-                                    <progress class="progress progress-primary w-full h-2 rounded-full" value="1" max="4"></progress>
+                                    <progress class="progress progress-primary w-full h-2 rounded-full" value="1"
+                                        max="4"></progress>
                                 </div>
                             </div>
                         </div>
@@ -241,18 +272,21 @@
                 </button>
 
                 <!-- 1. Базовое движение (вперед, назад, вправо, влево) -->
-                <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
+                <div
+                    class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
                     <div class="card-body p-4.5 gap-3.5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="badge badge-soft font-bold text-[11px] px-2 rounded-full"
                                     :class="completedLessons >= 1 ? 'badge-success' : 'badge-primary'">Урок 1</span>
                             </div>
-                            <span x-show="completedLessons >= 1" class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
+                            <span x-show="completedLessons >= 1"
+                                class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
                                 <span class="material-symbols-rounded text-xs filled">check</span>
                                 <span>Пройдено</span>
                             </span>
-                            <span x-show="completedLessons === 0" class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
+                            <span x-show="completedLessons === 0"
+                                class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
                                 Доступно
                             </span>
                         </div>
@@ -277,30 +311,33 @@
                             class="btn rounded-2xl w-full font-bold gap-2 mt-1"
                             :class="completedLessons >= 1 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
                             <span x-text="completedLessons >= 1 ? 'Пройти заново' : 'Начать урок'"></span>
-                            <span class="material-symbols-rounded text-lg" x-text="completedLessons >= 1 ? 'replay' : 'play_arrow'"></span>
+                            <span class="material-symbols-rounded text-lg"
+                                x-text="completedLessons >= 1 ? 'replay' : 'play_arrow'"></span>
                         </button>
                     </div>
                 </div>
 
                 <!-- 2. Цикл со счетчиком (сделать A x раз) -->
-                <div class="card card-border rounded-3xl transition-all"
-                    :class="completedLessons >= 1 
+                <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 1 
                         ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
                     <div class="card-body p-4.5 gap-3.5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="badge badge-soft font-bold text-[11px] px-2 rounded-full"
-                                    :class="completedLessons >= 2 ? 'badge-success' : (completedLessons >= 1 ? 'badge-primary' : 'badge-ghost')">Урок 2</span>
+                                    :class="completedLessons >= 2 ? 'badge-success' : (completedLessons >= 1 ? 'badge-primary' : 'badge-ghost')">Урок
+                                    2</span>
                             </div>
                             <div x-show="completedLessons < 1" class="flex items-center gap-1 text-base-content/50">
                                 <span class="material-symbols-rounded text-lg">lock</span>
                             </div>
-                            <span x-show="completedLessons >= 2" class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
+                            <span x-show="completedLessons >= 2"
+                                class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
                                 <span class="material-symbols-rounded text-xs filled">check</span>
                                 <span>Пройдено</span>
                             </span>
-                            <span x-show="completedLessons === 1" class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
+                            <span x-show="completedLessons === 1"
+                                class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
                                 В процессе
                             </span>
                         </div>
@@ -327,38 +364,41 @@
                             </p>
                         </div>
 
-                        <button x-show="completedLessons >= 1"
-                            @click="completedLessons = Math.max(completedLessons, 2)"
+                        <button x-show="completedLessons >= 1" @click="completedLessons = Math.max(completedLessons, 2)"
                             class="btn rounded-2xl w-full font-bold gap-2 mt-1"
                             :class="completedLessons >= 2 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
                             <span x-text="completedLessons >= 2 ? 'Пройти заново' : 'Продолжить урок'"></span>
-                            <span class="material-symbols-rounded text-lg" x-text="completedLessons >= 2 ? 'replay' : 'play_arrow'"></span>
+                            <span class="material-symbols-rounded text-lg"
+                                x-text="completedLessons >= 2 ? 'replay' : 'play_arrow'"></span>
                         </button>
-                        <button x-show="completedLessons < 1" disabled class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
+                        <button x-show="completedLessons < 1" disabled
+                            class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
                             <span>Заблокировано</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- 3. Условия (если A, то сделать Б) -->
-                <div class="card card-border rounded-3xl transition-all"
-                    :class="completedLessons >= 2 
+                <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 2 
                         ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
                     <div class="card-body p-4.5 gap-3.5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="badge badge-soft font-bold text-[11px] px-2 rounded-full"
-                                    :class="completedLessons >= 3 ? 'badge-success' : (completedLessons >= 2 ? 'badge-primary' : 'badge-ghost')">Урок 3</span>
+                                    :class="completedLessons >= 3 ? 'badge-success' : (completedLessons >= 2 ? 'badge-primary' : 'badge-ghost')">Урок
+                                    3</span>
                             </div>
                             <div x-show="completedLessons < 2" class="flex items-center gap-1 text-base-content/50">
                                 <span class="material-symbols-rounded text-lg">lock</span>
                             </div>
-                            <span x-show="completedLessons >= 3" class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
+                            <span x-show="completedLessons >= 3"
+                                class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
                                 <span class="material-symbols-rounded text-xs filled">check</span>
                                 <span>Пройдено</span>
                             </span>
-                            <span x-show="completedLessons === 2" class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
+                            <span x-show="completedLessons === 2"
+                                class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
                                 Доступно
                             </span>
                         </div>
@@ -385,38 +425,41 @@
                             </p>
                         </div>
 
-                        <button x-show="completedLessons >= 2"
-                            @click="completedLessons = Math.max(completedLessons, 3)"
+                        <button x-show="completedLessons >= 2" @click="completedLessons = Math.max(completedLessons, 3)"
                             class="btn rounded-2xl w-full font-bold gap-2 mt-1"
                             :class="completedLessons >= 3 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
                             <span x-text="completedLessons >= 3 ? 'Пройти заново' : 'Начать урок'"></span>
-                            <span class="material-symbols-rounded text-lg" x-text="completedLessons >= 3 ? 'replay' : 'play_arrow'"></span>
+                            <span class="material-symbols-rounded text-lg"
+                                x-text="completedLessons >= 3 ? 'replay' : 'play_arrow'"></span>
                         </button>
-                        <button x-show="completedLessons < 2" disabled class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
+                        <button x-show="completedLessons < 2" disabled
+                            class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
                             <span>Заблокировано</span>
                         </button>
                     </div>
                 </div>
 
                 <!-- 4. Условный цикл (делать А пока Б) -->
-                <div class="card card-border rounded-3xl transition-all"
-                    :class="completedLessons >= 3 
+                <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 3 
                         ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
                     <div class="card-body p-4.5 gap-3.5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="badge badge-soft font-bold text-[11px] px-2 rounded-full"
-                                    :class="completedLessons >= 4 ? 'badge-success' : (completedLessons >= 3 ? 'badge-primary' : 'badge-ghost')">Урок 4</span>
+                                    :class="completedLessons >= 4 ? 'badge-success' : (completedLessons >= 3 ? 'badge-primary' : 'badge-ghost')">Урок
+                                    4</span>
                             </div>
                             <div x-show="completedLessons < 3" class="flex items-center gap-1 text-base-content/50">
                                 <span class="material-symbols-rounded text-lg">lock</span>
                             </div>
-                            <span x-show="completedLessons >= 4" class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
+                            <span x-show="completedLessons >= 4"
+                                class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">
                                 <span class="material-symbols-rounded text-xs filled">check</span>
                                 <span>Пройдено</span>
                             </span>
-                            <span x-show="completedLessons === 3" class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
+                            <span x-show="completedLessons === 3"
+                                class="badge badge-soft badge-primary font-bold text-[10px] rounded-full">
                                 Доступно
                             </span>
                         </div>
@@ -443,22 +486,23 @@
                             </p>
                         </div>
 
-                        <button x-show="completedLessons >= 3"
-                            @click="completedLessons = Math.max(completedLessons, 4)"
+                        <button x-show="completedLessons >= 3" @click="completedLessons = Math.max(completedLessons, 4)"
                             class="btn rounded-2xl w-full font-bold gap-2 mt-1"
                             :class="completedLessons >= 4 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
                             <span x-text="completedLessons >= 4 ? 'Пройти заново' : 'Начать урок'"></span>
-                            <span class="material-symbols-rounded text-lg" x-text="completedLessons >= 4 ? 'replay' : 'play_arrow'"></span>
+                            <span class="material-symbols-rounded text-lg"
+                                x-text="completedLessons >= 4 ? 'replay' : 'play_arrow'"></span>
                         </button>
-                        <button x-show="completedLessons < 3" disabled class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
+                        <button x-show="completedLessons < 3" disabled
+                            class="btn btn-disabled rounded-2xl w-full font-medium mt-1">
                             <span>Заблокировано</span>
                         </button>
                     </div>
                 </div>
             </div>
+
             <!-- Знания -->
             <div x-show="activeTab === 'knowledge'" class="space-y-4 pb-4">
-                <!-- Заголовок страницы -->
                 <div class="flex items-center justify-between pt-1">
                     <div>
                         <p class="text-xs font-semibold text-base-content/60 tracking-wider uppercase">Справочник</p>
@@ -470,196 +514,576 @@
                     </span>
                 </div>
 
-                <!-- Вводная карточка -->
-                <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
-                    <div class="card-body p-4.5 gap-2">
-                        <div class="flex items-center gap-2">
-                            <span class="material-symbols-rounded text-sky-500 text-lg">code</span>
-                            <h3 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Русский алгоритмический язык</h3>
-                        </div>
-                        <p class="text-xs text-base-content/70 leading-relaxed">
-                            Используется понятный синтаксис на русском языке для управления исполнителем на игровом поле. Ниже приведены все доступные команды и конструкции по урокам.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- 1. Базовое движение (Урок 1) -->
-                <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
-                    <div class="card-body p-4.5 gap-3.5">
-                        <div class="flex items-center justify-between">
+                <!-- 0. Что такое алгоритм и программирование? (Основы) -->
+                <details
+                    class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
+                    <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
+                        <div class="flex items-center justify-between pr-5">
                             <div class="flex items-center gap-2">
-                                <span class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Урок 1</span>
-                                <span class="text-[11px] font-medium text-base-content/60">Базовые команды</span>
+                                <span
+                                    class="badge badge-soft badge-secondary font-bold text-[11px] px-2 rounded-full">Основы
+                                    IT</span>
                             </div>
-                            <span class="badge badge-soft badge-neutral text-[10px] font-bold rounded-full">4 команды</span>
+                        </div>
+                        <div class="mt-2 pr-5">
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Что такое алгоритм и
+                                программа?</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Как компьютер понимает команды и почему важна
+                                точность</p>
+                        </div>
+                    </summary>
+                    <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
+                        <div class="divider my-1 border-base-300/60"></div>
+
+                        <!-- Концепт -->
+                        <div class="space-y-1.5">
+                            <h4 class="font-bold text-base-content flex items-center gap-1.5">
+                                <span class="material-symbols-rounded text-sky-500 text-base">psychology</span>
+                                <span>Суть концепции: Язык инструкций</span>
+                            </h4>
+                            <p class="leading-relaxed">
+                                Компьютер или автопилот автомобиля не умеют думать самостоятельно. Они не обладают
+                                интуицией и не могут «догадаться», чего от них хотят. Чтобы машина выполнила задачу,
+                                программист составляет для неё <b class="text-base-content">алгоритм</b>.
+                            </p>
+                            <p class="leading-relaxed">
+                                <b class="text-base-content">Программа</b> — это алгоритм, записанный на формальном
+                                языке программирования, который компьютер способен исполнять шаг за шагом без участия
+                                человека.
+                            </p>
+                        </div>
+
+                        <!-- Понятие исполнителя -->
+                        <div class="p-3 rounded-2xl bg-base-100/80 border border-base-300/70 space-y-2">
+                            <h5
+                                class="font-bold text-base-content flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-sky-500">
+                                <span class="material-symbols-rounded text-sm">directions_car</span>
+                                <span>Понятие «Исполнитель»</span>
+                            </h5>
+                            <p class="leading-relaxed">
+                                <b class="text-base-content">Исполнитель</b> — это объект (наш автомобиль, такси или
+                                робот), который выполняет команды. У каждого исполнителя есть строго ограниченная
+                                <b>система команд (СКИ)</b>. Он умеет делать только те действия, которые в него заложены
+                                заранее, и ничего сверх того.
+                            </p>
+                        </div>
+
+                        <!-- Свойства алгоритма -->
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-base-content">Главные правила любого алгоритма:</h4>
+                            <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
+                                    <span class="font-bold text-sky-500 block">1. Дискретность</span>
+                                    <span class="text-base-content/70 mt-0.5 block">Разбит на чёткие отдельные
+                                        шаги</span>
+                                </div>
+                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
+                                    <span class="font-bold text-sky-500 block">2. Понятность</span>
+                                    <span class="text-base-content/70 mt-0.5 block">Содержит только известные
+                                        команды</span>
+                                </div>
+                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
+                                    <span class="font-bold text-sky-500 block">3. Точность</span>
+                                    <span class="text-base-content/70 mt-0.5 block">Однозначен: нет
+                                        двусмысленности</span>
+                                </div>
+                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
+                                    <span class="font-bold text-sky-500 block">4. Результат</span>
+                                    <span class="text-base-content/70 mt-0.5 block">Всегда приводит к решению
+                                        задачи</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ошибки / Баги -->
+                        <div
+                            class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 space-y-1">
+                            <div class="flex items-center gap-1.5 font-bold text-xs">
+                                <span class="material-symbols-rounded text-sm text-amber-500">bug_report</span>
+                                <span>Ошибки в коде (Баги)</span>
+                            </div>
+                            <p class="text-[11px] leading-relaxed">
+                                Ошибку в программе программисты называют <b>багом (bug)</b>. Если вы забыли повернуть
+                                или указали лишний шаг, автопилот врежется в ограждение. Поиск и исправление ошибок
+                                называется <b>отладкой (debugging)</b>.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 1. Базовое движение: Линейные алгоритмы -->
+                <details
+                    class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
+                    <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
+                        <div class="flex items-center justify-between pr-5">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Урок
+                                    1</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 pr-5">
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Линейные алгоритмы:
+                                Движение</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Последовательное выполнение команд сверху
+                                вниз</p>
+                        </div>
+                    </summary>
+                    <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
+                        <div class="divider my-1 border-base-300/60"></div>
+
+                        <div class="space-y-1.5">
+                            <h4 class="font-bold text-base-content flex items-center gap-1.5">
+                                <span
+                                    class="material-symbols-rounded text-sky-500 text-base">format_list_numbered</span>
+                                <span>Концепция: Линейная структура программы</span>
+                            </h4>
+                            <p class="leading-relaxed">
+                                <b class="text-base-content">Линейный алгоритм</b> — это простейшая форма программы. Все
+                                инструкции выполняются строго последовательно друг за другом: первая строка, затем
+                                вторая, затем третья.
+                            </p>
+                            <p class="leading-relaxed">
+                                <b>Порядок имеет решающее значение!</b> Сравните: «надеть носки, затем обуть ботинки» и
+                                наоборот. В коде то же самое: команда <code
+                                    class="font-mono text-sky-500 font-bold">повернуть направо</code>, выполненная
+                                <i>до</i> или <i>после</i> шага вперед, приведёт машину в совершенно разные точки!
+                            </p>
+                        </div>
+
+                        <div class="space-y-2">
+                            <h4 class="font-bold text-base-content">Справочник доступных команд:</h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                <div
+                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
+                                    <code
+                                        class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">вперед</code>
+                                    <span class="text-base-content/70 text-[11px]">Движение на 1 клетку вперёд по
+                                        направлению машины</span>
+                                </div>
+                                <div
+                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
+                                    <code
+                                        class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">назад</code>
+                                    <span class="text-base-content/70 text-[11px]">Откат на 1 клетку назад без изменения
+                                        ориентации</span>
+                                </div>
+                                <div
+                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
+                                    <code
+                                        class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">повернуть направо</code>
+                                    <span class="text-base-content/70 text-[11px]">Разворот корпуса на 90° по часовой
+                                        стрелке</span>
+                                </div>
+                                <div
+                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
+                                    <code
+                                        class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">повернуть налево</code>
+                                    <span class="text-base-content/70 text-[11px]">Разворот корпуса на 90° против
+                                        часовой стрелки</span>
+                                </div>
+                                <div
+                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
+                                    <code
+                                        class="font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md w-fit">загрузить</code>
+                                    <span class="text-base-content/70 text-[11px]">Посадить пассажира или забрать
+                                        контейнер с грузом</span>
+                                </div>
+                                <div
+                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
+                                    <code
+                                        class="font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md w-fit">выгрузить</code>
+                                    <span class="text-base-content/70 text-[11px]">Высадить пассажира в точке
+                                        назначения</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример:
+                                Маршрут такси</p>
+                            <pre
+                                class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед
+вперед
+повернуть направо
+вперед
+загрузить</pre>
+                            <p class="text-[11px] text-base-content/60 italic">
+                                Программа проезжает 2 квартала вперед, поворачивает направо, доезжает до пассажира и
+                                сажает его в салон.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 2. Цикл со счетчиком -->
+                <details
+                    class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
+                    <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
+                        <div class="flex items-center justify-between pr-5">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Урок
+                                    2</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 pr-5">
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Циклы со счётчиком:
+                                Автоматизация и DRY</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Повторение команд без дублирования кода</p>
+                        </div>
+                    </summary>
+                    <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
+                        <div class="divider my-1 border-base-300/60"></div>
+
+                        <div class="space-y-1.5">
+                            <h4 class="font-bold text-base-content flex items-center gap-1.5">
+                                <span class="material-symbols-rounded text-sky-500 text-base">repeat</span>
+                                <span>Концепция: Зачем нужны циклы?</span>
+                            </h4>
+                            <p class="leading-relaxed">
+                                В реальных задачах действия часто повторяются. Если вам нужно проехать по прямой 10
+                                перекрёстков, писать 10 раз команду <code
+                                    class="font-mono text-sky-500 font-bold">вперед</code> долго, некрасиво и
+                                утомительно. Легко случайно написать 9 или 11 раз и ошибиться.
+                            </p>
+                            <p class="leading-relaxed">
+                                В разработке существует фундаментальное правило — <b class="text-base-content">DRY
+                                    (Don't Repeat Yourself / Не повторяйся)</b>. Программист не должен копировать
+                                однотипный код вручную. Для автоматизации повторений служат <b
+                                    class="text-base-content">циклы</b>.
+                            </p>
+                        </div>
+
+                        <div class="p-3 rounded-2xl bg-base-100/80 border border-base-300/70 space-y-1.5">
+                            <h5 class="font-bold text-base-content text-[11px] uppercase tracking-wider text-sky-500">
+                                Как это работает внутри?
+                            </h5>
+                            <p class="leading-relaxed">
+                                • <b class="text-base-content">Итерация</b> — это один отдельный шаг (виток) выполнения
+                                цикла.<br>
+                                • <b class="text-base-content">Счётчик</b> — внутреннее число, которое компьютер
+                                увеличивает на каждой итерации. Когда счётчик достигает заданного предела, цикл
+                                останавливается.
+                            </p>
+                        </div>
+
+                        <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 space-y-1.5 text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-base-content">Формат записи:</span>
+                                <code
+                                    class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg">[действие] X раз</code>
+                            </div>
+                            <p class="text-[11px] text-base-content/70">
+                                Где <b class="text-base-content">действие</b> — любая базовая команда, а <b
+                                    class="text-base-content">X</b> — точное количество повторений (целое положительное
+                                число).
+                            </p>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Сравнение:
+                                Без цикла vs С циклом</p>
+                            <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
+                                <div class="p-2 rounded-2xl bg-error/10 border border-error/20 text-base-content">
+                                    <span class="text-error font-sans font-bold text-[10px] block mb-1">Ручной повтор
+                                        (громоздко):</span>
+                                    вперед<br>вперед<br>вперед<br>вперед
+                                </div>
+                                <div class="p-2 rounded-2xl bg-success/10 border border-success/20 text-base-content">
+                                    <span class="text-success font-sans font-bold text-[10px] block mb-1">Цикл
+                                        (лаконично):</span>
+                                    <span class="font-bold text-success">вперед 4 раза</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример
+                                маршрута</p>
+                            <pre
+                                class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед 3 раза
+повернуть направо
+вперед 5 раз</pre>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 3. Условия и датчики: Ветвление -->
+                <details
+                    class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
+                    <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
+                        <div class="flex items-center justify-between pr-5">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Урок
+                                    3</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 pr-5">
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Ветвление: Условия и
+                                принятие решений</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Логика «Если... то... иначе» и сенсоры
+                                автопилота</p>
+                        </div>
+                    </summary>
+                    <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
+                        <div class="divider my-1 border-base-300/60"></div>
+
+                        <div class="space-y-1.5">
+                            <h4 class="font-bold text-base-content flex items-center gap-1.5">
+                                <span class="material-symbols-rounded text-sky-500 text-base">alt_route</span>
+                                <span>Концепция: Как программа делает выбор?</span>
+                            </h4>
+                            <p class="leading-relaxed">
+                                В реальном городе на дорогах появляются пробки, внезапные заборы и пешеходы. Линейная
+                                программа «слепа» — она выполняет заученные шаги и неизбежно врежется в неожиданную
+                                преграду.
+                            </p>
+                            <p class="leading-relaxed">
+                                <b class="text-base-content">Ветвление</b> позволяет программе выбирать разные пути
+                                выполнения в зависимости от ситуации. Компьютер задает вопрос: «Истинно ли условие?» (Да
+                                / Нет). В зависимости от ответа выполняется нужный блок кода.
+                            </p>
+                        </div>
+
+                        <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 space-y-2 text-xs">
+                            <div class="space-y-1">
+                                <span class="font-bold text-base-content">1. Неполное ветвление (только действие при
+                                    успехе):</span>
+                                <div class="bg-base-200/80 p-2 rounded-xl font-mono text-sky-500 font-bold">
+                                    если &lt;условие&gt; то: &lt;команда&gt;
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <span class="font-bold text-base-content">2. Полное ветвление (с альтернативным планом
+                                    «иначе»):</span>
+                                <div class="bg-base-200/80 p-2 rounded-xl font-mono text-sky-500 font-bold">
+                                    если &lt;условие&gt; то: &lt;команда 1&gt; иначе: &lt;команда 2&gt;
+                                </div>
+                            </div>
                         </div>
 
                         <div>
-                            <h3 class="text-base font-bold text-base-content tracking-tight">Движение и повороты</h3>
-                            <p class="text-xs text-base-content/60 mt-0.5">Команды для перемещения исполнителя по сетке поля</p>
+                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider mb-2">Датчики
+                                пространства автопилота</p>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
+                                    <code
+                                        class="font-mono font-bold text-amber-500 block text-[11px]">спереди_свободно</code>
+                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Впереди нет стены или
+                                        машины</span>
+                                </div>
+                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
+                                    <code
+                                        class="font-mono font-bold text-amber-500 block text-[11px]">сзади_свободно</code>
+                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Сзади свободная
+                                        клетка</span>
+                                </div>
+                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
+                                    <code
+                                        class="font-mono font-bold text-amber-500 block text-[11px]">слева_свободно</code>
+                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Слева свободная
+                                        полоса</span>
+                                </div>
+                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
+                                    <code
+                                        class="font-mono font-bold text-amber-500 block text-[11px]">справа_свободно</code>
+                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Справа свободная
+                                        полоса</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1">
+                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример
+                                объезда препятствия</p>
+                            <pre
+                                class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">если спереди_свободно то:
+    вперед
+иначе:
+    повернуть направо</pre>
+                            <p class="text-[11px] text-base-content/60 italic">
+                                Машина едет прямо только тогда, когда путь чист. Если впереди препятствие, машина
+                                сворачивает в объезд.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <details
+                    class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
+                    <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
+                        <div class="flex items-center justify-between pr-5">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Урок
+                                    4</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 pr-5">
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Условный цикл:
+                                Неопределённые маршруты</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Повторение до тех пор, пока выполняется
+                                условие</p>
+                        </div>
+                    </summary>
+                    <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
+                        <div class="divider my-1 border-base-300/60"></div>
+
+                        <div class="space-y-1.5">
+                            <h4 class="font-bold text-base-content flex items-center gap-1.5">
+                                <span class="material-symbols-rounded text-sky-500 text-base">sync_alt</span>
+                                <span>Концепция: Когда неизвестно число шагов?</span>
+                            </h4>
+                            <p class="leading-relaxed">
+                                В цикле со счётчиком (<code class="font-mono text-sky-500 font-bold">3 раза</code>) мы
+                                должны заранее знать длину пути. Но представьте длинную прямую магистраль, где светофор
+                                может загореться в любой момент, или лабиринт, расстояние в котором меняется от карты к
+                                карте.
+                            </p>
+                            <p class="leading-relaxed">
+                                Для таких задач существует <b class="text-base-content">цикл с условием (while)</b>. Он
+                                повторяет действие снова и снова, <b class="text-base-content">пока истинно проверяемое
+                                    условие</b>. Как только условие становится ложным (на пути стена или финиш) — цикл
+                                сам немедленно завершает работу!
+                            </p>
+                        </div>
+
+                        <div
+                            class="p-3 rounded-2xl bg-error/10 border border-error/30 text-red-900 dark:text-red-200 space-y-1">
+                            <div class="flex items-center gap-1.5 font-bold text-xs">
+                                <span class="material-symbols-rounded text-sm text-error">all_inclusive</span>
+                                <span>Ловушка: Бесконечный цикл (Infinite Loop)</span>
+                            </div>
+                            <p class="text-[11px] leading-relaxed">
+                                Если условие цикла никогда не перестаёт выполняться (например, вы проверяете датчик, но
+                                забыли двигаться вперёд), программа попадёт в «вечный цикл» и намертво зависнет. Команды
+                                внутри цикла обязательно должны изменять ситуацию так, чтобы цикл рано или поздно
+                                завершился!
+                            </p>
+                        </div>
+
+                        <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 space-y-1.5 text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="font-bold text-base-content">Конструкция:</span>
+                                <code
+                                    class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg">[действие] пока [условие]</code>
+                            </div>
+                            <p class="text-[11px] text-base-content/70">
+                                Или многострочная запись: <code
+                                    class="font-mono text-sky-500 font-bold">пока &lt;условие&gt; выполнить: &lt;команды&gt;</code>
+                            </p>
+                        </div>
+
+                        <div class="space-y-1">
+                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример:
+                                Движение до упора</p>
+                            <pre
+                                class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед пока спереди_свободно
+повернуть налево</pre>
+                            <p class="text-[11px] text-base-content/60 italic">
+                                Транспорт будет безопасно ехать вперед на любую дистанцию, пока перед капотом чисто, и
+                                остановится ровно перед препятствием для поворота.
+                            </p>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 5. Логические операторы и комбинирование -->
+                <details
+                    class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
+                    <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
+                        <div class="flex items-center justify-between pr-5">
+                            <div class="flex items-center gap-2">
+                                <span
+                                    class="badge badge-soft badge-accent font-bold text-[11px] px-2 rounded-full">Продвинутый</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 pr-5">
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Логические связки и
+                                комбинирование</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Сложные условия и вложенность циклов для
+                                автопилота</p>
+                        </div>
+                    </summary>
+                    <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
+                        <div class="divider my-1 border-base-300/60"></div>
+
+                        <div class="space-y-1.5">
+                            <h4 class="font-bold text-base-content flex items-center gap-1.5">
+                                <span class="material-symbols-rounded text-sky-500 text-base">hub</span>
+                                <span>Концепция: Булева алгебра и связки</span>
+                            </h4>
+                            <p class="leading-relaxed">
+                                В реальном мире решение часто зависит от нескольких обстоятельств сразу: «Мы
+                                поворачиваем, если справа свободно <b class="text-base-content">И</b> горит зеленый
+                                свет». Для объединения условий в программировании используются логические связки:
+                            </p>
                         </div>
 
                         <div class="space-y-2 text-xs">
-                            <div class="flex items-start gap-2.5 p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg shrink-0">вперед</code>
-                                <span class="text-base-content/70">Перемещает исполнителя на 1 клетку вперед</span>
+                            <div
+                                class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
+                                <code
+                                    class="font-mono font-bold text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded-lg shrink-0">И</code>
+                                <div class="text-base-content/70">
+                                    <b class="text-base-content">Конъюнкция:</b> всё выражение истинно только тогда,
+                                    когда <span class="underline">оба</span> условия верны одновременно.
+                                </div>
                             </div>
-                            <div class="flex items-start gap-2.5 p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg shrink-0">назад</code>
-                                <span class="text-base-content/70">Перемещает исполнителя на 1 клетку назад без разворота</span>
+                            <div
+                                class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
+                                <code
+                                    class="font-mono font-bold text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded-lg shrink-0">ИЛИ</code>
+                                <div class="text-base-content/70">
+                                    <b class="text-base-content">Дизъюнкция:</b> истинно, если выполняется <span
+                                        class="underline">хотя бы одно</span> из условий (любое или оба).
+                                </div>
                             </div>
-                            <div class="flex items-start gap-2.5 p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg shrink-0">повернуть направо</code>
-                                <span class="text-base-content/70">Поворачивает исполнителя на 90° по часовой стрелке</span>
-                            </div>
-                            <div class="flex items-start gap-2.5 p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg shrink-0">повернуть налево</code>
-                                <span class="text-base-content/70">Поворачивает исполнителя на 90° против часовой стрелки</span>
+                            <div
+                                class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
+                                <code
+                                    class="font-mono font-bold text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded-lg shrink-0">НЕ</code>
+                                <div class="text-base-content/70">
+                                    <b class="text-base-content">Отрицание:</b> инвертирует результат (было «Истина» —
+                                    стало «Ложь», и наоборот).
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Пример кода -->
-                        <div class="space-y-1">
-                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример программы</p>
-                            <pre class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед
-повернуть направо
-вперед</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Цикл со счетчиком (Урок 2) -->
-                <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
-                    <div class="card-body p-4.5 gap-3.5">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Урок 2</span>
-                                <span class="text-[11px] font-medium text-base-content/60">Повторение</span>
-                            </div>
-                            <span class="badge badge-soft badge-neutral text-[10px] font-bold rounded-full">Счётчик</span>
-                        </div>
-
-                        <div>
-                            <h3 class="text-base font-bold text-base-content tracking-tight">Цикл со счетчиком</h3>
-                            <p class="text-xs text-base-content/60 mt-0.5">Повторяет указанное действие заданное число раз</p>
-                        </div>
-
-                        <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 space-y-1.5 text-xs">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-base-content">Синтаксис:</span>
-                                <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg">Б X раз</code>
-                            </div>
-                            <p class="text-[11px] text-base-content/70">
-                                Где <b class="text-base-content">Б</b> — действие (команда), а <b class="text-base-content">X</b> — количество повторений (например, 2, 3, 5).
+                        <div class="space-y-1.5">
+                            <h4 class="font-bold text-base-content flex items-center gap-1.5">
+                                <span class="material-symbols-rounded text-sky-500 text-base">account_tree</span>
+                                <span>Вложенные конструкции: Условия внутри циклов</span>
+                            </h4>
+                            <p class="leading-relaxed">
+                                Настоящие автопилоты строятся из комбинаций: вы можете поместить условие <code
+                                    class="font-mono text-sky-500 font-bold">если</code> внутрь цикла <code
+                                    class="font-mono text-sky-500 font-bold">пока</code>. Машина будет ехать и на каждом
+                                перекрёстке самостоятельно оценивать обстановку по датчикам!
                             </p>
                         </div>
 
-                        <!-- Пример кода -->
                         <div class="space-y-1">
-                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример программы</p>
-                            <pre class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед 3 раза
-повернуть направо
-вперед 2 раза</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. Условия и датчики (Урок 3) -->
-                <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
-                    <div class="card-body p-4.5 gap-3.5">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Урок 3</span>
-                                <span class="text-[11px] font-medium text-base-content/60">Ветвление</span>
-                            </div>
-                            <span class="badge badge-soft badge-neutral text-[10px] font-bold rounded-full">Условия</span>
-                        </div>
-
-                        <div>
-                            <h3 class="text-base font-bold text-base-content tracking-tight">Условия и датчики</h3>
-                            <p class="text-xs text-base-content/60 mt-0.5">Выполняет действие только в том случае, если условие верно</p>
-                        </div>
-
-                        <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 space-y-1.5 text-xs">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-base-content">Конструкция:</span>
-                                <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg">если А то Б</code>
-                            </div>
-                            <p class="text-[11px] text-base-content/70">
-                                Где <b class="text-base-content">А</b> — проверка датчика, а <b class="text-base-content">Б</b> — выполняемая команда.
+                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример
+                                автопилота с вложенностью</p>
+                            <pre
+                                class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">пока спереди_свободно выполнить:
+    вперед
+    если справа_свободно то:
+        повернуть направо</pre>
+                            <p class="text-[11px] text-base-content/60 italic">
+                                Алгоритм обхода препятствий: машина движется вперед, постоянно сканируя правый поворот
+                                на каждом шаге.
                             </p>
                         </div>
-
-                        <div>
-                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider mb-2">Датчики пространства</p>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
-                                <div class="p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <code class="font-mono font-bold text-amber-500 block text-[11px]">спереди_пусто</code>
-                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Впереди нет стены</span>
-                                </div>
-                                <div class="p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <code class="font-mono font-bold text-amber-500 block text-[11px]">сзади_пусто</code>
-                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Сзади свободно</span>
-                                </div>
-                                <div class="p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <code class="font-mono font-bold text-amber-500 block text-[11px]">слева_пусто</code>
-                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Слева свободно</span>
-                                </div>
-                                <div class="p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <code class="font-mono font-bold text-amber-500 block text-[11px]">справа_пусто</code>
-                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Справа свободно</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Пример кода -->
-                        <div class="space-y-1">
-                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример программы</p>
-                            <pre class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">если спереди_пусто то вперед
-если справа_пусто то повернуть направо</pre>
-                        </div>
                     </div>
-                </div>
-
-                <!-- 4. Условный цикл (Урок 4) -->
-                <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
-                    <div class="card-body p-4.5 gap-3.5">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <span class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Урок 4</span>
-                                <span class="text-[11px] font-medium text-base-content/60">Цикл с условием</span>
-                            </div>
-                            <span class="badge badge-soft badge-neutral text-[10px] font-bold rounded-full">Пока</span>
-                        </div>
-
-                        <div>
-                            <h3 class="text-base font-bold text-base-content tracking-tight">Условный цикл</h3>
-                            <p class="text-xs text-base-content/60 mt-0.5">Повторяет действие, пока истинно условие</p>
-                        </div>
-
-                        <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 space-y-1.5 text-xs">
-                            <div class="flex items-center gap-2">
-                                <span class="font-bold text-base-content">Конструкция:</span>
-                                <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg">А пока Б</code>
-                            </div>
-                            <p class="text-[11px] text-base-content/70">
-                                Где <b class="text-base-content">А</b> — действие, а <b class="text-base-content">Б</b> — условие продолжения (например, состояние датчика).
-                            </p>
-                        </div>
-
-                        <!-- Пример кода -->
-                        <div class="space-y-1">
-                            <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример программы</p>
-                            <pre class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед пока спереди_пусто
-повернуть налево</pre>
-                        </div>
-                    </div>
-                </div>
+                </details>
             </div>
 
             <!-- Профиль -->
             <div x-show="activeTab === 'profile'" class="space-y-4 pb-4">
-                <!-- Заголовок страницы -->
                 <div class="flex items-center justify-between pt-1">
                     <div>
                         <p class="text-xs font-semibold text-base-content/60 tracking-wider uppercase">Игрок</p>
@@ -671,20 +1095,23 @@
                     </span>
                 </div>
 
-                <!-- Карточка профиля (Hero Card) -->
+                <!-- Карточка профиля -->
                 <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
                     <div class="card-body p-4.5 gap-4">
                         <div class="flex items-center gap-3.5">
                             <div class="relative shrink-0">
-                                <div class="w-14 h-14 rounded-2xl bg-linear-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white font-black text-2xl shadow-sm">
+                                <div
+                                    class="w-14 h-14 rounded-2xl bg-linear-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white font-black text-2xl shadow-sm">
                                     А
                                 </div>
-                                <span class="absolute -bottom-1 -right-1 bg-amber-500 text-white text-[10px] font-black rounded-full px-1.5 py-0.2 border-2 border-base-200 shadow-xs"
+                                <span
+                                    class="absolute -bottom-1 -right-1 bg-amber-500 text-white text-[10px] font-black rounded-full px-1.5 py-0.2 border-2 border-base-200 shadow-xs"
                                     x-text="'LVL ' + userLevel"></span>
                             </div>
 
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-lg font-black text-base-content tracking-tight truncate" x-text="userName"></h3>
+                                <h3 class="text-lg font-black text-base-content tracking-tight truncate"
+                                    x-text="userName"></h3>
                                 <p class="text-xs text-base-content/60">Начинающий алгоритмист</p>
                                 <div class="flex items-center gap-1.5 mt-1 text-sky-500 font-bold text-xs">
                                     <span class="material-symbols-rounded text-base filled">stars</span>
@@ -699,7 +1126,8 @@
                                 <span class="text-base-content/70 font-medium">Прогресс до 4 уровня</span>
                                 <span class="font-bold text-sky-500" x-text="userXp + ' / 1000 XP'"></span>
                             </div>
-                            <progress class="progress progress-primary w-full h-2.5 rounded-full" :value="userXp" max="1000"></progress>
+                            <progress class="progress progress-primary w-full h-2.5 rounded-full" :value="userXp"
+                                max="1000"></progress>
                         </div>
 
                         <!-- Статистика -->
@@ -716,7 +1144,8 @@
                                 <div class="flex items-center justify-center text-sky-500">
                                     <span class="material-symbols-rounded text-lg filled">school</span>
                                 </div>
-                                <p class="text-sm font-black text-base-content mt-0.5" x-text="completedLessons + ' / 4'"></p>
+                                <p class="text-sm font-black text-base-content mt-0.5"
+                                    x-text="completedLessons + ' / 4'"></p>
                                 <p class="text-[10px] text-base-content/50 font-medium">Уроки</p>
                             </div>
 
@@ -731,15 +1160,18 @@
                     </div>
                 </div>
 
-                <!-- Испытания и достижения -->
+                <!-- Достижения -->
                 <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
                     <div class="card-body p-4.5 gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <span class="material-symbols-rounded text-amber-500 text-lg filled">military_tech</span>
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Достижения</h4>
+                                <span
+                                    class="material-symbols-rounded text-amber-500 text-lg filled">military_tech</span>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Достижения
+                                </h4>
                             </div>
-                            <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">2/5 выполнено</span>
+                            <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">2/5
+                                выполнено</span>
                         </div>
                         <p class="text-[11px] text-base-content/60 -mt-1">
                             Сложные испытания для настоящих мастеров алгоритмического мышления
@@ -750,20 +1182,26 @@
                             <div class="space-y-1.5 pt-0">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-                                            <span class="material-symbols-rounded text-base filled">workspace_premium</span>
+                                        <div
+                                            class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
+                                            <span
+                                                class="material-symbols-rounded text-base filled">workspace_premium</span>
                                         </div>
                                         <p class="text-xs font-bold text-base-content">Гроссмейстер алгоритмов</p>
                                     </div>
-                                    <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+200 XP</span>
+                                    <span
+                                        class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+200
+                                        XP</span>
                                 </div>
-                                <p class="text-[11px] text-base-content/60">Пройди 15 маршрутов без единой ошибки и столкновения</p>
+                                <p class="text-[11px] text-base-content/60">Пройди 15 маршрутов без единой ошибки и
+                                    столкновения</p>
                                 <div class="space-y-1 pt-0.5">
                                     <div class="flex justify-between text-[11px] text-base-content/70">
                                         <span>Прогресс</span>
                                         <span class="font-semibold">11 / 15</span>
                                     </div>
-                                    <progress class="progress progress-warning w-full h-2 rounded-full" value="11" max="15"></progress>
+                                    <progress class="progress progress-warning w-full h-2 rounded-full" value="11"
+                                        max="15"></progress>
                                 </div>
                             </div>
 
@@ -771,23 +1209,29 @@
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
+                                        <div
+                                            class="w-7 h-7 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
                                             <span class="material-symbols-rounded text-base filled">all_inclusive</span>
                                         </div>
                                         <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
                                             <span>Архитектор циклов</span>
-                                            <span class="material-symbols-rounded text-success text-sm filled">check_circle</span>
+                                            <span
+                                                class="material-symbols-rounded text-success text-sm filled">check_circle</span>
                                         </p>
                                     </div>
-                                    <span class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+150 XP</span>
+                                    <span
+                                        class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+150
+                                        XP</span>
                                 </div>
-                                <p class="text-[11px] text-base-content/60">Используй конструкцию «А пока Б» в 10 лабиринтах</p>
+                                <p class="text-[11px] text-base-content/60">Используй конструкцию «А пока Б» в 10
+                                    лабиринтах</p>
                                 <div class="space-y-1 pt-0.5">
                                     <div class="flex justify-between text-[11px] text-base-content/70">
                                         <span class="text-success font-medium">Выполнено!</span>
                                         <span class="font-semibold text-success">10 / 10</span>
                                     </div>
-                                    <progress class="progress progress-success w-full h-2 rounded-full" value="10" max="10"></progress>
+                                    <progress class="progress progress-success w-full h-2 rounded-full" value="10"
+                                        max="10"></progress>
                                 </div>
                             </div>
 
@@ -795,23 +1239,29 @@
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
+                                        <div
+                                            class="w-7 h-7 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
                                             <span class="material-symbols-rounded text-base filled">radar</span>
                                         </div>
                                         <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
                                             <span>Чутьё навигатора</span>
-                                            <span class="material-symbols-rounded text-success text-sm filled">check_circle</span>
+                                            <span
+                                                class="material-symbols-rounded text-success text-sm filled">check_circle</span>
                                         </p>
                                     </div>
-                                    <span class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+120 XP</span>
+                                    <span
+                                        class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+120
+                                        XP</span>
                                 </div>
-                                <p class="text-[11px] text-base-content/60">Примени все 4 датчика («спереди», «сзади», «слева», «справа»)</p>
+                                <p class="text-[11px] text-base-content/60">Примени все 4 датчика («спереди», «сзади»,
+                                    «слева», «справа»)</p>
                                 <div class="space-y-1 pt-0.5">
                                     <div class="flex justify-between text-[11px] text-base-content/70">
                                         <span class="text-success font-medium">Выполнено!</span>
                                         <span class="font-semibold text-success">4 / 4</span>
                                     </div>
-                                    <progress class="progress progress-success w-full h-2 rounded-full" value="4" max="4"></progress>
+                                    <progress class="progress progress-success w-full h-2 rounded-full" value="4"
+                                        max="4"></progress>
                                 </div>
                             </div>
 
@@ -819,20 +1269,25 @@
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
+                                        <div
+                                            class="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
                                             <span class="material-symbols-rounded text-base filled">bolt</span>
                                         </div>
                                         <p class="text-xs font-bold text-base-content">Оптимизатор кода</p>
                                     </div>
-                                    <span class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+250 XP</span>
+                                    <span
+                                        class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+250
+                                        XP</span>
                                 </div>
-                                <p class="text-[11px] text-base-content/60">Реши 8 уровней с кодом не длиннее 5 строк</p>
+                                <p class="text-[11px] text-base-content/60">Реши 8 уровней с кодом не длиннее 5 строк
+                                </p>
                                 <div class="space-y-1 pt-0.5">
                                     <div class="flex justify-between text-[11px] text-base-content/70">
                                         <span>Прогресс</span>
                                         <span class="font-semibold">5 / 8</span>
                                     </div>
-                                    <progress class="progress progress-primary w-full h-2 rounded-full" value="5" max="8"></progress>
+                                    <progress class="progress progress-primary w-full h-2 rounded-full" value="5"
+                                        max="8"></progress>
                                 </div>
                             </div>
 
@@ -840,20 +1295,26 @@
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
-                                        <div class="w-7 h-7 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
-                                            <span class="material-symbols-rounded text-base filled">local_fire_department</span>
+                                        <div
+                                            class="w-7 h-7 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                                            <span
+                                                class="material-symbols-rounded text-base filled">local_fire_department</span>
                                         </div>
                                         <p class="text-xs font-bold text-base-content">Стальная выдержка</p>
                                     </div>
-                                    <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+300 XP</span>
+                                    <span
+                                        class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+300
+                                        XP</span>
                                 </div>
-                                <p class="text-[11px] text-base-content/60">Удерживай серию побед не менее 7 дней подряд</p>
+                                <p class="text-[11px] text-base-content/60">Удерживай серию побед не менее 7 дней подряд
+                                </p>
                                 <div class="space-y-1 pt-0.5">
                                     <div class="flex justify-between text-[11px] text-base-content/70">
                                         <span>Прогресс</span>
                                         <span class="font-semibold" x-text="streak + ' / 7'"></span>
                                     </div>
-                                    <progress class="progress progress-warning w-full h-2 rounded-full" :value="streak" max="7"></progress>
+                                    <progress class="progress progress-warning w-full h-2 rounded-full" :value="streak"
+                                        max="7"></progress>
                                 </div>
                             </div>
                         </div>

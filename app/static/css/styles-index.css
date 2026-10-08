@@ -5,6 +5,8 @@
 @source "../../templates/**/*.html";
 @source "../js/**/*.js";
 
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *, .dark, .dark *));
+
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark;
 }
