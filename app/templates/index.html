@@ -83,8 +83,7 @@
                                 <div class="flex items-center gap-2">
                                     <span
                                         class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Текущий
-                                        маршрут</span>
-                                    <span class="text-[11px] font-medium text-base-content/60">Маршрут #1 · Такси</span>
+                                        урок</span>
                                 </div>
                                 <button @click="hasStartedLesson = false"
                                     class="text-[10px] font-medium text-base-content/40 hover:text-base-content"
@@ -92,8 +91,7 @@
                             </div>
 
                             <div>
-                                <h3 class="text-base font-bold text-base-content tracking-tight">Основы движения: Вперёд
-                                    и назад</h3>
+                                <h3 class="text-base font-bold text-base-content tracking-tight">Цикл со счетчиком</h3>
                             </div>
 
                             <div class="space-y-1.5">
@@ -121,16 +119,14 @@
                         <div class="card-body p-4.5 gap-3.5">
                             <div class="flex items-center justify-between">
                                 <span
-                                    class="badge badge-soft badge-neutral font-bold text-[11px] px-2 rounded-full">Новый
-                                    старт</span>
+                                    class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Начало</span>
                                 <button @click="hasStartedLesson = true"
                                     class="text-[10px] font-medium text-base-content/40 hover:text-base-content"
                                     title="Включить начатый урок (демо)">Демо</button>
                             </div>
 
                             <div>
-                                <h3 class="text-base font-bold text-base-content tracking-tight">Основы движения: Вперёд
-                                    и назад</h3>
+                                <h3 class="text-base font-bold text-base-content tracking-tight">Что такое алгоритм и программа?</h3>
                             </div>
 
                             <button @click="activeTab = 'lessons'"
@@ -162,7 +158,7 @@
                                     <p class="text-xs font-bold text-base-content">3 маршрута без столкновений</p>
                                     <span
                                         class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+50
-                                        XP</span>
+                                        ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Пройди уровни без единого столкновения</p>
                                 <div class="space-y-1 pt-0.5">
@@ -185,7 +181,7 @@
                                     </p>
                                     <span
                                         class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+30
-                                        XP</span>
+                                        ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Используй команды «вправо» и «влево» 10 раз
                                 </p>
@@ -205,7 +201,7 @@
                                     <p class="text-xs font-bold text-base-content">Логический маневр</p>
                                     <span
                                         class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+40
-                                        XP</span>
+                                        ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Примени условие «если спереди_свободно»</p>
                                 <div class="space-y-1 pt-0.5">
@@ -556,7 +552,7 @@
                         <!-- Понятие исполнителя -->
                         <div class="p-3 rounded-2xl bg-base-100/80 border border-base-300/70 space-y-2">
                             <h5
-                                class="font-bold text-base-content flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-sky-500">
+                                class="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-sky-500">
                                 <span class="material-symbols-rounded text-sm">directions_car</span>
                                 <span>Понятие «Исполнитель»</span>
                             </h5>
@@ -756,7 +752,7 @@
                         </div>
 
                         <div class="p-3 rounded-2xl bg-base-100/80 border border-base-300/70 space-y-1.5">
-                            <h5 class="font-bold text-base-content text-[11px] uppercase tracking-wider text-sky-500">
+                            <h5 class="font-bold text-[11px] uppercase tracking-wider text-sky-500">
                                 Как это работает внутри?
                             </h5>
                             <p class="leading-relaxed">
@@ -1089,55 +1085,29 @@
                         <p class="text-xs font-semibold text-base-content/60 tracking-wider uppercase">Игрок</p>
                         <h2 class="text-2xl font-black tracking-tight text-base-content">Профиль</h2>
                     </div>
-                    <span class="badge badge-soft badge-primary font-bold text-xs gap-1.5 py-3.5 px-3 rounded-full">
-                        <span class="material-symbols-rounded text-base text-sky-500 filled">person</span>
-                        <span x-text="'Уровень ' + userLevel"></span>
-                    </span>
                 </div>
 
-                <!-- Карточка профиля -->
                 <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
                     <div class="card-body p-4.5 gap-4">
                         <div class="flex items-center gap-3.5">
-                            <div class="relative shrink-0">
-                                <div
-                                    class="w-14 h-14 rounded-2xl bg-linear-to-tr from-sky-500 to-indigo-500 flex items-center justify-center text-white font-black text-2xl shadow-sm">
-                                    А
-                                </div>
-                                <span
-                                    class="absolute -bottom-1 -right-1 bg-amber-500 text-white text-[10px] font-black rounded-full px-1.5 py-0.2 border-2 border-base-200 shadow-xs"
-                                    x-text="'LVL ' + userLevel"></span>
-                            </div>
 
-                            <div class="flex-1 min-w-0">
-                                <h3 class="text-lg font-black text-base-content tracking-tight truncate"
+                            <div class="flex-1 flex-row min-w-0">
+                                <h3 class="block text-lg font-black text-base-content tracking-tight truncate"
                                     x-text="userName"></h3>
-                                <p class="text-xs text-base-content/60">Начинающий алгоритмист</p>
                                 <div class="flex items-center gap-1.5 mt-1 text-sky-500 font-bold text-xs">
                                     <span class="material-symbols-rounded text-base filled">stars</span>
-                                    <span x-text="userXp + ' XP'"></span>
+                                    <span x-text="userXp + ' ОП'"></span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Прогресс до следующего уровня -->
-                        <div class="space-y-1.5 pt-1">
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="text-base-content/70 font-medium">Прогресс до 4 уровня</span>
-                                <span class="font-bold text-sky-500" x-text="userXp + ' / 1000 XP'"></span>
-                            </div>
-                            <progress class="progress progress-primary w-full h-2.5 rounded-full" :value="userXp"
-                                max="1000"></progress>
-                        </div>
-
-                        <!-- Статистика -->
                         <div class="grid grid-cols-3 gap-2 pt-1 border-t border-base-300/60">
                             <div class="text-center p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
                                 <div class="flex items-center justify-center text-orange-500">
                                     <span class="material-symbols-rounded text-lg filled">local_fire_department</span>
                                 </div>
-                                <p class="text-sm font-black text-base-content mt-0.5" x-text="streak + ' дн.'"></p>
-                                <p class="text-[10px] text-base-content/50 font-medium">Серия</p>
+                                <p class="text-sm font-black text-base-content mt-0.5" x-text="streak"></p>
+                                <p class="text-[10px] text-base-content/50 font-medium">Макс. серия</p>
                             </div>
 
                             <div class="text-center p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
@@ -1154,7 +1124,7 @@
                                     <span class="material-symbols-rounded text-lg filled">military_tech</span>
                                 </div>
                                 <p class="text-sm font-black text-base-content mt-0.5">2 / 5</p>
-                                <p class="text-[10px] text-base-content/50 font-medium">Испытания</p>
+                                <p class="text-[10px] text-base-content/50 font-medium">Достижения</p>
                             </div>
                         </div>
                     </div>
@@ -1173,12 +1143,9 @@
                             <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">2/5
                                 выполнено</span>
                         </div>
-                        <p class="text-[11px] text-base-content/60 -mt-1">
-                            Сложные испытания для настоящих мастеров алгоритмического мышления
-                        </p>
 
                         <div class="space-y-3.5 divide-y divide-base-300/60">
-                            <!-- Достижение 1: Гроссмейстер алгоритмов -->
+                            <!-- 1. Гроссмейстер алгоритмов -->
                             <div class="space-y-1.5 pt-0">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -1191,7 +1158,7 @@
                                     </div>
                                     <span
                                         class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+200
-                                        XP</span>
+                                        ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Пройди 15 маршрутов без единой ошибки и
                                     столкновения</p>
@@ -1205,7 +1172,7 @@
                                 </div>
                             </div>
 
-                            <!-- Достижение 2: Архитектор циклов -->
+                            <!-- 2. Архитектор циклов -->
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -1221,7 +1188,7 @@
                                     </div>
                                     <span
                                         class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+150
-                                        XP</span>
+                                        ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Используй конструкцию «А пока Б» в 10
                                     лабиринтах</p>
@@ -1235,7 +1202,7 @@
                                 </div>
                             </div>
 
-                            <!-- Достижение 3: Чутьё навигатора -->
+                            <!-- 3. Чутьё навигатора -->
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -1251,7 +1218,7 @@
                                     </div>
                                     <span
                                         class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+120
-                                        XP</span>
+                                        ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Примени все 4 датчика («спереди», «сзади»,
                                     «слева», «справа»)</p>
@@ -1265,7 +1232,7 @@
                                 </div>
                             </div>
 
-                            <!-- Достижение 4: Оптимизатор кода -->
+                            <!-- 4. Оптимизатор кода -->
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -1277,7 +1244,7 @@
                                     </div>
                                     <span
                                         class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+250
-                                        XP</span>
+                                        ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Реши 8 уровней с кодом не длиннее 5 строк
                                 </p>
@@ -1291,7 +1258,7 @@
                                 </div>
                             </div>
 
-                            <!-- Достижение 5: Стальная выдержка -->
+                            <!-- 5. Стальная выдержка -->
                             <div class="space-y-1.5 pt-3.5">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
@@ -1304,7 +1271,7 @@
                                     </div>
                                     <span
                                         class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+300
-                                        XP</span>
+                                        ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Удерживай серию побед не менее 7 дней подряд
                                 </p>
