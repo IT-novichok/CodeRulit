@@ -12,12 +12,73 @@
 </head>
 
 <body class="bg-base-200 min-h-screen flex items-center justify-center font-sans antialiased"
-    x-data="{ ...themeHandler(), activeTab: 'home', streak: 3, hasStartedLesson: true, completedLessons: 1, userName: 'Александр', userXp: 640, userLevel: 3 }">
+    x-data="{
+        ...themeHandler(),
+        activeTab: 'home',
+        streak: parseInt(localStorage.getItem('streak') || '0', 10),
+        maxStreak: parseInt(localStorage.getItem('maxStreak') || '0', 10),
+        completedLessons: parseInt(localStorage.getItem('completedLessons') || '0', 10),
+        userName: localStorage.getItem('userName') || '',
+        userXp: parseInt(localStorage.getItem('userXp') || '0', 10),
+        isOnboarding: !localStorage.getItem('userName'),
+        inputName: '',
+        get userLevel() { return Math.max(1, Math.floor(this.userXp / 200) + 1); },
+        get hasStartedLesson() { return this.completedLessons > 0; },
+        get currentLessonName() {
+            const names = ['Базовое движение', 'Цикл со счетчиком', 'Условия', 'Условный цикл'];
+            if (this.completedLessons >= 4) return 'Повторение (Ревизия)';
+            return names[this.completedLessons] || 'Базовое движение';
+        },
+        completeOnboarding() {
+            const trimmed = (this.inputName || '').trim();
+            const name = trimmed || 'Александр';
+            this.userName = name;
+            localStorage.setItem('userName', name);
+            if (!localStorage.getItem('streak')) localStorage.setItem('streak', '0');
+            if (!localStorage.getItem('maxStreak')) localStorage.setItem('maxStreak', '0');
+            if (!localStorage.getItem('completedLessons')) localStorage.setItem('completedLessons', '0');
+            if (!localStorage.getItem('userXp')) localStorage.setItem('userXp', '0');
+            this.isOnboarding = false;
+        }
+    }">
     <div
         class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
 
+        <!-- Экран первого входа (Онбординг) -->
+        <template x-if="isOnboarding">
+            <div class="flex-1 flex flex-col justify-between p-6 py-10 text-center h-full">
+                <div class="my-auto space-y-6">
+                    <div class="w-24 h-24 rounded-3xl bg-sky-500/10 text-sky-500 flex items-center justify-center mx-auto shadow-inner border border-sky-500/20">
+                        <span class="material-symbols-rounded text-6xl filled">directions_car</span>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h2 class="text-2xl font-black text-base-content tracking-tight">Добро пожаловать в КодРулит!</h2>
+                        <p class="text-xs text-base-content/70 max-w-xs mx-auto leading-relaxed">
+                            Интерактивный тренажер алгоритмов. Управляйте беспилотным автомобилем и изучайте программирование с нуля!
+                        </p>
+                    </div>
+
+                    <div class="space-y-2 text-left max-w-xs mx-auto w-full pt-4">
+                        <label class="text-xs font-bold text-base-content/70 px-1 block">Как вас зовут?</label>
+                        <input type="text" x-model="inputName" @keydown.enter="completeOnboarding()"
+                            placeholder="Ваше имя"
+                            class="input input-bordered w-full rounded-2xl bg-base-200 text-sm font-semibold focus:border-sky-500">
+                    </div>
+                </div>
+
+                <div class="pt-4 max-w-xs mx-auto w-full">
+                    <button @click="completeOnboarding()"
+                        class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-lg shadow-primary/25 gap-2">
+                        <span>Начать</span>
+                        <span class="material-symbols-rounded text-lg">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+        </template>
+
         <!-- Верхняя панель -->
-        <header class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none">
+        <header x-show="!isOnboarding" class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none">
             <div class="navbar-start">
                 <button class="btn btn-ghost btn-circle btn-sm text-base-content" aria-label="Настройки"
                     title="Настройки">
@@ -38,7 +99,7 @@
         </header>
 
         <!-- Страница -->
-        <main class="flex-1 overflow-y-auto px-4 py-5 flex flex-col">
+        <main x-show="!isOnboarding" class="flex-1 overflow-y-auto px-4 py-5 flex flex-col">
             <!-- Главная -->
             <div x-show="activeTab === 'home'" class="space-y-4 pb-4">
                 <div class="px-2 py-1 transition-all duration-300">
@@ -64,13 +125,6 @@
                             <p x-show="streak === 0" class="text-xs font-medium text-base-content/60 mt-0.5">Начни урок,
                                 чтобы зажечь огонек</p>
                         </div>
-
-                        <!-- Демо -->
-                        <button @click="streak = streak > 0 ? 0 : 3"
-                            class="btn btn-ghost btn-circle btn-xs text-base-content/40 hover:text-base-content"
-                            :title="streak > 0 ? 'Переключить на 0 (демо)' : 'Зажечь огонь (демо)'">
-                            <span class="material-symbols-rounded text-sm">sync</span>
-                        </button>
                     </div>
                 </div>
 
@@ -82,30 +136,26 @@
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
                                     <span
-                                        class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Текущий
-                                        урок</span>
+                                        class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Текущий урок</span>
                                 </div>
-                                <button @click="hasStartedLesson = false"
-                                    class="text-[10px] font-medium text-base-content/40 hover:text-base-content"
-                                    title="Сбросить урок (демо)">Сбросить</button>
                             </div>
 
                             <div>
-                                <h3 class="text-base font-bold text-base-content tracking-tight">Цикл со счетчиком</h3>
+                                <h3 class="text-base font-bold text-base-content tracking-tight" x-text="currentLessonName"></h3>
                             </div>
 
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs">
-                                    <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
-                                    <span class="font-bold text-sky-500">60%</span>
+                                    <span class="text-base-content/70 font-medium">Общий прогресс</span>
+                                    <span class="font-bold text-sky-500" x-text="Math.round((completedLessons / 4) * 100) + '%'"></span>
                                 </div>
-                                <progress class="progress progress-primary w-full h-2.5 rounded-full" value="60"
+                                <progress class="progress progress-primary w-full h-2.5 rounded-full" :value="(completedLessons / 4) * 100"
                                     max="100"></progress>
                             </div>
 
-                            <button @click="activeTab = 'lessons'"
+                            <button @click="window.location.href = completedLessons >= 4 ? 'lesson.html?lesson=revision' : ('lesson.html?lesson=' + (completedLessons + 1))"
                                 class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1">
-                                <span>Продолжить урок</span>
+                                <span x-text="completedLessons >= 4 ? 'Начать повторение' : 'Продолжить урок'"></span>
                                 <span class="material-symbols-rounded text-lg">play_arrow</span>
                             </button>
                         </div>
@@ -120,16 +170,22 @@
                             <div class="flex items-center justify-between">
                                 <span
                                     class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Начало</span>
-                                <button @click="hasStartedLesson = true"
-                                    class="text-[10px] font-medium text-base-content/40 hover:text-base-content"
-                                    title="Включить начатый урок (демо)">Демо</button>
                             </div>
 
                             <div>
-                                <h3 class="text-base font-bold text-base-content tracking-tight">Что такое алгоритм и программа?</h3>
+                                <h3 class="text-base font-bold text-base-content tracking-tight">Базовое движение</h3>
                             </div>
 
-                            <button @click="activeTab = 'lessons'"
+                            <div class="space-y-1.5">
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-base-content/70 font-medium">Общий прогресс</span>
+                                    <span class="font-bold text-sky-500">0%</span>
+                                </div>
+                                <progress class="progress progress-primary w-full h-2.5 rounded-full" value="0"
+                                    max="100"></progress>
+                            </div>
+
+                            <button @click="window.location.href = 'lesson.html?lesson=1'"
                                 class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1">
                                 <span>Начать урок</span>
                                 <span class="material-symbols-rounded text-lg">flag</span>
@@ -143,11 +199,11 @@
                     <div class="card-body p-4.5 gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <span class="material-symbols-rounded text-amber-500 text-lg">crisis_alert</span>
+                                <span class="material-symbols-rounded text-sky-500 text-lg">crisis_alert</span>
                                 <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Задания дня
                                 </h4>
                             </div>
-                            <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">1/3
+                            <span class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">1/3
                                 выполнено</span>
                         </div>
 
@@ -157,7 +213,7 @@
                                 <div class="flex items-center justify-between">
                                     <p class="text-xs font-bold text-base-content">3 маршрута без столкновений</p>
                                     <span
-                                        class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+50
+                                        class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+50
                                         ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Пройди уровни без единого столкновения</p>
@@ -166,7 +222,7 @@
                                         <span>Прогресс</span>
                                         <span class="font-semibold">2 / 3</span>
                                     </div>
-                                    <progress class="progress progress-warning w-full h-2 rounded-full" value="2"
+                                    <progress class="progress progress-primary w-full h-2 rounded-full" value="2"
                                         max="3"></progress>
                                 </div>
                             </div>
@@ -227,16 +283,15 @@
                         <h2 class="text-2xl font-black tracking-tight text-base-content">Все уроки</h2>
                     </div>
 
-                    <button @click="completedLessons = (completedLessons + 1) % 5"
-                        class="badge badge-soft badge-primary font-bold text-xs gap-1.5 py-3.5 px-3 hover:scale-105 transition-transform cursor-pointer"
-                        title="Нажмите, чтобы переключить демо-прогресс (0-4 уроков)">
+                    <div class="badge badge-soft badge-primary font-bold text-xs gap-1.5 py-3.5 px-3 select-none">
                         <span class="material-symbols-rounded text-base text-sky-500 filled">school</span>
                         <span x-text="completedLessons + ' / 4 пройдено'"></span>
-                    </button>
+                    </div>
                 </div>
 
                 <!-- Повторение -->
                 <button :disabled="completedLessons < 4"
+                    @click="if (completedLessons >= 4) window.location.href = 'lesson.html?lesson=revision'"
                     class="btn w-full rounded-2xl h-auto py-3 px-4 flex items-center justify-between transition-all"
                     :class="completedLessons >= 4 
                         ? 'btn-primary text-white shadow-md hover:shadow-lg hover:scale-[1.01]' 
@@ -267,7 +322,7 @@
                     </div>
                 </button>
 
-                <!-- 1. Базовое движение (вперед, назад, вправо, влево) -->
+                <!-- 1. Базовое движение (вперед, направо, налево) -->
                 <div
                     class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
                     <div class="card-body p-4.5 gap-3.5">
@@ -289,7 +344,7 @@
 
                         <div>
                             <h3 class="text-base font-bold text-base-content tracking-tight">Базовое движение</h3>
-                            <p class="text-xs text-base-content/60 mt-0.5">Команды: вперед, назад, вправо, влево</p>
+                            <p class="text-xs text-base-content/60 mt-0.5">Команды: вперед, направо, налево</p>
                         </div>
 
                         <div class="space-y-1.5">
@@ -303,7 +358,7 @@
                                 :value="completedLessons >= 1 ? 100 : 0" max="100"></progress>
                         </div>
 
-                        <button @click="completedLessons = Math.max(completedLessons, 1)"
+                        <button @click="window.location.href = 'lesson.html?lesson=1'"
                             class="btn rounded-2xl w-full font-bold gap-2 mt-1"
                             :class="completedLessons >= 1 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
                             <span x-text="completedLessons >= 1 ? 'Пройти заново' : 'Начать урок'"></span>
@@ -360,7 +415,7 @@
                             </p>
                         </div>
 
-                        <button x-show="completedLessons >= 1" @click="completedLessons = Math.max(completedLessons, 2)"
+                        <button x-show="completedLessons >= 1" @click="window.location.href = 'lesson.html?lesson=2'"
                             class="btn rounded-2xl w-full font-bold gap-2 mt-1"
                             :class="completedLessons >= 2 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
                             <span x-text="completedLessons >= 2 ? 'Пройти заново' : 'Продолжить урок'"></span>
@@ -421,7 +476,7 @@
                             </p>
                         </div>
 
-                        <button x-show="completedLessons >= 2" @click="completedLessons = Math.max(completedLessons, 3)"
+                        <button x-show="completedLessons >= 2" @click="window.location.href = 'lesson.html?lesson=3'"
                             class="btn rounded-2xl w-full font-bold gap-2 mt-1"
                             :class="completedLessons >= 3 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
                             <span x-text="completedLessons >= 3 ? 'Пройти заново' : 'Начать урок'"></span>
@@ -482,7 +537,7 @@
                             </p>
                         </div>
 
-                        <button x-show="completedLessons >= 3" @click="completedLessons = Math.max(completedLessons, 4)"
+                        <button x-show="completedLessons >= 3" @click="window.location.href = 'lesson.html?lesson=4'"
                             class="btn rounded-2xl w-full font-bold gap-2 mt-1"
                             :class="completedLessons >= 4 ? 'btn-ghost border border-base-300 text-base-content' : 'btn-primary text-white'">
                             <span x-text="completedLessons >= 4 ? 'Пройти заново' : 'Начать урок'"></span>
@@ -641,8 +696,7 @@
                             </p>
                             <p class="leading-relaxed">
                                 <b>Порядок имеет решающее значение!</b> Сравните: «надеть носки, затем обуть ботинки» и
-                                наоборот. В коде то же самое: команда <code
-                                    class="font-mono text-sky-500 font-bold">повернуть направо</code>, выполненная
+                                наоборот. В коде то же самое: команда <code class="font-mono text-sky-500 font-bold">направо</code>, выполненная
                                 <i>до</i> или <i>после</i> шага вперед, приведёт машину в совершенно разные точки!
                             </p>
                         </div>
@@ -659,22 +713,13 @@
                                 </div>
                                 <div
                                     class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
-                                    <code
-                                        class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">назад</code>
-                                    <span class="text-base-content/70 text-[11px]">Откат на 1 клетку назад без изменения
-                                        ориентации</span>
-                                </div>
-                                <div
-                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
-                                    <code
-                                        class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">повернуть направо</code>
+                                    <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">направо</code>
                                     <span class="text-base-content/70 text-[11px]">Разворот корпуса на 90° по часовой
                                         стрелке</span>
                                 </div>
                                 <div
                                     class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
-                                    <code
-                                        class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">повернуть налево</code>
+                                    <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">налево</code>
                                     <span class="text-base-content/70 text-[11px]">Разворот корпуса на 90° против
                                         часовой стрелки</span>
                                 </div>
@@ -701,7 +746,7 @@
                             <pre
                                 class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед
 вперед
-повернуть направо
+направо
 вперед
 загрузить</pre>
                             <p class="text-[11px] text-base-content/60 italic">
@@ -799,7 +844,7 @@
                                 маршрута</p>
                             <pre
                                 class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед 3 раза
-повернуть направо
+направо
 вперед 5 раз</pre>
                         </div>
                     </div>
@@ -898,7 +943,7 @@
                                 class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">если спереди_свободно то:
     вперед
 иначе:
-    повернуть направо</pre>
+    направо</pre>
                             <p class="text-[11px] text-base-content/60 italic">
                                 Машина едет прямо только тогда, когда путь чист. Если впереди препятствие, машина
                                 сворачивает в объезд.
@@ -977,7 +1022,7 @@
                                 Движение до упора</p>
                             <pre
                                 class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед пока спереди_свободно
-повернуть налево</pre>
+налево</pre>
                             <p class="text-[11px] text-base-content/60 italic">
                                 Транспорт будет безопасно ехать вперед на любую дистанцию, пока перед капотом чисто, и
                                 остановится ровно перед препятствием для поворота.
@@ -1068,7 +1113,7 @@
                                 class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">пока спереди_свободно выполнить:
     вперед
     если справа_свободно то:
-        повернуть направо</pre>
+        направо</pre>
                             <p class="text-[11px] text-base-content/60 italic">
                                 Алгоритм обхода препятствий: машина движется вперед, постоянно сканируя правый поворот
                                 на каждом шаге.
@@ -1106,7 +1151,7 @@
                                 <div class="flex items-center justify-center text-orange-500">
                                     <span class="material-symbols-rounded text-lg filled">local_fire_department</span>
                                 </div>
-                                <p class="text-sm font-black text-base-content mt-0.5" x-text="streak"></p>
+                                <p class="text-sm font-black text-base-content mt-0.5" x-text="maxStreak"></p>
                                 <p class="text-[10px] text-base-content/50 font-medium">Макс. серия</p>
                             </div>
 
@@ -1123,7 +1168,7 @@
                                 <div class="flex items-center justify-center text-emerald-500">
                                     <span class="material-symbols-rounded text-lg filled">military_tech</span>
                                 </div>
-                                <p class="text-sm font-black text-base-content mt-0.5">2 / 5</p>
+                                <p class="text-sm font-black text-base-content mt-0.5" x-text="(2 + (maxStreak >= 7 ? 1 : 0)) + ' / 5'"></p>
                                 <p class="text-[10px] text-base-content/50 font-medium">Достижения</p>
                             </div>
                         </div>
@@ -1140,8 +1185,7 @@
                                 <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Достижения
                                 </h4>
                             </div>
-                            <span class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">2/5
-                                выполнено</span>
+                            <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full" :class="maxStreak >= 7 ? 'badge-success' : 'badge-warning'" x-text="(2 + (maxStreak >= 7 ? 1 : 0)) + '/5 выполнено'"></span>
                         </div>
 
                         <div class="space-y-3.5 divide-y divide-base-300/60">
@@ -1237,13 +1281,13 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
                                         <div
-                                            class="w-7 h-7 rounded-xl bg-sky-500/10 text-sky-500 flex items-center justify-center shrink-0">
+                                            class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
                                             <span class="material-symbols-rounded text-base filled">bolt</span>
                                         </div>
                                         <p class="text-xs font-bold text-base-content">Оптимизатор кода</p>
                                     </div>
                                     <span
-                                        class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+250
+                                        class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+250
                                         ОП</span>
                                 </div>
                                 <p class="text-[11px] text-base-content/60">Реши 8 уровней с кодом не длиннее 5 строк
@@ -1253,7 +1297,7 @@
                                         <span>Прогресс</span>
                                         <span class="font-semibold">5 / 8</span>
                                     </div>
-                                    <progress class="progress progress-primary w-full h-2 rounded-full" value="5"
+                                    <progress class="progress progress-warning w-full h-2 rounded-full" value="5"
                                         max="8"></progress>
                                 </div>
                             </div>
@@ -1263,24 +1307,32 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-2">
                                         <div
-                                            class="w-7 h-7 rounded-xl bg-orange-500/10 text-orange-500 flex items-center justify-center shrink-0">
+                                            class="w-7 h-7 rounded-xl flex items-center justify-center shrink-0"
+                                            :class="maxStreak >= 7 ? 'bg-success/10 text-success' : 'bg-orange-500/10 text-orange-500'">
                                             <span
                                                 class="material-symbols-rounded text-base filled">local_fire_department</span>
                                         </div>
-                                        <p class="text-xs font-bold text-base-content">Стальная выдержка</p>
+                                        <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
+                                            <span>Стальная выдержка</span>
+                                            <template x-if="maxStreak >= 7">
+                                                <span class="material-symbols-rounded text-success text-sm filled">check_circle</span>
+                                            </template>
+                                        </p>
                                     </div>
                                     <span
-                                        class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+300
+                                        class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
+                                        :class="maxStreak >= 7 ? 'badge-success' : 'badge-warning'">+300
                                         ОП</span>
                                 </div>
-                                <p class="text-[11px] text-base-content/60">Удерживай серию побед не менее 7 дней подряд
-                                </p>
+                                <p class="text-[11px] text-base-content/60">Серия из 7 верных ответов подряд</p>
                                 <div class="space-y-1 pt-0.5">
                                     <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span>Прогресс</span>
-                                        <span class="font-semibold" x-text="streak + ' / 7'"></span>
+                                        <span :class="maxStreak >= 7 ? 'text-success font-medium' : ''" x-text="maxStreak >= 7 ? 'Выполнено!' : 'Прогресс'"></span>
+                                        <span class="font-semibold" :class="maxStreak >= 7 ? 'text-success' : ''" x-text="Math.min(maxStreak, 7) + ' / 7'"></span>
                                     </div>
-                                    <progress class="progress progress-warning w-full h-2 rounded-full" :value="streak"
+                                    <progress class="progress w-full h-2 rounded-full"
+                                        :class="maxStreak >= 7 ? 'progress-success' : 'progress-warning'"
+                                        :value="Math.min(maxStreak, 7)"
                                         max="7"></progress>
                                 </div>
                             </div>
@@ -1291,7 +1343,7 @@
         </main>
 
         <!-- Навигация -->
-        <nav class="p-3 sticky bottom-0 z-40 bg-linear-to-t from-base-100 via-base-100/80 to-transparent">
+        <nav x-show="!isOnboarding" class="p-3 sticky bottom-0 z-40 bg-linear-to-t from-base-100 via-base-100/80 to-transparent">
             <div
                 class="dock dock-sm dock-telegram rounded-2xl shadow-lg border border-base-300 bg-base-200/95 backdrop-blur-md px-1">
                 <!-- Главная -->

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>КодРулит — Урок</title>
+    <link rel="shortcut icon" href="../static/img/icons/favicon.svg" type="image/x-icon">
+    <link rel="stylesheet" href="../static/css/output-index.css">
+    <script defer src="../static/js/lesson.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+
+<body class="bg-base-200 min-h-screen flex items-center justify-center font-sans antialiased"
+    x-data="lessonApp()">
+    <div
+        class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
+
+        <!-- Верхняя панель (Хэдер) -->
+        <header class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none gap-2 shrink-0">
+            <!-- Крестик выхода с подтверждением -->
+            <div class="navbar-start w-auto">
+                <button @click="exitModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-base-content"
+                    aria-label="Выйти из урока" title="Выйти из урока">
+                    <span class="material-symbols-rounded text-2xl">close</span>
+                </button>
+            </div>
+
+            <!-- Прогресс-бар и счетчик серии -->
+            <div class="navbar-center flex-1 flex items-center gap-2 px-1">
+                <progress class="progress progress-primary flex-1 h-2.5 rounded-full transition-all duration-300"
+                    :value="currentStepIndex + 1" :max="totalSteps"></progress>
+                <span class="badge badge-soft badge-primary font-bold text-[11px] shrink-0 px-2 py-1"
+                    x-text="(currentStepIndex + 1) + ' / ' + totalSteps"></span>
+                <div class="flex items-center gap-0.5 font-bold text-xs shrink-0 px-1.5 py-0.5 rounded-lg transition-colors"
+                    :class="streak > 0 ? 'text-orange-500 bg-orange-500/10' : 'text-base-content/40 bg-base-200'"
+                    title="Серия верных ответов подряд">
+                    <span class="material-symbols-rounded text-base filled">local_fire_department</span>
+                    <span x-text="streak"></span>
+                </div>
+            </div>
+
+            <!-- Кнопка вызова теории -->
+            <div class="navbar-end w-auto flex items-center gap-1">
+                <button @click="theoryModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-sky-500 hover:bg-sky-500/10"
+                    aria-label="Справка и теория" title="Теория к уроку">
+                    <span class="material-symbols-rounded text-2xl filled">menu_book</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Основная скроллируемая зона контента -->
+        <main class="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
+            <!-- Состояние загрузки -->
+            <template x-if="isLoading">
+                <div class="flex-1 flex flex-col items-center justify-center gap-3 py-16 text-center">
+                    <span class="loading loading-spinner loading-lg text-primary"></span>
+                    <p class="text-xs text-base-content/60 font-semibold tracking-wide">Загрузка урока...</p>
+                </div>
+            </template>
+
+            <!-- Состояние ошибки загрузки JSON -->
+            <template x-if="loadError">
+                <div class="flex-1 flex flex-col items-center justify-center gap-4 py-12 px-2 text-center">
+                    <div class="w-14 h-14 rounded-2xl bg-error/10 text-error flex items-center justify-center">
+                        <span class="material-symbols-rounded text-3xl">error</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-base-content">Ошибка загрузки</h3>
+                        <p class="text-xs text-base-content/70 mt-1 max-w-xs leading-relaxed" x-text="loadError"></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button @click="window.location.reload()" class="btn btn-primary btn-sm rounded-xl text-white font-bold text-xs">
+                            Повторить
+                        </button>
+                        <a href="index.html" class="btn btn-ghost btn-sm border border-base-300 rounded-xl font-bold text-xs">
+                            В меню
+                        </a>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Контент задания -->
+            <template x-if="!isLoading && currentTask">
+                <div class="space-y-3">
+                    <!-- Заголовок-инструкция (без лишнего описания и без надписи 5х5) -->
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="badge badge-soft badge-primary font-bold text-[10px] uppercase tracking-wider"
+                                x-text="lessonData ? lessonData.badge : 'Урок'"></span>
+                        </div>
+                        <h2 class="text-sm sm:text-base font-bold tracking-tight text-base-content leading-snug"
+                            x-text="currentTask.prompt || currentTask.title"></h2>
+                    </div>
+
+                    <!-- 1. ТЕОРЕТИЧЕСКИЙ ВОПРОС -->
+                    <template x-if="currentTask.type === 'theory'">
+                        <div class="space-y-2 pt-1">
+                            <template x-for="(opt, optIdx) in currentTask.options" :key="optIdx">
+                                <button @click="selectOption(optIdx)"
+                                    class="w-full text-left p-3.5 rounded-2xl border text-xs font-semibold transition-all flex items-center justify-between"
+                                    :class="selectedOption === optIdx 
+                                        ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400 shadow-xs' 
+                                        : 'bg-base-200 border-base-300 text-base-content hover:border-sky-500/40'">
+                                    <span x-text="opt"></span>
+                                    <span class="material-symbols-rounded text-lg shrink-0 ml-2"
+                                        :class="selectedOption === optIdx ? 'text-sky-500 filled' : 'text-base-content/20'"
+                                        x-text="selectedOption === optIdx ? 'check_circle' : 'radio_button_unchecked'"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+
+                    <!-- 2. ИГРОВОЕ ПОЛЕ 5x5 (НОРМАЛЬНЫЙ РАЗМЕР КЛЕТОК) -->
+                    <template x-if="currentTask.type !== 'theory'">
+                        <div class="space-y-3">
+                            <!-- Сетка 5x5 с увеличенными ровными клетками -->
+                            <div class="mx-auto w-full max-w-[320px] aspect-square p-2.5 rounded-3xl bg-base-200 border border-base-300 shadow-inner grid grid-cols-5 gap-2 relative select-none">
+                                <template x-for="cell in gridCells" :key="cell.x + '-' + cell.y">
+                                    <div class="aspect-square rounded-2xl flex items-center justify-center relative overflow-hidden transition-colors"
+                                        :class="{
+                                            'bg-slate-300 dark:bg-slate-700/80 border border-slate-400/20 shadow-xs': cell.type === 'road',
+                                            'bg-emerald-500/35 dark:bg-emerald-700/40 border border-emerald-500/20': cell.type === 'grass',
+                                            'ring-2 ring-sky-400/80 bg-sky-500/20': cell.isStart,
+                                            'ring-2 ring-amber-400 bg-amber-400/20': cell.isFinish
+                                        }">
+                                        <!-- Метка Финиша -->
+                                        <template x-if="cell.isFinish && !(car.x === cell.x && car.y === cell.y)">
+                                            <span class="material-symbols-rounded text-amber-500 text-xl filled animate-pulse">sports_score</span>
+                                        </template>
+
+                                        <!-- Машинка -->
+                                        <template x-if="car.x === cell.x && car.y === cell.y">
+                                            <div class="absolute inset-0 flex items-center justify-center transition-transform duration-300 ease-in-out"
+                                                :style="'transform: rotate(' + car.angle + 'deg);'">
+                                                <template x-if="!car.crashed">
+                                                    <span class="material-symbols-rounded text-3xl drop-shadow-md filled"
+                                                        :class="cell.isFinish ? 'text-amber-400 dark:text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]' : 'text-sky-500 dark:text-sky-400'">directions_car</span>
+                                                </template>
+                                                <template x-if="car.crashed">
+                                                    <span class="material-symbols-rounded text-error text-3xl animate-bounce filled">car_crash</span>
+                                                </template>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <!-- ПОЛЕ КОДА: 3 ТИПА ИНТЕРАКТИВА -->
+                            <div class="card bg-base-200 border border-base-300 rounded-2xl p-3 space-y-2.5">
+                                <div class="flex items-center justify-between text-[11px] font-bold text-base-content/60">
+                                    <span class="flex items-center gap-1.5">
+                                        <span class="material-symbols-rounded text-sky-500 text-sm">code</span>
+                                        <span>Программа автопилота</span>
+                                    </span>
+                                    <template x-if="currentTask.type === 'blocks'">
+                                        <button @click="clearBlocks()" class="text-xs text-base-content/40 hover:text-error" title="Очистить">Сброс</button>
+                                    </template>
+                                </div>
+
+                                <!-- ТИП 1: Подставить слово в пропуск (Duolingo style) -->
+                                <template x-if="currentTask.type === 'fill_blank'">
+                                    <div class="space-y-2.5">
+                                        <div class="font-mono text-xs p-2.5 rounded-xl bg-base-100 border border-base-300 leading-relaxed">
+                                            <template x-for="(line, idx) in currentTask.template.split('\n')" :key="idx">
+                                                <div class="py-0.5">
+                                                    <template x-if="line.includes('[blank]')">
+                                                        <span>
+                                                            <span x-text="line.split('[blank]')[0]"></span>
+                                                            <button @click="clearBlank()"
+                                                                class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg border text-xs font-bold font-mono transition-all"
+                                                                :class="filledBlank 
+                                                                    ? 'bg-sky-500 text-white border-sky-500 shadow-xs' 
+                                                                    : 'bg-base-200 border-dashed border-base-content/30 text-base-content/40 min-w-16'">
+                                                                <span x-text="filledBlank || '...'"></span>
+                                                            </button>
+                                                            <span x-text="line.split('[blank]')[1]"></span>
+                                                        </span>
+                                                    </template>
+                                                    <template x-if="!line.includes('[blank]')">
+                                                        <span x-text="line"></span>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <!-- Банк вариантов слов -->
+                                        <div>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                <template x-for="word in currentTask.wordBank" :key="word">
+                                                    <button @click="fillBlank(word)"
+                                                        class="btn btn-sm rounded-xl font-mono text-xs font-semibold"
+                                                        :class="filledBlank === word ? 'btn-primary text-white' : 'bg-base-100 border border-base-300 text-base-content hover:border-sky-500'"
+                                                        x-text="word"></button>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- ТИП 2: Составить строку из блоков (Block builder) -->
+                                <template x-if="currentTask.type === 'blocks'">
+                                    <div class="space-y-2.5">
+                                        <!-- Строка сборки кода -->
+                                        <div class="min-h-12 p-2 rounded-xl bg-base-100 border border-base-300 flex flex-wrap gap-1.5 items-center">
+                                            <template x-if="assembledBlocks.length === 0">
+                                                <span class="text-[11px] text-base-content/40 font-mono italic px-1">Выберите команды ниже...</span>
+                                            </template>
+                                            <template x-for="(block, bIdx) in assembledBlocks" :key="bIdx">
+                                                <button @click="removeBlock(bIdx)"
+                                                    class="badge badge-primary gap-1 py-2.5 px-2 rounded-xl font-mono text-[11px] font-bold text-white shadow-xs hover:badge-error transition-colors"
+                                                    title="Нажмите, чтобы убрать">
+                                                    <span x-text="block"></span>
+                                                    <span class="material-symbols-rounded text-xs">close</span>
+                                                </button>
+                                            </template>
+                                        </div>
+
+                                        <!-- Банк доступных команд -->
+                                        <div>
+                                            <div class="flex flex-wrap gap-1.5">
+                                                <template x-for="word in currentTask.wordBank" :key="word">
+                                                    <button @click="addBlock(word)"
+                                                        class="btn btn-xs sm:btn-sm rounded-xl font-mono text-[11px] font-semibold bg-base-100 border border-base-300 hover:border-sky-500 hover:bg-sky-500/10 text-base-content"
+                                                        x-text="'+ ' + word"></button>
+                                                </template>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
+
+                                <!-- ТИП 3: Написать свое слово (Text Input) -->
+                                <template x-if="currentTask.type === 'text_input'">
+                                    <div class="space-y-2.5">
+                                        <div class="font-mono text-xs p-2.5 rounded-xl bg-base-100 border border-base-300 leading-relaxed">
+                                            <template x-for="(line, idx) in currentTask.template.split('\n')" :key="idx">
+                                                <div class="py-0.5">
+                                                    <template x-if="line.includes('[input]')">
+                                                        <div class="flex items-center gap-1.5 flex-wrap">
+                                                            <span x-text="line.split('[input]')[0]"></span>
+                                                            <input type="text" x-model="typedInput"
+                                                                :placeholder="currentTask.placeholder || 'команда'"
+                                                                class="input input-bordered input-xs font-mono text-xs rounded-xl w-32 px-2 text-center border-sky-500/50 focus:border-sky-500" />
+                                                            <span x-text="line.split('[input]')[1]"></span>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="!line.includes('[input]')">
+                                                        <span x-text="line"></span>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+        </main>
+
+        <!-- ПРИКРЕПЛЕННАЯ НИЖНЯЯ ПАНЕЛЬ: СТАТУС ВЫПОЛНЕНИЯ И КНОПКА ЗАПУСКА (НЕ НАДО ПРОЛИСТЫВАТЬ) -->
+        <footer x-show="!isLoading && currentTask" class="sticky bottom-0 z-30 bg-base-100/95 backdrop-blur-md border-t border-base-300 px-4 py-3 space-y-2 shrink-0">
+            <!-- Оповещения / Предупреждения / Результат запуска -->
+            <template x-if="statusMessage">
+                <div class="alert rounded-2xl text-xs font-bold py-2.5 px-3.5 shadow-sm transition-all flex items-center gap-2"
+                    :class="{
+                        'alert-warning bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-300': taskStatus === 'syntax_error',
+                        'alert-error bg-error/10 border-error/30 text-error': taskStatus === 'fail',
+                        'alert-success bg-success/10 border-success/30 text-success': taskStatus === 'success',
+                        'alert-info bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-300': taskStatus === 'running'
+                    }">
+                    <span class="material-symbols-rounded text-lg shrink-0"
+                        x-text="taskStatus === 'syntax_error' ? 'warning' : (taskStatus === 'fail' ? 'error' : (taskStatus === 'success' ? 'check_circle' : 'hourglass_top'))"></span>
+                    <span class="flex-1 leading-snug" x-text="statusMessage"></span>
+                </div>
+            </template>
+
+            <!-- Главная кнопка действия -->
+            <div>
+                <!-- 1. Запустить или Проверить -->
+                <template x-if="taskStatus === 'idle' || taskStatus === 'syntax_error'">
+                    <button @click="runOrCheck()"
+                        class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-md hover:shadow-lg gap-2 text-sm">
+                        <span class="material-symbols-rounded text-lg">play_arrow</span>
+                        <span x-text="currentTask && currentTask.type === 'theory' ? 'Проверить ответ' : 'Запустить код'"></span>
+                    </button>
+                </template>
+
+                <!-- 2. Выполняется симуляция -->
+                <template x-if="taskStatus === 'running'">
+                    <button disabled class="btn btn-primary rounded-2xl w-full font-bold text-white opacity-80 gap-2 text-sm">
+                        <span class="loading loading-spinner loading-xs"></span>
+                        <span>Выполнение автопилота...</span>
+                    </button>
+                </template>
+
+                <!-- 3. Ошибка выполнения -> Попробовать еще раз -->
+                <template x-if="taskStatus === 'fail'">
+                    <button @click="resetCarToStart()"
+                        class="btn btn-warning rounded-2xl w-full font-bold text-white shadow-md gap-2 text-sm">
+                        <span class="material-symbols-rounded text-lg">replay</span>
+                        <span>Попробовать снова</span>
+                    </button>
+                </template>
+
+                <!-- 4. Успех -> Следующее задание / Завершить -->
+                <template x-if="taskStatus === 'success'">
+                    <button @click="nextStep()"
+                        class="btn btn-success rounded-2xl w-full font-bold text-white shadow-md gap-2 text-sm">
+                        <span x-text="currentStepIndex + 1 < totalSteps ? 'Следующее задание' : 'Завершить урок'"></span>
+                        <span class="material-symbols-rounded text-lg">arrow_forward</span>
+                    </button>
+                </template>
+            </div>
+        </footer>
+
+        <!-- МОДАЛЬНОЕ ОКНО 1: ПРЕДУПРЕЖДЕНИЕ О ВЫХОДЕ -->
+        <dialog class="modal" :class="{ 'modal-open': exitModalOpen }">
+            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
+                <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
+                    <span class="material-symbols-rounded text-3xl">warning</span>
+                </div>
+                <div>
+                    <h3 class="text-base font-black text-base-content">Покинуть урок?</h3>
+                    <p class="text-xs text-base-content/70 mt-1 leading-relaxed">
+                        Прогресс текущего урока не сохранится. Вы точно хотите выйти в главное меню?
+                    </p>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button @click="exitModalOpen = false" class="btn btn-ghost border border-base-300 rounded-2xl flex-1 font-bold text-xs">
+                        Остаться
+                    </button>
+                    <button @click="confirmExit()" class="btn btn-error rounded-2xl flex-1 font-bold text-white text-xs">
+                        Выйти
+                    </button>
+                </div>
+            </div>
+            <form method="dialog" class="modal-backdrop" @click="exitModalOpen = false">
+                <button>close</button>
+            </form>
+        </dialog>
+
+        <!-- МОДАЛЬНОЕ ОКНО 2: СПРАВКА И ТЕОРИЯ ДЛЯ ТЕЛЕФОНА (УДОБНО ЧИТАТЬ) -->
+        <dialog class="modal" :class="{ 'modal-open': theoryModalOpen }">
+            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-5 space-y-4 max-w-sm max-h-[85vh] overflow-y-auto">
+                <div class="flex items-center justify-between pb-2 border-b border-base-300">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-rounded text-sky-500 text-2xl filled">menu_book</span>
+                        <h3 class="text-base font-black text-base-content" x-text="lessonData ? lessonData.theory.title : 'Теория'"></h3>
+                    </div>
+                    <button @click="theoryModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
+                        <span class="material-symbols-rounded text-base">close</span>
+                    </button>
+                </div>
+
+                <div class="space-y-3.5 text-xs text-base-content/85">
+                    <template x-if="lessonData && lessonData.theory">
+                        <div class="space-y-3.5">
+                            <template x-for="(sec, sIdx) in lessonData.theory.sections" :key="sIdx">
+                                <div class="p-3.5 rounded-2xl bg-base-200/70 border border-base-300/70 space-y-2">
+                                    <h4 class="font-bold text-sm text-sky-600 dark:text-sky-400" x-text="sec.heading"></h4>
+                                    <template x-if="sec.content">
+                                        <p class="leading-relaxed" x-text="sec.content"></p>
+                                    </template>
+                                    <template x-if="sec.items">
+                                        <div class="space-y-1.5 pt-1">
+                                            <template x-for="(item, iIdx) in sec.items" :key="iIdx">
+                                                <div class="p-2 rounded-xl bg-base-100 border border-base-300/50">
+                                                    <code class="font-mono font-bold text-sky-500 text-xs block" x-text="item.cmd"></code>
+                                                    <span class="text-[11px] text-base-content/75 block mt-0.5" x-text="item.desc"></span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="pt-2">
+                    <button @click="theoryModalOpen = false" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs">
+                        Понятно, вернуться к заданию
+                    </button>
+                </div>
+            </div>
+            <form method="dialog" class="modal-backdrop" @click="theoryModalOpen = false">
+                <button>close</button>
+            </form>
+        </dialog>
+
+        <!-- МОДАЛЬНОЕ ОКНО 3: ПОЗДРАВЛЕНИЕ С ОКОНЧАНИЕМ УРОКА -->
+        <dialog class="modal" :class="{ 'modal-open': lessonCompleted }">
+            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
+                <div class="w-16 h-16 rounded-3xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto shadow-inner">
+                    <span class="material-symbols-rounded text-4xl filled">emoji_events</span>
+                </div>
+                <div>
+                    <span class="badge badge-soft badge-success font-bold text-xs uppercase px-2.5 py-1 mb-1">Успех!</span>
+                    <h3 class="text-xl font-black text-base-content">Урок завершен!</h3>
+                    <p class="text-xs text-base-content/70 mt-1 leading-relaxed">
+                        Вы успешно освоили материал и решили все задания маршрута.
+                    </p>
+                </div>
+
+                <!-- Награды -->
+                <div class="grid grid-cols-2 gap-2 text-center">
+                    <div class="p-2.5 rounded-2xl bg-base-200 border border-base-300">
+                        <span class="text-[10px] uppercase font-bold text-base-content/50 block">Опыт</span>
+                        <span class="font-black text-amber-500 text-sm" x-text="lessonId === 'revision' ? '+250 XP' : '+150 XP'"></span>
+                    </div>
+                    <div class="p-2.5 rounded-2xl bg-base-200 border border-base-300">
+                        <span class="text-[10px] uppercase font-bold text-base-content/50 block">Серия верных</span>
+                        <div class="font-black text-orange-500 text-sm flex items-center justify-center gap-0.5">
+                            <span x-text="streak"></span>
+                            <span class="material-symbols-rounded text-sm filled">local_fire_department</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-1">
+                    <a href="index.html" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs shadow-md">
+                        Вернуться к урокам
+                    </a>
+                </div>
+            </div>
+        </dialog>
+
+    </div>
+</body>
+
+</html>
