@@ -7,6 +7,18 @@
     <title>КодРулит — Урок</title>
     <link rel="shortcut icon" href="../static/img/icons/favicon.svg" type="image/x-icon">
     <link rel="stylesheet" href="../static/css/output-index.css">
+    <script>
+        (function() {
+            try {
+                const saved = localStorage.getItem('coderulit-theme');
+                const theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+            } catch (e) {}
+        })();
+    </script>
+    <script defer src="../static/js/theme-handler.js"></script>
+    <script defer src="../static/js/gamification.js"></script>
     <script defer src="../static/js/lesson.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -41,8 +53,14 @@
                 </div>
             </div>
 
-            <!-- Кнопка вызова теории -->
+            <!-- Кнопка темы и вызова теории -->
             <div class="navbar-end w-auto flex items-center gap-1">
+                <button @click="toggleTheme()" class="btn btn-ghost btn-circle btn-sm text-base-content"
+                    :aria-label="theme === 'dark' ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'"
+                    :title="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'">
+                    <span class="material-symbols-rounded text-2xl"
+                        x-text="theme === 'dark' ? 'light_mode' : 'dark_mode'"></span>
+                </button>
                 <button @click="theoryModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-sky-500 hover:bg-sky-500/10"
                     aria-label="Справка и теория" title="Теория к уроку">
                     <span class="material-symbols-rounded text-2xl filled">menu_book</span>
@@ -115,36 +133,61 @@
                     <!-- 2. ИГРОВОЕ ПОЛЕ 5x5 (НОРМАЛЬНЫЙ РАЗМЕР КЛЕТОК) -->
                     <template x-if="currentTask.type !== 'theory'">
                         <div class="space-y-3">
-                            <!-- Сетка 5x5 с увеличенными ровными клетками -->
-                            <div class="mx-auto w-full max-w-[320px] aspect-square p-2.5 rounded-3xl bg-base-200 border border-base-300 shadow-inner grid grid-cols-5 gap-2 relative select-none">
+                            <!-- Сетка 5x5 с SVG плитками без зазоров -->
+                            <div class="mx-auto w-full max-w-[320px] aspect-square rounded-3xl overflow-hidden border border-base-300 shadow-md grid grid-cols-5 gap-0 relative select-none">
                                 <template x-for="cell in gridCells" :key="cell.x + '-' + cell.y">
-                                    <div class="aspect-square rounded-2xl flex items-center justify-center relative overflow-hidden transition-colors"
-                                        :class="{
-                                            'bg-slate-300 dark:bg-slate-700/80 border border-slate-400/20 shadow-xs': cell.type === 'road',
-                                            'bg-emerald-500/35 dark:bg-emerald-700/40 border border-emerald-500/20': cell.type === 'grass',
-                                            'ring-2 ring-sky-400/80 bg-sky-500/20': cell.isStart,
-                                            'ring-2 ring-amber-400 bg-amber-400/20': cell.isFinish
-                                        }">
-                                        <!-- Метка Финиша -->
-                                        <template x-if="cell.isFinish && !(car.x === cell.x && car.y === cell.y)">
-                                            <span class="material-symbols-rounded text-amber-500 text-xl filled animate-pulse">sports_score</span>
+                                    <div class="aspect-square flex items-center justify-center relative overflow-hidden select-none">
+                                        <!-- Тайл травы -->
+                                        <template x-if="cell.type === 'grass'">
+                                            <img src="../static/img/field/grass.svg" class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none" alt="grass">
                                         </template>
 
-                                        <!-- Машинка -->
-                                        <template x-if="car.x === cell.x && car.y === cell.y">
-                                            <div class="absolute inset-0 flex items-center justify-center transition-transform duration-300 ease-in-out"
-                                                :style="'transform: rotate(' + car.angle + 'deg);'">
-                                                <template x-if="!car.crashed">
-                                                    <span class="material-symbols-rounded text-3xl drop-shadow-md filled"
-                                                        :class="cell.isFinish ? 'text-amber-400 dark:text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]' : 'text-sky-500 dark:text-sky-400'">directions_car</span>
-                                                </template>
-                                                <template x-if="car.crashed">
-                                                    <span class="material-symbols-rounded text-error text-3xl animate-bounce filled">car_crash</span>
-                                                </template>
-                                            </div>
+                                        <!-- Тайл дороги (ориентирован по направлению пути) -->
+                                        <template x-if="cell.type === 'road' && !cell.isStart && !cell.isFinish">
+                                            <img :src="'../static/img/field/' + (cell.tileSvg || 'road.svg')"
+                                                class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                                                :style="'transform: rotate(' + (cell.tileAngle || 0) + 'deg);'"
+                                                alt="road">
+                                        </template>
+
+                                        <!-- Тайл старта -->
+                                        <template x-if="cell.isStart">
+                                            <img src="../static/img/field/start.svg" class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none" alt="start">
+                                        </template>
+
+                                        <!-- Тайл финиша -->
+                                        <template x-if="cell.isFinish">
+                                            <img src="../static/img/field/finish.svg" class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none" alt="finish">
+                                        </template>
+
+                                        <!-- Метка Финиша (пульсирующий флаг) -->
+                                        <template x-if="cell.isFinish && taskStatus !== 'success'">
+                                            <span class="material-symbols-rounded text-amber-500 text-xl filled animate-pulse z-10 select-none">sports_score</span>
                                         </template>
                                     </div>
                                 </template>
+
+                                <!-- Автомобиль (плавное перемещение по сетке поверх тайлов) -->
+                                <div class="absolute top-0 left-0 w-[20%] h-[20%] flex items-center justify-center pointer-events-none z-20 select-none will-change-transform"
+                                    :class="car.animate ? 'transition-transform duration-300 ease-in-out' : 'transition-none'"
+                                    :style="'transform: translate(' + (car.x * 100) + '%, ' + (car.y * 100) + '%) rotate(' + car.angle + 'deg);'">
+                                    <!-- Обычное состояние: машина -->
+                                    <template x-if="!car.crashed">
+                                        <img src="../static/img/field/car.svg"
+                                            class="w-[82%] h-[82%] object-contain select-none pointer-events-none drop-shadow-md"
+                                            alt="car">
+                                    </template>
+
+                                    <!-- Состояние аварии -->
+                                    <template x-if="car.crashed">
+                                        <div class="relative w-full h-full flex items-center justify-center">
+                                            <img src="../static/img/field/car.svg"
+                                                class="w-[82%] h-[82%] object-contain opacity-60 grayscale-[30%] select-none pointer-events-none"
+                                                alt="car">
+                                            <span class="material-symbols-rounded text-error text-3xl animate-bounce filled absolute inset-0 m-auto flex items-center justify-center drop-shadow-lg">car_crash</span>
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
 
                             <!-- ПОЛЕ КОДА: 3 ТИПА ИНТЕРАКТИВА -->

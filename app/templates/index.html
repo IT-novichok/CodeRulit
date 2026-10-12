@@ -7,7 +7,18 @@
     <title>КодРулит</title>
     <link rel="shortcut icon" href="../static/img/icons/favicon.svg" type="image/x-icon">
     <link rel="stylesheet" href="../static/css/output-index.css">
+    <script>
+        (function() {
+            try {
+                const saved = localStorage.getItem('coderulit-theme');
+                const theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.classList.toggle('dark', theme === 'dark');
+            } catch (e) {}
+        })();
+    </script>
     <script defer src="../static/js/theme-handler.js"></script>
+    <script defer src="../static/js/gamification.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
@@ -22,6 +33,36 @@
         userXp: parseInt(localStorage.getItem('userXp') || '0', 10),
         isOnboarding: !localStorage.getItem('userName'),
         inputName: '',
+        settingsModalOpen: false,
+        dailyTasks: [],
+        achievementsList: [],
+
+        init() {
+            if (typeof this.initTheme === 'function') {
+                this.initTheme();
+            }
+            this.refreshGamification();
+        },
+
+        refreshGamification() {
+            this.streak = parseInt(localStorage.getItem('streak') || '0', 10);
+            this.maxStreak = parseInt(localStorage.getItem('maxStreak') || '0', 10);
+            this.completedLessons = parseInt(localStorage.getItem('completedLessons') || '0', 10);
+            this.userXp = parseInt(localStorage.getItem('userXp') || '0', 10);
+            if (window.CodeRulitGamification) {
+                this.dailyTasks = window.CodeRulitGamification.loadDailyTasks();
+                this.achievementsList = window.CodeRulitGamification.loadAchievements();
+            }
+        },
+
+        get completedDailyTasksCount() {
+            return (this.dailyTasks || []).filter(t => (t.current || 0) >= t.target).length;
+        },
+
+        get completedAchievementsCount() {
+            return (this.achievementsList || []).filter(a => (a.current || 0) >= a.max).length;
+        },
+
         get userLevel() { return Math.max(1, Math.floor(this.userXp / 200) + 1); },
         get hasStartedLesson() { return this.completedLessons > 0; },
         get currentLessonName() {
@@ -38,7 +79,20 @@
             if (!localStorage.getItem('maxStreak')) localStorage.setItem('maxStreak', '0');
             if (!localStorage.getItem('completedLessons')) localStorage.setItem('completedLessons', '0');
             if (!localStorage.getItem('userXp')) localStorage.setItem('userXp', '0');
+
+            if (window.CodeRulitGamification) {
+                window.CodeRulitGamification.initNewAccount();
+            }
+            this.refreshGamification();
             this.isOnboarding = false;
+        },
+        resetAccount() {
+            if (window.CodeRulitGamification) {
+                window.CodeRulitGamification.resetAccountProgress();
+            } else {
+                localStorage.clear();
+                window.location.reload();
+            }
         }
     }">
     <div
@@ -80,7 +134,7 @@
         <!-- Верхняя панель -->
         <header x-show="!isOnboarding" class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none">
             <div class="navbar-start">
-                <button class="btn btn-ghost btn-circle btn-sm text-base-content" aria-label="Настройки"
+                <button @click="settingsModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-base-content" aria-label="Настройки"
                     title="Настройки">
                     <span class="material-symbols-rounded text-2xl">settings</span>
                 </button>
@@ -97,6 +151,30 @@
                 </button>
             </div>
         </header>
+
+        <!-- Модальное окно настроек -->
+        <div x-show="settingsModalOpen" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity"
+            @keydown.escape.window="settingsModalOpen = false">
+            <div class="card bg-base-100 border border-base-300 rounded-3xl shadow-2xl max-w-xs w-full p-5 space-y-4 text-center">
+                <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center mx-auto">
+                    <span class="material-symbols-rounded text-2xl">manage_accounts</span>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-base-content">Настройки профиля</h3>
+                    <p class="text-xs text-base-content/60 mt-1" x-text="'Игрок: ' + (userName || 'Новый игрок')"></p>
+                </div>
+                <div class="space-y-2 pt-1">
+                    <button @click="resetAccount()" class="btn btn-error btn-soft btn-sm rounded-xl w-full font-bold gap-1.5">
+                        <span class="material-symbols-rounded text-base">restart_alt</span>
+                        <span>Сбросить весь прогресс</span>
+                    </button>
+                    <button @click="settingsModalOpen = false" class="btn btn-ghost btn-sm rounded-xl w-full font-bold text-base-content/60">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
 
         <!-- Страница -->
         <main x-show="!isOnboarding" class="flex-1 overflow-y-auto px-4 py-5 flex flex-col">
@@ -200,75 +278,43 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="material-symbols-rounded text-sky-500 text-lg">crisis_alert</span>
-                                <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Задания дня
-                                </h4>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Задания дня</h4>
                             </div>
-                            <span class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">1/3
-                                выполнено</span>
+                            <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
+                                :class="completedDailyTasksCount === dailyTasks.length && dailyTasks.length > 0 ? 'badge-success' : 'badge-primary'"
+                                x-text="completedDailyTasksCount + '/' + dailyTasks.length + ' выполнено'"></span>
                         </div>
 
                         <div class="space-y-3.5 divide-y divide-base-300/60">
-                            <!-- Задание 1 -->
-                            <div class="space-y-1.5 pt-0">
-                                <div class="flex items-center justify-between">
-                                    <p class="text-xs font-bold text-base-content">3 маршрута без столкновений</p>
-                                    <span
-                                        class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+50
-                                        ОП</span>
-                                </div>
-                                <p class="text-[11px] text-base-content/60">Пройди уровни без единого столкновения</p>
-                                <div class="space-y-1 pt-0.5">
-                                    <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span>Прогресс</span>
-                                        <span class="font-semibold">2 / 3</span>
+                            <template x-for="(task, index) in dailyTasks" :key="task.id">
+                                <div class="space-y-1.5" :class="index > 0 ? 'pt-3.5' : 'pt-0'">
+                                    <div class="flex items-center justify-between">
+                                        <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
+                                            <span x-text="task.title"></span>
+                                            <template x-if="(task.current || 0) >= task.target">
+                                                <span class="material-symbols-rounded text-success text-sm filled">check_circle</span>
+                                            </template>
+                                        </p>
+                                        <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
+                                            :class="(task.current || 0) >= task.target ? 'badge-success' : 'badge-primary'"
+                                            x-text="task.reward"></span>
                                     </div>
-                                    <progress class="progress progress-primary w-full h-2 rounded-full" value="2"
-                                        max="3"></progress>
-                                </div>
-                            </div>
-
-                            <!-- Задание 2 -->
-                            <div class="space-y-1.5 pt-3.5">
-                                <div class="flex items-center justify-between">
-                                    <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
-                                        <span>Идеальный поворот</span>
-                                        <span
-                                            class="material-symbols-rounded text-success text-sm filled">check_circle</span>
-                                    </p>
-                                    <span
-                                        class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+30
-                                        ОП</span>
-                                </div>
-                                <p class="text-[11px] text-base-content/60">Используй команды «вправо» и «влево» 10 раз
-                                </p>
-                                <div class="space-y-1 pt-0.5">
-                                    <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span class="text-success font-medium">Выполнено!</span>
-                                        <span class="font-semibold text-success">10 / 10</span>
+                                    <p class="text-[11px] text-base-content/60" x-text="task.desc"></p>
+                                    <div class="space-y-1 pt-0.5">
+                                        <div class="flex justify-between text-[11px] text-base-content/70">
+                                            <span :class="(task.current || 0) >= task.target ? 'text-success font-medium' : ''"
+                                                x-text="(task.current || 0) >= task.target ? 'Выполнено!' : 'Прогресс'"></span>
+                                            <span class="font-semibold"
+                                                :class="(task.current || 0) >= task.target ? 'text-success' : ''"
+                                                x-text="Math.min(task.current || 0, task.target) + ' / ' + task.target"></span>
+                                        </div>
+                                        <progress class="progress w-full h-2 rounded-full"
+                                            :class="(task.current || 0) >= task.target ? 'progress-success' : 'progress-primary'"
+                                            :value="Math.min(task.current || 0, task.target)"
+                                            :max="task.target"></progress>
                                     </div>
-                                    <progress class="progress progress-success w-full h-2 rounded-full" value="10"
-                                        max="10"></progress>
                                 </div>
-                            </div>
-
-                            <!-- Задание 3 -->
-                            <div class="space-y-1.5 pt-3.5">
-                                <div class="flex items-center justify-between">
-                                    <p class="text-xs font-bold text-base-content">Логический маневр</p>
-                                    <span
-                                        class="badge badge-soft badge-primary font-bold text-[10px] gap-1 rounded-full">+40
-                                        ОП</span>
-                                </div>
-                                <p class="text-[11px] text-base-content/60">Примени условие «если спереди_свободно»</p>
-                                <div class="space-y-1 pt-0.5">
-                                    <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span>Прогресс</span>
-                                        <span class="font-semibold">1 / 4</span>
-                                    </div>
-                                    <progress class="progress progress-primary w-full h-2 rounded-full" value="1"
-                                        max="4"></progress>
-                                </div>
-                            </div>
+                            </template>
                         </div>
                     </div>
                 </div>
@@ -402,11 +448,11 @@
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
                                 <span class="font-bold" :class="completedLessons >= 2 ? 'text-success' : 'text-sky-500'"
-                                    x-text="completedLessons >= 2 ? '100%' : '60%'"></span>
+                                    x-text="completedLessons >= 2 ? '100%' : '0%'"></span>
                             </div>
                             <progress class="progress w-full h-2.5 rounded-full"
                                 :class="completedLessons >= 2 ? 'progress-success' : 'progress-primary'"
-                                :value="completedLessons >= 2 ? 100 : 60" max="100"></progress>
+                                :value="completedLessons >= 2 ? 100 : 0" max="100"></progress>
                         </div>
 
                         <div x-show="completedLessons < 1" class="py-1">
@@ -1168,7 +1214,7 @@
                                 <div class="flex items-center justify-center text-emerald-500">
                                     <span class="material-symbols-rounded text-lg filled">military_tech</span>
                                 </div>
-                                <p class="text-sm font-black text-base-content mt-0.5" x-text="(2 + (maxStreak >= 7 ? 1 : 0)) + ' / 5'"></p>
+                                <p class="text-sm font-black text-base-content mt-0.5" x-text="completedAchievementsCount + ' / 5'"></p>
                                 <p class="text-[10px] text-base-content/50 font-medium">Достижения</p>
                             </div>
                         </div>
@@ -1185,157 +1231,46 @@
                                 <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Достижения
                                 </h4>
                             </div>
-                            <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full" :class="maxStreak >= 7 ? 'badge-success' : 'badge-warning'" x-text="(2 + (maxStreak >= 7 ? 1 : 0)) + '/5 выполнено'"></span>
+                            <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
+                                :class="completedAchievementsCount === (achievementsList.length || 5) && achievementsList.length > 0 ? 'badge-success' : 'badge-warning'"
+                                x-text="completedAchievementsCount + '/' + (achievementsList.length || 5) + ' выполнено'"></span>
                         </div>
 
                         <div class="space-y-3.5 divide-y divide-base-300/60">
-                            <!-- 1. Гроссмейстер алгоритмов -->
-                            <div class="space-y-1.5 pt-0">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-                                            <span
-                                                class="material-symbols-rounded text-base filled">workspace_premium</span>
+                            <template x-for="(ach, index) in achievementsList" :key="ach.id">
+                                <div class="space-y-1.5" :class="index > 0 ? 'pt-3.5' : 'pt-0'">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-7 h-7 rounded-xl flex items-center justify-center shrink-0"
+                                                :class="(ach.current || 0) >= ach.max ? 'bg-success/10 text-success' : (ach.id === 'streakMaster' ? 'bg-orange-500/10 text-orange-500' : 'bg-amber-500/10 text-amber-500')">
+                                                <span class="material-symbols-rounded text-base filled" x-text="ach.icon"></span>
+                                            </div>
+                                            <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
+                                                <span x-text="ach.title"></span>
+                                                <template x-if="(ach.current || 0) >= ach.max">
+                                                    <span class="material-symbols-rounded text-success text-sm filled">check_circle</span>
+                                                </template>
+                                            </p>
                                         </div>
-                                        <p class="text-xs font-bold text-base-content">Гроссмейстер алгоритмов</p>
+                                        <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
+                                            :class="(ach.current || 0) >= ach.max ? 'badge-success' : 'badge-warning'"
+                                            x-text="ach.reward"></span>
                                     </div>
-                                    <span
-                                        class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+200
-                                        ОП</span>
-                                </div>
-                                <p class="text-[11px] text-base-content/60">Пройди 15 маршрутов без единой ошибки и
-                                    столкновения</p>
-                                <div class="space-y-1 pt-0.5">
-                                    <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span>Прогресс</span>
-                                        <span class="font-semibold">11 / 15</span>
-                                    </div>
-                                    <progress class="progress progress-warning w-full h-2 rounded-full" value="11"
-                                        max="15"></progress>
-                                </div>
-                            </div>
-
-                            <!-- 2. Архитектор циклов -->
-                            <div class="space-y-1.5 pt-3.5">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-7 h-7 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
-                                            <span class="material-symbols-rounded text-base filled">all_inclusive</span>
+                                    <p class="text-[11px] text-base-content/60" x-text="ach.desc"></p>
+                                    <div class="space-y-1 pt-0.5">
+                                        <div class="flex justify-between text-[11px] text-base-content/70">
+                                            <span :class="(ach.current || 0) >= ach.max ? 'text-success font-medium' : ''"
+                                                x-text="(ach.current || 0) >= ach.max ? 'Выполнено!' : 'Прогресс'"></span>
+                                            <span class="font-semibold" :class="(ach.current || 0) >= ach.max ? 'text-success' : ''"
+                                                x-text="Math.min(ach.current || 0, ach.max) + ' / ' + ach.max"></span>
                                         </div>
-                                        <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
-                                            <span>Архитектор циклов</span>
-                                            <span
-                                                class="material-symbols-rounded text-success text-sm filled">check_circle</span>
-                                        </p>
+                                        <progress class="progress w-full h-2 rounded-full"
+                                            :class="(ach.current || 0) >= ach.max ? 'progress-success' : 'progress-warning'"
+                                            :value="Math.min(ach.current || 0, ach.max)"
+                                            :max="ach.max"></progress>
                                     </div>
-                                    <span
-                                        class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+150
-                                        ОП</span>
                                 </div>
-                                <p class="text-[11px] text-base-content/60">Используй конструкцию «А пока Б» в 10
-                                    лабиринтах</p>
-                                <div class="space-y-1 pt-0.5">
-                                    <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span class="text-success font-medium">Выполнено!</span>
-                                        <span class="font-semibold text-success">10 / 10</span>
-                                    </div>
-                                    <progress class="progress progress-success w-full h-2 rounded-full" value="10"
-                                        max="10"></progress>
-                                </div>
-                            </div>
-
-                            <!-- 3. Чутьё навигатора -->
-                            <div class="space-y-1.5 pt-3.5">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-7 h-7 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
-                                            <span class="material-symbols-rounded text-base filled">radar</span>
-                                        </div>
-                                        <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
-                                            <span>Чутьё навигатора</span>
-                                            <span
-                                                class="material-symbols-rounded text-success text-sm filled">check_circle</span>
-                                        </p>
-                                    </div>
-                                    <span
-                                        class="badge badge-soft badge-success font-bold text-[10px] gap-1 rounded-full">+120
-                                        ОП</span>
-                                </div>
-                                <p class="text-[11px] text-base-content/60">Примени все 4 датчика («спереди», «сзади»,
-                                    «слева», «справа»)</p>
-                                <div class="space-y-1 pt-0.5">
-                                    <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span class="text-success font-medium">Выполнено!</span>
-                                        <span class="font-semibold text-success">4 / 4</span>
-                                    </div>
-                                    <progress class="progress progress-success w-full h-2 rounded-full" value="4"
-                                        max="4"></progress>
-                                </div>
-                            </div>
-
-                            <!-- 4. Оптимизатор кода -->
-                            <div class="space-y-1.5 pt-3.5">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-7 h-7 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0">
-                                            <span class="material-symbols-rounded text-base filled">bolt</span>
-                                        </div>
-                                        <p class="text-xs font-bold text-base-content">Оптимизатор кода</p>
-                                    </div>
-                                    <span
-                                        class="badge badge-soft badge-warning font-bold text-[10px] gap-1 rounded-full">+250
-                                        ОП</span>
-                                </div>
-                                <p class="text-[11px] text-base-content/60">Реши 8 уровней с кодом не длиннее 5 строк
-                                </p>
-                                <div class="space-y-1 pt-0.5">
-                                    <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span>Прогресс</span>
-                                        <span class="font-semibold">5 / 8</span>
-                                    </div>
-                                    <progress class="progress progress-warning w-full h-2 rounded-full" value="5"
-                                        max="8"></progress>
-                                </div>
-                            </div>
-
-                            <!-- 5. Стальная выдержка -->
-                            <div class="space-y-1.5 pt-3.5">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2">
-                                        <div
-                                            class="w-7 h-7 rounded-xl flex items-center justify-center shrink-0"
-                                            :class="maxStreak >= 7 ? 'bg-success/10 text-success' : 'bg-orange-500/10 text-orange-500'">
-                                            <span
-                                                class="material-symbols-rounded text-base filled">local_fire_department</span>
-                                        </div>
-                                        <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
-                                            <span>Стальная выдержка</span>
-                                            <template x-if="maxStreak >= 7">
-                                                <span class="material-symbols-rounded text-success text-sm filled">check_circle</span>
-                                            </template>
-                                        </p>
-                                    </div>
-                                    <span
-                                        class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
-                                        :class="maxStreak >= 7 ? 'badge-success' : 'badge-warning'">+300
-                                        ОП</span>
-                                </div>
-                                <p class="text-[11px] text-base-content/60">Серия из 7 верных ответов подряд</p>
-                                <div class="space-y-1 pt-0.5">
-                                    <div class="flex justify-between text-[11px] text-base-content/70">
-                                        <span :class="maxStreak >= 7 ? 'text-success font-medium' : ''" x-text="maxStreak >= 7 ? 'Выполнено!' : 'Прогресс'"></span>
-                                        <span class="font-semibold" :class="maxStreak >= 7 ? 'text-success' : ''" x-text="Math.min(maxStreak, 7) + ' / 7'"></span>
-                                    </div>
-                                    <progress class="progress w-full h-2 rounded-full"
-                                        :class="maxStreak >= 7 ? 'progress-success' : 'progress-warning'"
-                                        :value="Math.min(maxStreak, 7)"
-                                        max="7"></progress>
-                                </div>
-                            </div>
+                            </template>
                         </div>
                     </div>
                 </div>

@@ -1,19 +1,19 @@
-(function applyTheme() {
-    const savedTheme = localStorage.getItem('coderulit-theme') ||
-        (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-})();
-
 function lessonApp() {
+    const initialStreak = parseInt(localStorage.getItem('streak') || '0', 10);
+    const initialMaxStreak = parseInt(localStorage.getItem('maxStreak') || '0', 10);
+
     return {
+        ...(typeof themeHandler === 'function' ? themeHandler() : {}),
         lessonId: '1',
         allLessonsData: null,
         lessonData: null,
         currentStepIndex: 0,
         totalSteps: 10,
         currentTask: null,
-        streak: parseInt(localStorage.getItem('streak') || '0', 10),
+        streak: initialStreak,
+        initialStreak: initialStreak,
+        initialMaxStreak: initialMaxStreak,
+        streakLostInLesson: false,
         isLoading: true,
         loadError: null,
 
@@ -39,13 +39,22 @@ function lessonApp() {
             startX: 0,
             startY: 0,
             startDir: 0,
-            crashed: false
+            crashed: false,
+            animate: false
         },
         finish: { x: 0, y: 0 },
 
         simulationTimer: null,
 
         async init() {
+            if (typeof this.initTheme === 'function') {
+                this.initTheme();
+            }
+
+            window.addEventListener('beforeunload', () => {
+                this.handleQuit();
+            });
+
             this.isLoading = true;
             this.loadError = null;
 
@@ -108,12 +117,56 @@ function lessonApp() {
                     const isStart = (x === gridDef.start.x && y === gridDef.start.y);
                     const isFinish = (x === gridDef.finish.x && y === gridDef.finish.y);
 
+                    let tileSvg = 'road.svg';
+                    let tileAngle = 0;
+
+                    if (isRoad) {
+                        const hasN = roadSet.has(`${x},${y - 1}`);
+                        const hasS = roadSet.has(`${x},${y + 1}`);
+                        const hasW = roadSet.has(`${x - 1},${y}`);
+                        const hasE = roadSet.has(`${x + 1},${y}`);
+
+                        // 1. Прямые участки
+                        if (hasN && hasS) {
+                            tileSvg = 'road.svg';
+                            tileAngle = 0;
+                        } else if (hasW && hasE) {
+                            tileSvg = 'road.svg';
+                            tileAngle = 90;
+                        // 2. Повороты за угол (road-turn соединяет Юг и Восток при 0°)
+                        } else if (hasS && hasE) {
+                            tileSvg = 'road-turn.svg';
+                            tileAngle = 0;
+                        } else if (hasS && hasW) {
+                            tileSvg = 'road-turn.svg';
+                            tileAngle = 90;
+                        } else if (hasN && hasW) {
+                            tileSvg = 'road-turn.svg';
+                            tileAngle = 180;
+                        } else if (hasN && hasE) {
+                            tileSvg = 'road-turn.svg';
+                            tileAngle = 270;
+                        // 3. Тупиковые и краевые участки (1 сосед)
+                        } else if (hasN || hasS) {
+                            tileSvg = 'road.svg';
+                            tileAngle = 0;
+                        } else if (hasW || hasE) {
+                            tileSvg = 'road.svg';
+                            tileAngle = 90;
+                        } else {
+                            tileSvg = 'road.svg';
+                            tileAngle = 0;
+                        }
+                    }
+
                     cells.push({
                         x,
                         y,
                         type: isRoad ? 'road' : 'grass',
                         isStart,
-                        isFinish
+                        isFinish,
+                        tileSvg,
+                        tileAngle
                     });
                 }
             }
@@ -127,7 +180,8 @@ function lessonApp() {
                 startX: gridDef.start.x,
                 startY: gridDef.start.y,
                 startDir: gridDef.start.dir ?? 0,
-                crashed: false
+                crashed: false,
+                animate: false
             };
         },
 
@@ -205,16 +259,21 @@ function lessonApp() {
                 this.taskStatus = 'success';
                 this.statusMessage = 'Правильно! Отличный ответ!';
                 this.streak++;
-                localStorage.setItem('streak', this.streak.toString());
-                const curMax = Math.max(parseInt(localStorage.getItem('maxStreak') || '0', 10), this.streak);
-                localStorage.setItem('maxStreak', curMax.toString());
                 if (window.confetti) {
                     window.confetti({ particleCount: 40, spread: 60, origin: { y: 0.8 } });
+                }
+                if (window.CodeRulitGamification) {
+                    window.CodeRulitGamification.recordTaskSuccess({
+                        task: this.currentTask,
+                        streak: this.streak,
+                        stepIndex: this.currentStepIndex
+                    });
                 }
             } else {
                 this.taskStatus = 'fail';
                 this.statusMessage = 'Не совсем так. Серия сброшена! Попробуйте еще раз.';
                 this.streak = 0;
+                this.streakLostInLesson = true;
                 localStorage.setItem('streak', '0');
             }
         },
@@ -249,6 +308,7 @@ function lessonApp() {
 
             const instructions = this.parseCode(assembledCodeString);
 
+            this.car.animate = false;
             this.car.x = this.car.startX;
             this.car.y = this.car.startY;
             this.car.dir = this.car.startDir;
@@ -257,6 +317,10 @@ function lessonApp() {
 
             this.taskStatus = 'running';
             this.statusMessage = 'Автопилот выполняет программу...';
+
+            setTimeout(() => {
+                this.car.animate = true;
+            }, 50);
 
             this.executeSimulationSteps(instructions);
         },
@@ -319,6 +383,7 @@ function lessonApp() {
                     this.taskStatus = 'fail';
                     this.statusMessage = 'Автомобиль съехал с дороги в траву! Серия сброшена.';
                     this.streak = 0;
+                    this.streakLostInLesson = true;
                     localStorage.setItem('streak', '0');
                     return;
                 }
@@ -328,16 +393,23 @@ function lessonApp() {
                         this.taskStatus = 'success';
                         this.statusMessage = 'Отлично! Маршрут пройден успешно!';
                         this.streak++;
-                        localStorage.setItem('streak', this.streak.toString());
-                        const curMax = Math.max(parseInt(localStorage.getItem('maxStreak') || '0', 10), this.streak);
-                        localStorage.setItem('maxStreak', curMax.toString());
                         if (window.confetti) {
                             window.confetti({ particleCount: 50, spread: 70, origin: { y: 0.7 } });
+                        }
+                        if (window.CodeRulitGamification) {
+                            window.CodeRulitGamification.recordTaskSuccess({
+                                task: this.currentTask,
+                                instructions: instructions,
+                                streak: this.streak,
+                                stepIndex: this.currentStepIndex,
+                                carCrashed: this.car.crashed
+                            });
                         }
                     } else {
                         this.taskStatus = 'fail';
                         this.statusMessage = 'Машина не доехала до финиша. Серия сброшена. Попробуйте еще раз!';
                         this.streak = 0;
+                        this.streakLostInLesson = true;
                         localStorage.setItem('streak', '0');
                     }
                     return;
@@ -408,6 +480,7 @@ function lessonApp() {
         },
 
         executeSingleAction(action) {
+            this.car.animate = true;
             const act = action.trim().toLowerCase();
             const car = this.car;
 
@@ -457,6 +530,7 @@ function lessonApp() {
                 clearTimeout(this.simulationTimer);
                 this.simulationTimer = null;
             }
+            this.car.animate = false;
             this.car.x = this.car.startX;
             this.car.y = this.car.startY;
             this.car.dir = this.car.startDir;
@@ -477,6 +551,11 @@ function lessonApp() {
         finishLesson() {
             this.lessonCompleted = true;
 
+            // Сохраняем набранную серию и рекорд только при успешном завершении урока
+            localStorage.setItem('streak', this.streak.toString());
+            const curMax = Math.max(parseInt(localStorage.getItem('maxStreak') || '0', 10), this.streak);
+            localStorage.setItem('maxStreak', curMax.toString());
+
             const currCompleted = parseInt(localStorage.getItem('completedLessons') || '0', 10);
             const numLessonId = parseInt(this.lessonId, 10);
             if (!isNaN(numLessonId)) {
@@ -488,12 +567,29 @@ function lessonApp() {
             const earnedXp = this.lessonId === 'revision' ? 250 : 150;
             localStorage.setItem('userXp', (currentXp + earnedXp).toString());
 
+            if (window.CodeRulitGamification) {
+                window.CodeRulitGamification.recordLessonFinish(earnedXp);
+            }
+
             if (window.confetti) {
                 window.confetti({ particleCount: 100, spread: 100, origin: { y: 0.5 } });
             }
         },
 
+        handleQuit() {
+            if (this.lessonCompleted) return;
+            if (this.streakLostInLesson) {
+                // Если серия была потеряна/сброшена из-за ошибки в этом уроке, она остается 0
+                localStorage.setItem('streak', '0');
+            } else {
+                // При выходе без завершения урока прогресс серии не сохраняется
+                localStorage.setItem('streak', this.initialStreak.toString());
+                localStorage.setItem('maxStreak', this.initialMaxStreak.toString());
+            }
+        },
+
         confirmExit() {
+            this.handleQuit();
             window.location.href = 'index.html';
         }
     };
