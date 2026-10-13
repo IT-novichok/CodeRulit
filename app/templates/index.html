@@ -115,7 +115,7 @@
                 </div>
 
                 <div class="my-auto space-y-4 py-2">
-                    <div class="w-20 h-20 rounded-3xl bg-sky-500/10 text-sky-500 flex items-center justify-center mx-auto shadow-inner border border-sky-500/20">
+                    <div class="w-20 h-20 rounded-3xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner border border-primary/20">
                         <span class="material-symbols-rounded text-5xl filled">directions_car</span>
                     </div>
 
@@ -129,21 +129,21 @@
 
                     <!-- 3 понятных пункта: Где вы и Что делать -->
                     <div class="card bg-base-200 border border-base-300 p-3.5 rounded-2xl text-left space-y-2.5 max-w-xs mx-auto">
-                        <div class="flex items-center gap-2 text-xs font-bold text-sky-500">
+                        <div class="flex items-center gap-2 text-xs font-bold text-primary">
                             <span class="material-symbols-rounded text-lg filled">checklist</span>
                             <span>Что предстоит делать:</span>
                         </div>
                         <ul class="text-[11px] text-base-content/85 space-y-2 leading-snug">
                             <li class="flex items-start gap-2">
-                                <span class="material-symbols-rounded text-sky-500 text-sm mt-0.5">navigation</span>
+                                <span class="material-symbols-rounded text-primary text-sm mt-0.5">navigation</span>
                                 <span><b>Строить маршруты:</b> отдавать команды движения и поворотов.</span>
                             </li>
                             <li class="flex items-start gap-2">
-                                <span class="material-symbols-rounded text-amber-500 text-sm mt-0.5">repeat</span>
+                                <span class="material-symbols-rounded text-secondary text-sm mt-0.5">repeat</span>
                                 <span><b>Автоматизировать:</b> применять циклы и сенсоры препятствий.</span>
                             </li>
                             <li class="flex items-start gap-2">
-                                <span class="material-symbols-rounded text-emerald-500 text-sm mt-0.5">timer</span>
+                                <span class="material-symbols-rounded text-accent text-sm mt-0.5">timer</span>
                                 <span><b>Быстро учиться:</b> каждый рейс занимает всего 3–5 минут практики.</span>
                             </li>
                         </ul>
@@ -154,7 +154,7 @@
                         <label class="text-[11px] font-bold text-base-content/70 px-1 block">Имя водителя:</label>
                         <input type="text" x-model="inputName" @keydown.enter="completeOnboarding()"
                             placeholder="Водитель"
-                            class="input input-bordered input-sm w-full rounded-xl bg-base-200 text-xs font-semibold focus:border-sky-500 mt-1">
+                            class="input input-bordered input-sm w-full rounded-xl bg-base-200 text-xs font-semibold focus:border-primary mt-1">
                     </div>
                 </div>
 
@@ -179,19 +179,19 @@
             </div>
             <div class="navbar-center flex flex-col items-center">
                 <h1 class="text-base font-bold tracking-tight text-base-content select-none leading-tight">КодРулит</h1>
-                <span class="text-[9px] font-semibold text-sky-500 uppercase tracking-wider">Умный транспорт</span>
+                <span class="text-[9px] font-semibold text-primary uppercase tracking-wider">Умный транспорт</span>
             </div>
             <div class="navbar-end">
                 <button @click="toggleTheme()" class="btn btn-ghost btn-circle btn-sm text-base-content"
-                    :aria-label="'Выбрать тему: ' + currentThemeMeta.name"
-                    :title="'Тема оформления: ' + currentThemeMeta.name">
+                    :aria-label="'Выбрать тему: ' + themeName"
+                    :title="'Тема оформления: ' + themeName">
                     <span class="material-symbols-rounded text-2xl"
-                        x-text="currentThemeMeta.icon"></span>
+                        x-text="themeIcon"></span>
                 </button>
             </div>
         </header>
 
-        <!-- Модальное окно выбора темы оформления (6 тем daisyUI) -->
+        <!-- Модальное окно выбора темы оформления (6 тем) -->
         <dialog class="modal" :class="{ 'modal-open': themeModalOpen }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-5 space-y-4 max-w-sm">
                 <div class="flex items-center justify-between pb-2 border-b border-base-300">
@@ -201,7 +201,7 @@
                         </div>
                         <div>
                             <h3 class="text-sm font-bold text-base-content leading-tight">Тема оформления</h3>
-                            <p class="text-[10px] text-base-content/60">6 цветовых стилей daisyUI</p>
+                            <p class="text-[10px] text-base-content/60">6 тем оформления интерфейса</p>
                         </div>
                     </div>
                     <button @click="themeModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
@@ -252,18 +252,18 @@
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity"
             @keydown.escape.window="settingsModalOpen = false">
             <div class="card bg-base-100 border border-base-300 rounded-3xl shadow-2xl max-w-xs w-full p-5 space-y-4 text-center">
-                <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center mx-auto">
+                <div class="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
                     <span class="material-symbols-rounded text-2xl">manage_accounts</span>
                 </div>
                 <div>
                     <h3 class="text-base font-bold text-base-content">Настройки профиля</h3>
                     <p class="text-xs text-base-content/60 mt-1" x-text="'Водитель: ' + (userName || 'Новый водитель')"></p>
-                    <p class="text-[10px] text-sky-500 font-semibold mt-0.5">Тренажёр программирования «КодРулит»</p>
+                    <p class="text-[10px] text-primary font-semibold mt-0.5">Тренажёр программирования «КодРулит»</p>
                 </div>
                 <div class="space-y-2 pt-1">
                     <button @click="themeModalOpen = true; settingsModalOpen = false" class="btn btn-outline border-base-300 btn-sm rounded-xl w-full font-bold gap-1.5 text-xs text-base-content">
-                        <span class="material-symbols-rounded text-base text-primary" x-text="currentThemeMeta.icon"></span>
-                        <span x-text="'Тема: ' + currentThemeMeta.name + ' (выбрать)'"></span>
+                        <span class="material-symbols-rounded text-base text-primary" x-text="themeIcon"></span>
+                        <span x-text="'Тема: ' + themeName + ' (выбрать)'"></span>
                     </button>
                     <button @click="introTutorialModalOpen = true; settingsModalOpen = false" class="btn btn-primary btn-soft btn-sm rounded-xl w-full font-bold gap-1.5 text-xs">
                         <span class="material-symbols-rounded text-base">school</span>
@@ -287,7 +287,7 @@
             <div class="card bg-base-100 border border-base-300 rounded-3xl shadow-2xl max-w-sm w-full p-5 space-y-4 text-center max-h-[85vh] overflow-y-auto">
                 <div class="flex items-center justify-between pb-2 border-b border-base-300">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-rounded text-sky-500 text-xl filled">school</span>
+                        <span class="material-symbols-rounded text-primary text-xl filled">school</span>
                         <h3 class="text-sm font-bold text-base-content">Вводный сценарий «КодРулит»</h3>
                     </div>
                     <button @click="introTutorialModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
@@ -297,7 +297,7 @@
 
                 <div class="space-y-3 text-left">
                     <div class="p-3 rounded-2xl bg-base-200 border border-base-300 space-y-1">
-                        <div class="flex items-center gap-2 text-xs font-bold text-sky-500">
+                        <div class="flex items-center gap-2 text-xs font-bold text-primary">
                             <span class="material-symbols-rounded text-base filled">directions_car</span>
                             <span>1. Как проходить уроки:</span>
                         </div>
@@ -307,7 +307,7 @@
                     </div>
 
                     <div class="p-3 rounded-2xl bg-base-200 border border-base-300 space-y-1">
-                        <div class="flex items-center gap-2 text-xs font-bold text-amber-500">
+                        <div class="flex items-center gap-2 text-xs font-bold text-secondary">
                             <span class="material-symbols-rounded text-base filled">extension</span>
                             <span>2. Как выполнять задания:</span>
                         </div>
@@ -317,7 +317,7 @@
                     </div>
 
                     <div class="p-3 rounded-2xl bg-base-200 border border-base-300 space-y-1">
-                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-500">
+                        <div class="flex items-center gap-2 text-xs font-bold text-accent">
                             <span class="material-symbols-rounded text-base filled">emoji_events</span>
                             <span>3. Игровые награды:</span>
                         </div>
@@ -462,27 +462,27 @@
                 <template x-if="!hasStartedLesson">
                     <div class="space-y-3">
                         <!-- Приветственный баннер-ориентир -->
-                        <div class="card rounded-3xl bg-linear-to-br from-sky-500/15 via-primary/10 to-indigo-500/10 border border-sky-500/30 shadow-xs p-4.5 space-y-2">
+                        <div class="card rounded-3xl bg-linear-to-br from-primary/15 via-secondary/10 to-accent/10 border border-primary/30 shadow-xs p-4.5 space-y-2">
                             <div class="flex items-center gap-2.5">
-                                <div class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                                <div class="w-10 h-10 rounded-2xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
                                     <span class="material-symbols-rounded text-2xl filled">local_shipping</span>
                                 </div>
                                 <div>
                                     <h3 class="text-sm sm:text-base font-black text-base-content leading-tight" x-text="'Добро пожаловать, ' + (userName || 'водитель') + '!'"></h3>
-                                    <p class="text-[11px] text-sky-600 dark:text-sky-400 font-semibold">Диспетчерская служба «КодРулит»</p>
+                                    <p class="text-[11px] text-primary font-semibold">Диспетчерская служба «КодРулит»</p>
                                 </div>
                             </div>
                             <p class="text-xs text-base-content/85 leading-relaxed">
                                 Вы находитесь в интерактивном тренажёре алгоритмов городского транспорта. Ваша задача — программировать маршруты и безопасно доставлять посылки по кварталам города!
                             </p>
-                            <div class="p-2.5 rounded-2xl bg-base-100/80 border border-sky-500/20 text-[11px] text-base-content/75 flex items-center gap-2">
-                                <span class="material-symbols-rounded text-sky-500 text-base shrink-0">info</span>
+                            <div class="p-2.5 rounded-2xl bg-base-100/80 border border-primary/20 text-[11px] text-base-content/75 flex items-center gap-2">
+                                <span class="material-symbols-rounded text-primary text-base shrink-0">info</span>
                                 <span>Начните с <b>Урока 1</b>: изучите базовые команды и совершите первый успешный рейс.</span>
                             </div>
                         </div>
 
                         <!-- Карточка старта Урока 1 -->
-                        <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
+                        <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-primary/40 transition-all">
                             <div class="card-body p-4.5 gap-3.5">
                                 <div class="flex items-center justify-between">
                                     <span class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Первый рейс</span>
@@ -497,7 +497,7 @@
                                 <div class="space-y-1.5">
                                     <div class="flex justify-between items-center text-xs">
                                         <span class="text-base-content/70 font-medium">Прогресс модуля</span>
-                                        <span class="font-bold text-sky-500">0%</span>
+                                        <span class="font-bold text-primary">0%</span>
                                     </div>
                                     <progress class="progress progress-primary w-full h-2.5 rounded-full" value="0" max="100"></progress>
                                 </div>
@@ -517,7 +517,7 @@
                     <div class="card-body p-4.5 gap-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <span class="material-symbols-rounded text-sky-500 text-lg">crisis_alert</span>
+                                <span class="material-symbols-rounded text-primary text-lg filled">crisis_alert</span>
                                 <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Задания дня</h4>
                             </div>
                             <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
@@ -570,14 +570,14 @@
                     </div>
 
                     <div class="badge badge-soft badge-primary font-bold text-xs gap-1.5 py-3.5 px-3 select-none">
-                        <span class="material-symbols-rounded text-base text-sky-500 filled">school</span>
+                        <span class="material-symbols-rounded text-base text-primary filled">school</span>
                         <span x-text="completedLessons + ' / 4 пройдено'"></span>
                     </div>
                 </div>
 
                 <!-- Карточка тематического модуля (Критерий 3) -->
-                <div class="card bg-sky-500/10 border border-sky-500/20 rounded-2xl p-3.5 space-y-1">
-                    <div class="flex items-center justify-between text-xs font-bold text-sky-600 dark:text-sky-400">
+                <div class="card bg-primary/10 border border-primary/20 rounded-2xl p-3.5 space-y-1">
+                    <div class="flex items-center justify-between text-xs font-bold text-primary">
                         <span class="flex items-center gap-1.5">
                             <span class="material-symbols-rounded text-sm">route</span>
                             <span>Модуль: «Основы алгоритмов»</span>
@@ -630,7 +630,7 @@
 
                 <!-- 1. Базовое движение (вперед, направо, налево) -->
                 <div
-                    class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
+                    class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-primary/40 transition-all">
                     <div class="card-body p-4.5 gap-3.5">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
@@ -656,7 +656,7 @@
                         <div class="space-y-1.5">
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
-                                <span class="font-bold" :class="completedLessons >= 1 ? 'text-success' : 'text-sky-500'"
+                                <span class="font-bold" :class="completedLessons >= 1 ? 'text-success' : 'text-primary'"
                                     x-text="completedLessons >= 1 ? '100%' : '0%'"></span>
                             </div>
                             <progress class="progress w-full h-2.5 rounded-full"
@@ -676,7 +676,7 @@
 
                 <!-- 2. Цикл со счетчиком (сделать A x раз) -->
                 <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 1 
-                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
+                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-primary/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
                     <div class="card-body p-4.5 gap-3.5">
                         <div class="flex items-center justify-between">
@@ -707,7 +707,7 @@
                         <div x-show="completedLessons >= 1" class="space-y-1.5">
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
-                                <span class="font-bold" :class="completedLessons >= 2 ? 'text-success' : 'text-sky-500'"
+                                <span class="font-bold" :class="completedLessons >= 2 ? 'text-success' : 'text-primary'"
                                     x-text="completedLessons >= 2 ? '100%' : '0%'"></span>
                             </div>
                             <progress class="progress w-full h-2.5 rounded-full"
@@ -737,7 +737,7 @@
 
                 <!-- 3. Условия (если A, то сделать Б) -->
                 <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 2 
-                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
+                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-primary/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
                     <div class="card-body p-4.5 gap-3.5">
                         <div class="flex items-center justify-between">
@@ -768,7 +768,7 @@
                         <div x-show="completedLessons >= 2" class="space-y-1.5">
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
-                                <span class="font-bold" :class="completedLessons >= 3 ? 'text-success' : 'text-sky-500'"
+                                <span class="font-bold" :class="completedLessons >= 3 ? 'text-success' : 'text-primary'"
                                     x-text="completedLessons >= 3 ? '100%' : '0%'"></span>
                             </div>
                             <progress class="progress w-full h-2.5 rounded-full"
@@ -798,7 +798,7 @@
 
                 <!-- 4. Условный цикл (делать А пока Б) -->
                 <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 3 
-                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40' 
+                        ? 'bg-base-200 border-base-300 shadow-xs hover:border-primary/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
                     <div class="card-body p-4.5 gap-3.5">
                         <div class="flex items-center justify-between">
@@ -829,7 +829,7 @@
                         <div x-show="completedLessons >= 3" class="space-y-1.5">
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-base-content/70 font-medium">Прогресс маршрута</span>
-                                <span class="font-bold" :class="completedLessons >= 4 ? 'text-success' : 'text-sky-500'"
+                                <span class="font-bold" :class="completedLessons >= 4 ? 'text-success' : 'text-primary'"
                                     x-text="completedLessons >= 4 ? '100%' : '0%'"></span>
                             </div>
                             <progress class="progress w-full h-2.5 rounded-full"
@@ -866,7 +866,7 @@
                         <h2 class="text-2xl font-black tracking-tight text-base-content">База знаний</h2>
                     </div>
                     <span class="badge badge-soft badge-primary font-bold text-xs gap-1.5 py-3.5 px-3 rounded-full">
-                        <span class="material-symbols-rounded text-base text-sky-500 filled">menu_book</span>
+                        <span class="material-symbols-rounded text-base text-primary filled">menu_book</span>
                         <span>Теория</span>
                     </span>
                 </div>
@@ -895,7 +895,7 @@
                         <!-- Концепт -->
                         <div class="space-y-1.5">
                             <h4 class="font-bold text-base-content flex items-center gap-1.5">
-                                <span class="material-symbols-rounded text-sky-500 text-base">psychology</span>
+                                <span class="material-symbols-rounded text-secondary text-base">psychology</span>
                                 <span>Суть концепции: Язык инструкций</span>
                             </h4>
                             <p class="leading-relaxed">
@@ -913,7 +913,7 @@
                         <!-- Понятие исполнителя -->
                         <div class="p-3 rounded-2xl bg-base-100/80 border border-base-300/70 space-y-2">
                             <h5
-                                class="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-sky-500">
+                                class="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-primary">
                                 <span class="material-symbols-rounded text-sm">directions_car</span>
                                 <span>Понятие «Исполнитель»</span>
                             </h5>
@@ -930,22 +930,22 @@
                             <h4 class="font-bold text-base-content">Главные правила любого алгоритма:</h4>
                             <div class="grid grid-cols-2 gap-2 text-[11px]">
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <span class="font-bold text-sky-500 block">1. Дискретность</span>
+                                    <span class="font-bold text-primary block">1. Дискретность</span>
                                     <span class="text-base-content/70 mt-0.5 block">Разбит на чёткие отдельные
                                         шаги</span>
                                 </div>
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <span class="font-bold text-sky-500 block">2. Понятность</span>
+                                    <span class="font-bold text-primary block">2. Понятность</span>
                                     <span class="text-base-content/70 mt-0.5 block">Содержит только известные
                                         команды</span>
                                 </div>
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <span class="font-bold text-sky-500 block">3. Точность</span>
+                                    <span class="font-bold text-primary block">3. Точность</span>
                                     <span class="text-base-content/70 mt-0.5 block">Однозначен: нет
                                         двусмысленности</span>
                                 </div>
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <span class="font-bold text-sky-500 block">4. Результат</span>
+                                    <span class="font-bold text-primary block">4. Результат</span>
                                     <span class="text-base-content/70 mt-0.5 block">Всегда приводит к решению
                                         задачи</span>
                                 </div>
@@ -1002,7 +1002,7 @@
                             </p>
                             <p class="leading-relaxed">
                                 <b>Порядок имеет решающее значение!</b> Сравните: «надеть носки, затем обуть ботинки» и
-                                наоборот. В коде то же самое: команда <code class="font-mono text-sky-500 font-bold">направо</code>, выполненная
+                                наоборот. В коде то же самое: команда <code class="font-mono text-primary font-bold">направо</code>, выполненная
                                 <i>до</i> или <i>после</i> шага вперед, приведёт машину в совершенно разные точки!
                             </p>
                         </div>
@@ -1013,33 +1013,33 @@
                                 <div
                                     class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
                                     <code
-                                        class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">вперед</code>
+                                        class="font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md w-fit">вперед</code>
                                     <span class="text-base-content/70 text-[11px]">Движение на 1 клетку вперёд по
                                         направлению машины</span>
                                 </div>
                                 <div
                                     class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
-                                    <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">направо</code>
+                                    <code class="font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md w-fit">направо</code>
                                     <span class="text-base-content/70 text-[11px]">Разворот корпуса на 90° по часовой
                                         стрелке</span>
                                 </div>
                                 <div
                                     class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
-                                    <code class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-md w-fit">налево</code>
+                                    <code class="font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-md w-fit">налево</code>
                                     <span class="text-base-content/70 text-[11px]">Разворот корпуса на 90° против
                                         часовой стрелки</span>
                                 </div>
                                 <div
                                     class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
                                     <code
-                                        class="font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md w-fit">загрузить</code>
+                                        class="font-mono font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-md w-fit">загрузить</code>
                                     <span class="text-base-content/70 text-[11px]">Посадить пассажира или забрать
                                         контейнер с грузом</span>
                                 </div>
                                 <div
                                     class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
                                     <code
-                                        class="font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md w-fit">выгрузить</code>
+                                        class="font-mono font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-md w-fit">выгрузить</code>
                                     <span class="text-base-content/70 text-[11px]">Высадить пассажира в точке
                                         назначения</span>
                                 </div>
@@ -1085,13 +1085,13 @@
 
                         <div class="space-y-1.5">
                             <h4 class="font-bold text-base-content flex items-center gap-1.5">
-                                <span class="material-symbols-rounded text-sky-500 text-base">repeat</span>
+                                <span class="material-symbols-rounded text-secondary text-base">repeat</span>
                                 <span>Концепция: Зачем нужны циклы?</span>
                             </h4>
                             <p class="leading-relaxed">
                                 В реальных задачах действия часто повторяются. Если вам нужно проехать по прямой 10
                                 перекрёстков, писать 10 раз команду <code
-                                    class="font-mono text-sky-500 font-bold">вперед</code> долго, некрасиво и
+                                    class="font-mono text-primary font-bold">вперед</code> долго, некрасиво и
                                 утомительно. Легко случайно написать 9 или 11 раз и ошибиться.
                             </p>
                             <p class="leading-relaxed">
@@ -1103,7 +1103,7 @@
                         </div>
 
                         <div class="p-3 rounded-2xl bg-base-100/80 border border-base-300/70 space-y-1.5">
-                            <h5 class="font-bold text-[11px] uppercase tracking-wider text-sky-500">
+                            <h5 class="font-bold text-[11px] uppercase tracking-wider text-primary">
                                 Как это работает внутри?
                             </h5>
                             <p class="leading-relaxed">
@@ -1119,7 +1119,7 @@
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-base-content">Формат записи:</span>
                                 <code
-                                    class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg">[действие] X раз</code>
+                                    class="font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-lg">[действие] X раз</code>
                             </div>
                             <p class="text-[11px] text-base-content/70">
                                 Где <b class="text-base-content">действие</b> — любая базовая команда, а <b
@@ -1179,7 +1179,7 @@
 
                         <div class="space-y-1.5">
                             <h4 class="font-bold text-base-content flex items-center gap-1.5">
-                                <span class="material-symbols-rounded text-sky-500 text-base">alt_route</span>
+                                <span class="material-symbols-rounded text-secondary text-base">alt_route</span>
                                 <span>Концепция: Как программа делает выбор?</span>
                             </h4>
                             <p class="leading-relaxed">
@@ -1198,14 +1198,14 @@
                             <div class="space-y-1">
                                 <span class="font-bold text-base-content">1. Неполное ветвление (только действие при
                                     успехе):</span>
-                                <div class="bg-base-200/80 p-2 rounded-xl font-mono text-sky-500 font-bold">
+                                <div class="bg-base-200/80 p-2 rounded-xl font-mono text-primary font-bold">
                                     если &lt;условие&gt; то: &lt;команда&gt;
                                 </div>
                             </div>
                             <div class="space-y-1">
                                 <span class="font-bold text-base-content">2. Полное ветвление (с альтернативным планом
                                     «иначе»):</span>
-                                <div class="bg-base-200/80 p-2 rounded-xl font-mono text-sky-500 font-bold">
+                                <div class="bg-base-200/80 p-2 rounded-xl font-mono text-primary font-bold">
                                     если &lt;условие&gt; то: &lt;команда 1&gt; иначе: &lt;команда 2&gt;
                                 </div>
                             </div>
@@ -1217,25 +1217,25 @@
                             <div class="grid grid-cols-2 gap-2 text-xs">
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
                                     <code
-                                        class="font-mono font-bold text-amber-500 block text-[11px]">спереди_свободно</code>
+                                        class="font-mono font-bold text-accent block text-[11px]">спереди_свободно</code>
                                     <span class="text-[10px] text-base-content/60 mt-0.5 block">Впереди нет стены или
                                         машины</span>
                                 </div>
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
                                     <code
-                                        class="font-mono font-bold text-amber-500 block text-[11px]">сзади_свободно</code>
+                                        class="font-mono font-bold text-accent block text-[11px]">сзади_свободно</code>
                                     <span class="text-[10px] text-base-content/60 mt-0.5 block">Сзади свободная
                                         клетка</span>
                                 </div>
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
                                     <code
-                                        class="font-mono font-bold text-amber-500 block text-[11px]">слева_свободно</code>
+                                        class="font-mono font-bold text-accent block text-[11px]">слева_свободно</code>
                                     <span class="text-[10px] text-base-content/60 mt-0.5 block">Слева свободная
                                         полоса</span>
                                 </div>
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
                                     <code
-                                        class="font-mono font-bold text-amber-500 block text-[11px]">справа_свободно</code>
+                                        class="font-mono font-bold text-accent block text-[11px]">справа_свободно</code>
                                     <span class="text-[10px] text-base-content/60 mt-0.5 block">Справа свободная
                                         полоса</span>
                                 </div>
@@ -1280,11 +1280,11 @@
 
                         <div class="space-y-1.5">
                             <h4 class="font-bold text-base-content flex items-center gap-1.5">
-                                <span class="material-symbols-rounded text-sky-500 text-base">sync_alt</span>
+                                <span class="material-symbols-rounded text-primary text-base">sync_alt</span>
                                 <span>Концепция: Когда неизвестно число шагов?</span>
                             </h4>
                             <p class="leading-relaxed">
-                                В цикле со счётчиком (<code class="font-mono text-sky-500 font-bold">3 раза</code>) мы
+                                В цикле со счётчиком (<code class="font-mono text-primary font-bold">3 раза</code>) мы
                                 должны заранее знать длину пути. Но представьте длинную прямую магистраль, где светофор
                                 может загореться в любой момент, или лабиринт, расстояние в котором меняется от карты к
                                 карте.
@@ -1315,11 +1315,11 @@
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-base-content">Конструкция:</span>
                                 <code
-                                    class="font-mono font-bold text-sky-500 bg-sky-500/10 px-2 py-0.5 rounded-lg">[действие] пока [условие]</code>
+                                    class="font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-lg">[действие] пока [условие]</code>
                             </div>
                             <p class="text-[11px] text-base-content/70">
                                 Или многострочная запись: <code
-                                    class="font-mono text-sky-500 font-bold">пока &lt;условие&gt; выполнить: &lt;команды&gt;</code>
+                                    class="font-mono text-primary font-bold">пока &lt;условие&gt; выполнить: &lt;команды&gt;</code>
                             </p>
                         </div>
 
@@ -1359,7 +1359,7 @@
 
                         <div class="space-y-1.5">
                             <h4 class="font-bold text-base-content flex items-center gap-1.5">
-                                <span class="material-symbols-rounded text-sky-500 text-base">hub</span>
+                                <span class="material-symbols-rounded text-accent text-base">hub</span>
                                 <span>Концепция: Булева алгебра и связки</span>
                             </h4>
                             <p class="leading-relaxed">
@@ -1373,7 +1373,7 @@
                             <div
                                 class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
                                 <code
-                                    class="font-mono font-bold text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded-lg shrink-0">И</code>
+                                    class="font-mono font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-lg shrink-0">И</code>
                                 <div class="text-base-content/70">
                                     <b class="text-base-content">Конъюнкция:</b> всё выражение истинно только тогда,
                                     когда <span class="underline">оба</span> условия верны одновременно.
@@ -1382,7 +1382,7 @@
                             <div
                                 class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
                                 <code
-                                    class="font-mono font-bold text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded-lg shrink-0">ИЛИ</code>
+                                    class="font-mono font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-lg shrink-0">ИЛИ</code>
                                 <div class="text-base-content/70">
                                     <b class="text-base-content">Дизъюнкция:</b> истинно, если выполняется <span
                                         class="underline">хотя бы одно</span> из условий (любое или оба).
@@ -1391,7 +1391,7 @@
                             <div
                                 class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
                                 <code
-                                    class="font-mono font-bold text-indigo-500 bg-indigo-500/10 px-2 py-0.5 rounded-lg shrink-0">НЕ</code>
+                                    class="font-mono font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-lg shrink-0">НЕ</code>
                                 <div class="text-base-content/70">
                                     <b class="text-base-content">Отрицание:</b> инвертирует результат (было «Истина» —
                                     стало «Ложь», и наоборот).
@@ -1401,13 +1401,13 @@
 
                         <div class="space-y-1.5">
                             <h4 class="font-bold text-base-content flex items-center gap-1.5">
-                                <span class="material-symbols-rounded text-sky-500 text-base">account_tree</span>
+                                <span class="material-symbols-rounded text-secondary text-base">account_tree</span>
                                 <span>Вложенные конструкции: Условия внутри циклов</span>
                             </h4>
                             <p class="leading-relaxed">
                                 Умные системы управления транспортом строятся из комбинаций: вы можете поместить условие <code
-                                    class="font-mono text-sky-500 font-bold">если</code> внутрь цикла <code
-                                    class="font-mono text-sky-500 font-bold">пока</code>. Машина будет ехать и на каждом
+                                    class="font-mono text-primary font-bold">если</code> внутрь цикла <code
+                                    class="font-mono text-primary font-bold">пока</code>. Машина будет ехать и на каждом
                                 перекрёстке самостоятельно оценивать обстановку по датчикам!
                             </p>
                         </div>
@@ -1445,7 +1445,7 @@
                             <div class="flex-1 flex-row min-w-0">
                                 <h3 class="block text-lg font-black text-base-content tracking-tight truncate"
                                     x-text="userName"></h3>
-                                <div class="flex items-center gap-1.5 mt-1 text-sky-500 font-bold text-xs">
+                                <div class="flex items-center gap-1.5 mt-1 text-primary font-bold text-xs">
                                     <span class="material-symbols-rounded text-base filled">stars</span>
                                     <span x-text="userXp + ' ОП'"></span>
                                 </div>
@@ -1462,7 +1462,7 @@
                             </div>
 
                             <div class="text-center p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                <div class="flex items-center justify-center text-sky-500">
+                                <div class="flex items-center justify-center text-primary">
                                     <span class="material-symbols-rounded text-lg filled">school</span>
                                 </div>
                                 <p class="text-sm font-black text-base-content mt-0.5"
@@ -1471,7 +1471,7 @@
                             </div>
 
                             <div class="text-center p-2 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                <div class="flex items-center justify-center text-emerald-500">
+                                <div class="flex items-center justify-center text-accent">
                                     <span class="material-symbols-rounded text-lg filled">military_tech</span>
                                 </div>
                                 <p class="text-sm font-black text-base-content mt-0.5" x-text="completedAchievementsCount + ' / 5'"></p>
@@ -1487,12 +1487,12 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span
-                                    class="material-symbols-rounded text-amber-500 text-lg filled">military_tech</span>
+                                    class="material-symbols-rounded text-accent text-lg filled">military_tech</span>
                                 <h4 class="text-xs font-bold uppercase tracking-wider text-base-content/70">Достижения
                                 </h4>
                             </div>
                             <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
-                                :class="completedAchievementsCount === (achievementsList.length || 5) && achievementsList.length > 0 ? 'badge-success' : 'badge-warning'"
+                                :class="completedAchievementsCount === (achievementsList.length || 5) && achievementsList.length > 0 ? 'badge-success' : 'badge-accent'"
                                 x-text="completedAchievementsCount + '/' + (achievementsList.length || 5) + ' выполнено'"></span>
                         </div>
 
@@ -1502,7 +1502,7 @@
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center gap-2">
                                             <div class="w-7 h-7 rounded-xl flex items-center justify-center shrink-0"
-                                                :class="(ach.current || 0) >= ach.max ? 'bg-success/10 text-success' : (ach.id === 'streakMaster' ? 'bg-orange-500/10 text-orange-500' : 'bg-amber-500/10 text-amber-500')">
+                                                :class="(ach.current || 0) >= ach.max ? 'bg-success/10 text-success' : 'bg-accent/10 text-accent'">
                                                 <span class="material-symbols-rounded text-base filled" x-text="ach.icon"></span>
                                             </div>
                                             <p class="text-xs font-bold text-base-content flex items-center gap-1.5">
@@ -1513,7 +1513,7 @@
                                             </p>
                                         </div>
                                         <span class="badge badge-soft font-bold text-[10px] gap-1 rounded-full"
-                                            :class="(ach.current || 0) >= ach.max ? 'badge-success' : 'badge-warning'"
+                                            :class="(ach.current || 0) >= ach.max ? 'badge-success' : 'badge-accent'"
                                             x-text="ach.reward"></span>
                                     </div>
                                     <p class="text-[11px] text-base-content/60" x-text="ach.desc"></p>
@@ -1525,7 +1525,7 @@
                                                 x-text="Math.min(ach.current || 0, ach.max) + ' / ' + ach.max"></span>
                                         </div>
                                         <progress class="progress w-full h-2 rounded-full"
-                                            :class="(ach.current || 0) >= ach.max ? 'progress-success' : 'progress-warning'"
+                                            :class="(ach.current || 0) >= ach.max ? 'progress-success' : 'progress-accent'"
                                             :value="Math.min(ach.current || 0, ach.max)"
                                             :max="ach.max"></progress>
                                     </div>
@@ -1543,7 +1543,7 @@
                 class="dock dock-sm dock-telegram rounded-2xl shadow-lg border border-base-300 bg-base-200/95 backdrop-blur-md px-1">
                 <!-- Главная -->
                 <button @click="activeTab = 'home'"
-                    :class="activeTab === 'home' ? 'dock-active text-sky-500' : 'text-base-content/60 hover:text-base-content'"
+                    :class="activeTab === 'home' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Главная">
                     <span class="material-symbols-rounded text-2xl"
                         :class="{ 'filled': activeTab === 'home' }">home</span>
@@ -1552,7 +1552,7 @@
 
                 <!-- Уроки -->
                 <button @click="activeTab = 'lessons'"
-                    :class="activeTab === 'lessons' ? 'dock-active text-sky-500' : 'text-base-content/60 hover:text-base-content'"
+                    :class="activeTab === 'lessons' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Уроки">
                     <span class="material-symbols-rounded text-2xl"
                         :class="{ 'filled': activeTab === 'lessons' }">code</span>
@@ -1561,7 +1561,7 @@
 
                 <!-- Знания -->
                 <button @click="activeTab = 'knowledge'"
-                    :class="activeTab === 'knowledge' ? 'dock-active text-sky-500' : 'text-base-content/60 hover:text-base-content'"
+                    :class="activeTab === 'knowledge' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Знания">
                     <span class="material-symbols-rounded text-2xl"
                         :class="{ 'filled': activeTab === 'knowledge' }">menu_book</span>
@@ -1570,7 +1570,7 @@
 
                 <!-- Профиль -->
                 <button @click="activeTab = 'profile'"
-                    :class="activeTab === 'profile' ? 'dock-active text-sky-500' : 'text-base-content/60 hover:text-base-content'"
+                    :class="activeTab === 'profile' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Профиль">
                     <span class="material-symbols-rounded text-2xl"
                         :class="{ 'filled': activeTab === 'profile' }">person</span>

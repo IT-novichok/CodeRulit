@@ -55,26 +55,20 @@
                 </div>
             </div>
 
-            <!-- Кнопки: Подсказка, ИИ-Штурман, Теория, Тема -->
+            <!-- Кнопки: Подсказка, ИИ-Штурман, Теория -->
             <div class="navbar-end w-auto flex items-center gap-1">
-                <button @click="openHint()" class="btn btn-ghost btn-circle btn-sm text-amber-500 hover:bg-amber-500/10"
+                <button @click="openHint()" class="btn btn-ghost btn-circle btn-sm text-accent hover:bg-accent/10"
                     aria-label="Подсказка к заданию" title="Подсказка к заданию">
                     <span class="material-symbols-rounded text-2xl filled">lightbulb</span>
                 </button>
-                <button @click="openAiWithQuestion()" class="btn btn-ghost btn-circle btn-sm text-sky-500 hover:bg-sky-500/10 relative"
+                <button @click="openAiWithQuestion()" class="btn btn-ghost btn-circle btn-sm text-primary hover:bg-primary/10 relative"
                     aria-label="ИИ-Штурман" title="ИИ-ассистент Штурман">
                     <span class="material-symbols-rounded text-2xl filled">smart_toy</span>
                     <span class="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                 </button>
-                <button @click="theoryModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-sky-500 hover:bg-sky-500/10"
+                <button @click="theoryModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-secondary hover:bg-secondary/10"
                     aria-label="Справка и теория" title="Теория к уроку">
                     <span class="material-symbols-rounded text-2xl filled">menu_book</span>
-                </button>
-                <button @click="toggleTheme()" class="btn btn-ghost btn-circle btn-sm text-base-content"
-                    :aria-label="'Выбрать тему: ' + currentThemeMeta.name"
-                    :title="'Тема оформления: ' + currentThemeMeta.name">
-                    <span class="material-symbols-rounded text-2xl"
-                        x-text="currentThemeMeta.icon"></span>
                 </button>
             </div>
         </header>
@@ -82,7 +76,7 @@
         <!-- Индикатор образовательного маршрута модуля (Критерий 3) -->
         <div class="px-3 py-1.5 bg-base-200/80 border-b border-base-300 flex items-center justify-between text-[11px] shrink-0">
             <div class="flex items-center gap-1.5 font-bold text-base-content/80 truncate">
-                <span class="material-symbols-rounded text-sky-500 text-sm">alt_route</span>
+                <span class="material-symbols-rounded text-primary text-sm">alt_route</span>
                 <span x-show="!isRevision" x-text="'Модуль: «Основы алгоритмов» • Урок ' + moduleLessonNum + ' из ' + moduleLessonsTotal"></span>
                 <span x-show="isRevision">Модуль: «Основы алгоритмов» • Итоговая ревизия</span>
             </div>
@@ -144,10 +138,10 @@
                     <template x-if="currentTask.type === 'lecture'">
                         <div class="space-y-3 pt-1">
                             <!-- Карточка микросюжета рейса -->
-                            <div class="rounded-2xl bg-gradient-to-r from-sky-500/10 via-primary/10 to-indigo-500/10 border border-sky-500/20 p-3.5 space-y-1.5">
+                            <div class="rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 border border-primary/20 p-3.5 space-y-1.5">
                                 <div class="flex items-center gap-2">
                                     <span class="badge badge-primary font-bold text-[10px] uppercase tracking-wide" x-text="currentTask.storyChapter || 'Бриф рейса'"></span>
-                                    <span class="text-xs font-bold text-sky-600 dark:text-sky-400">Служба доставки «КодРулит»</span>
+                                    <span class="text-xs font-bold text-primary">Служба доставки «КодРулит»</span>
                                 </div>
                                 <p class="text-xs leading-relaxed text-base-content/90 font-medium" x-text="currentTask.story"></p>
                             </div>
@@ -155,7 +149,7 @@
                             <!-- Карточка понятного объяснения материала -->
                             <div class="rounded-2xl bg-base-200 border border-base-300 p-3.5 space-y-2">
                                 <div class="flex items-center gap-2">
-                                    <span class="material-symbols-rounded text-sky-500 text-lg filled">auto_stories</span>
+                                    <span class="material-symbols-rounded text-primary text-lg filled">auto_stories</span>
                                     <h3 class="text-xs font-bold uppercase tracking-wide text-base-content/80">Как это устроено</h3>
                                 </div>
                                 <p class="text-xs leading-relaxed text-base-content/80" x-text="currentTask.explanation"></p>
@@ -165,20 +159,20 @@
                             <template x-if="currentTask.example">
                                 <div class="rounded-2xl bg-base-200 border border-base-300 p-3.5 space-y-2">
                                     <div class="flex items-center gap-2">
-                                        <span class="material-symbols-rounded text-emerald-500 text-lg">terminal</span>
+                                        <span class="material-symbols-rounded text-secondary text-lg">terminal</span>
                                         <h3 class="text-xs font-bold uppercase tracking-wide text-base-content/80">Пример программы</h3>
                                     </div>
-                                    <pre class="bg-base-100 rounded-xl p-3 border border-base-300 font-mono text-xs text-sky-500 font-bold whitespace-pre-wrap leading-relaxed" x-text="currentTask.example.code"></pre>
+                                    <pre class="bg-base-100 rounded-xl p-3 border border-base-300 font-mono text-xs text-primary font-bold whitespace-pre-wrap leading-relaxed" x-text="currentTask.example.code"></pre>
                                     <p class="text-[11px] text-base-content/70 italic leading-snug" x-text="currentTask.example.desc"></p>
                                 </div>
                             </template>
 
                             <!-- Правило водителя -->
                             <template x-if="currentTask.rule">
-                                <div class="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-3 flex items-start gap-2.5">
-                                    <span class="material-symbols-rounded text-amber-500 text-xl shrink-0 mt-0.5 filled">verified</span>
+                                <div class="rounded-2xl bg-accent/10 border border-accent/30 p-3 flex items-start gap-2.5">
+                                    <span class="material-symbols-rounded text-accent text-xl shrink-0 mt-0.5 filled">verified</span>
                                     <div>
-                                        <span class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 block tracking-wide">Правило водителя</span>
+                                        <span class="text-[11px] font-black uppercase text-accent block tracking-wide">Правило водителя</span>
                                         <p class="text-xs text-base-content/90 font-semibold leading-snug mt-0.5" x-text="currentTask.rule"></p>
                                     </div>
                                 </div>
@@ -202,11 +196,11 @@
                                 <button @click="selectOption(optIdx)"
                                     class="w-full text-left p-3.5 rounded-2xl border text-xs font-semibold transition-all flex items-center justify-between"
                                     :class="selectedOption === optIdx 
-                                        ? 'bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400 shadow-xs' 
-                                        : 'bg-base-200 border-base-300 text-base-content hover:border-sky-500/40'">
+                                        ? 'bg-primary/10 border-primary text-primary shadow-xs' 
+                                        : 'bg-base-200 border-base-300 text-base-content hover:border-primary/40'">
                                     <span x-text="opt"></span>
                                     <span class="material-symbols-rounded text-lg shrink-0 ml-2"
-                                        :class="selectedOption === optIdx ? 'text-sky-500 filled' : 'text-base-content/20'"
+                                        :class="selectedOption === optIdx ? 'text-primary filled' : 'text-base-content/20'"
                                         x-text="selectedOption === optIdx ? 'check_circle' : 'radio_button_unchecked'"></span>
                                 </button>
                             </template>
@@ -277,7 +271,7 @@
                             <div class="card bg-base-200 border border-base-300 rounded-2xl p-3 space-y-2.5">
                                 <div class="flex items-center justify-between text-[11px] font-bold text-base-content/60">
                                     <span class="flex items-center gap-1.5">
-                                        <span class="material-symbols-rounded text-sky-500 text-sm">code</span>
+                                        <span class="material-symbols-rounded text-primary text-sm">code</span>
                                         <span>Программа бортового компьютера</span>
                                     </span>
                                     <template x-if="currentTask.type === 'blocks'">
@@ -297,7 +291,7 @@
                                                             <button @click="clearBlank()"
                                                                 class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg border text-xs font-bold font-mono transition-all"
                                                                 :class="filledBlank 
-                                                                    ? 'bg-sky-500 text-white border-sky-500 shadow-xs' 
+                                                                    ? 'bg-primary text-primary-content border-primary shadow-xs' 
                                                                     : 'bg-base-200 border-dashed border-base-content/30 text-base-content/40 min-w-16'">
                                                                 <span x-text="filledBlank || '...'"></span>
                                                             </button>
@@ -317,7 +311,7 @@
                                                 <template x-for="word in currentTask.wordBank" :key="word">
                                                     <button @click="fillBlank(word)"
                                                         class="btn btn-sm rounded-xl font-mono text-xs font-semibold"
-                                                        :class="filledBlank === word ? 'btn-primary text-white' : 'bg-base-100 border border-base-300 text-base-content hover:border-sky-500'"
+                                                        :class="filledBlank === word ? 'btn-primary text-white' : 'bg-base-100 border border-base-300 text-base-content hover:border-primary'"
                                                         x-text="word"></button>
                                                 </template>
                                             </div>
@@ -348,7 +342,7 @@
                                             <div class="flex flex-wrap gap-1.5">
                                                 <template x-for="word in currentTask.wordBank" :key="word">
                                                     <button @click="addBlock(word)"
-                                                        class="btn btn-xs sm:btn-sm rounded-xl font-mono text-[11px] font-semibold bg-base-100 border border-base-300 hover:border-sky-500 hover:bg-sky-500/10 text-base-content"
+                                                        class="btn btn-xs sm:btn-sm rounded-xl font-mono text-[11px] font-semibold bg-base-100 border border-base-300 hover:border-primary hover:bg-primary/10 text-base-content"
                                                         x-text="'+ ' + word"></button>
                                                 </template>
                                             </div>
@@ -367,7 +361,7 @@
                                                             <span x-text="line.split('[input]')[0]"></span>
                                                             <input type="text" x-model="typedInput"
                                                                 :placeholder="currentTask.placeholder || 'команда'"
-                                                                class="input input-bordered input-xs font-mono text-xs rounded-xl w-32 px-2 text-center border-sky-500/50 focus:border-sky-500" />
+                                                                class="input input-bordered input-xs font-mono text-xs rounded-xl w-32 px-2 text-center border-primary/50 focus:border-primary" />
                                                             <span x-text="line.split('[input]')[1]"></span>
                                                         </div>
                                                     </template>
@@ -490,7 +484,7 @@
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-5 space-y-4 max-w-sm max-h-[85vh] overflow-y-auto">
                 <div class="flex items-center justify-between pb-2 border-b border-base-300">
                     <div class="flex items-center gap-2">
-                        <span class="material-symbols-rounded text-sky-500 text-2xl filled">menu_book</span>
+                        <span class="material-symbols-rounded text-secondary text-2xl filled">menu_book</span>
                         <h3 class="text-base font-black text-base-content" x-text="lessonData ? lessonData.theory.title : 'Теория'"></h3>
                     </div>
                     <button @click="theoryModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
@@ -503,7 +497,7 @@
                         <div class="space-y-3.5">
                             <template x-for="(sec, sIdx) in lessonData.theory.sections" :key="sIdx">
                                 <div class="p-3.5 rounded-2xl bg-base-200/70 border border-base-300/70 space-y-2">
-                                    <h4 class="font-bold text-sm text-sky-600 dark:text-sky-400" x-text="sec.heading"></h4>
+                                    <h4 class="font-bold text-sm text-secondary" x-text="sec.heading"></h4>
                                     <template x-if="sec.content">
                                         <p class="leading-relaxed" x-text="sec.content"></p>
                                     </template>
@@ -511,7 +505,7 @@
                                         <div class="space-y-1.5 pt-1">
                                             <template x-for="(item, iIdx) in sec.items" :key="iIdx">
                                                 <div class="p-2 rounded-xl bg-base-100 border border-base-300/50">
-                                                    <code class="font-mono font-bold text-sky-500 text-xs block" x-text="item.cmd"></code>
+                                                    <code class="font-mono font-bold text-primary text-xs block" x-text="item.cmd"></code>
                                                     <span class="text-[11px] text-base-content/75 block mt-0.5" x-text="item.desc"></span>
                                                 </div>
                                             </template>
@@ -537,7 +531,7 @@
         <!-- МОДАЛЬНОЕ ОКНО 3: ПОЗДРАВЛЕНИЕ С ОКОНЧАНИЕМ УРОКА -->
         <dialog class="modal" :class="{ 'modal-open': lessonCompleted }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
-                <div class="w-16 h-16 rounded-3xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto shadow-inner">
+                <div class="w-16 h-16 rounded-3xl bg-accent/15 text-accent flex items-center justify-center mx-auto shadow-inner">
                     <span class="material-symbols-rounded text-4xl filled">emoji_events</span>
                 </div>
                 <div>
@@ -546,7 +540,7 @@
                     <p class="text-xs text-base-content/70 mt-1 leading-relaxed">
                         Вы успешно освоили материал и решили все задания маршрута.
                     </p>
-                    <div class="mt-2 text-[11px] font-semibold text-sky-600 dark:text-sky-400 bg-sky-500/10 py-1.5 px-2.5 rounded-xl border border-sky-500/20"
+                    <div class="mt-2 text-[11px] font-semibold text-primary bg-primary/10 py-1.5 px-2.5 rounded-xl border border-primary/20"
                          x-show="!isRevision">
                         <span x-text="'Пройдено уроков модуля: ' + moduleLessonNum + ' из ' + moduleLessonsTotal + ' (Осталось: ' + lessonsLeftInModule + ')'"></span>
                     </div>
@@ -556,7 +550,7 @@
                 <div class="grid grid-cols-2 gap-2 text-center">
                     <div class="p-2.5 rounded-2xl bg-base-200 border border-base-300">
                         <span class="text-[10px] uppercase font-bold text-base-content/50 block">Опыт</span>
-                        <span class="font-black text-amber-500 text-sm" x-text="lessonId === 'revision' ? '+250 XP' : '+150 XP'"></span>
+                        <span class="font-black text-accent text-sm" x-text="lessonId === 'revision' ? '+250 XP' : '+150 XP'"></span>
                     </div>
                     <div class="p-2.5 rounded-2xl bg-base-200 border border-base-300">
                         <span class="text-[10px] uppercase font-bold text-base-content/50 block">Серия верных</span>
@@ -655,7 +649,7 @@
                 <!-- Хэдер чата -->
                 <div class="flex items-center justify-between pb-2 border-b border-base-300 shrink-0">
                     <div class="flex items-center gap-2.5">
-                        <div class="w-9 h-9 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center">
+                        <div class="w-9 h-9 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
                             <span class="material-symbols-rounded text-xl filled">smart_toy</span>
                         </div>
                         <div>
@@ -702,7 +696,7 @@
                     <template x-if="isAiThinking">
                         <div class="chat chat-start">
                             <div class="chat-bubble bg-base-200 border border-base-300 rounded-2xl text-xs py-2 px-3 flex items-center gap-1.5 text-base-content/60">
-                                <span class="loading loading-dots loading-xs text-sky-500"></span>
+                                <span class="loading loading-dots loading-xs text-primary"></span>
                                 <span>Штурман анализирует трассу...</span>
                             </div>
                         </div>
@@ -714,7 +708,7 @@
                     <div class="flex gap-1.5 items-center">
                         <input type="text" x-model="aiInput" @keydown.enter="sendAiMessage()"
                                placeholder="Задайте вопрос штурману..."
-                               class="input input-bordered input-sm rounded-xl flex-1 text-xs bg-base-200 border-base-300 focus:border-sky-500">
+                               class="input input-bordered input-sm rounded-xl flex-1 text-xs bg-base-200 border-base-300 focus:border-primary">
                         <button @click="sendAiMessage()" class="btn btn-primary btn-sm btn-circle text-white shadow-xs" :disabled="!aiInput.trim()">
                             <span class="material-symbols-rounded text-lg">send</span>
                         </button>
@@ -723,62 +717,6 @@
                 </div>
             </div>
             <form method="dialog" class="modal-backdrop" @click="aiChatModalOpen = false">
-                <button>close</button>
-            </form>
-        </dialog>
-
-        <!-- МОДАЛЬНОЕ ОКНО 7: ВЫБОР ТЕМЫ ОФОРМЛЕНИЯ (6 ТЕМ DAISYUI) -->
-        <dialog class="modal" :class="{ 'modal-open': themeModalOpen }">
-            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-5 space-y-4 max-w-sm">
-                <div class="flex items-center justify-between pb-2 border-b border-base-300">
-                    <div class="flex items-center gap-2">
-                        <div class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                            <span class="material-symbols-rounded text-xl filled">palette</span>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-base-content leading-tight">Тема оформления</h3>
-                            <p class="text-[10px] text-base-content/60">6 цветовых стилей daisyUI</p>
-                        </div>
-                    </div>
-                    <button @click="themeModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
-                        <span class="material-symbols-rounded text-base">close</span>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-2 gap-2.5">
-                    <template x-for="t in themes" :key="t.id">
-                        <button @click="setTheme(t.id)"
-                            class="p-3 rounded-2xl border text-left flex flex-col justify-between gap-2 transition-all relative overflow-hidden"
-                            :class="theme === t.id 
-                                ? 'bg-primary/10 border-primary ring-2 ring-primary/30 shadow-xs' 
-                                : 'bg-base-200 border-base-300 hover:border-primary/40'">
-                            <div class="flex items-center justify-between">
-                                <span class="material-symbols-rounded text-lg text-primary" x-text="t.icon"></span>
-                                <!-- Цветовые индикаторы -->
-                                <div class="flex items-center gap-1">
-                                    <template x-for="(col, cIdx) in t.colors" :key="cIdx">
-                                        <span class="w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs" :style="'background-color: ' + col"></span>
-                                    </template>
-                                </div>
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-1">
-                                    <span class="font-bold text-xs text-base-content" x-text="t.name"></span>
-                                    <span x-show="theme === t.id" class="material-symbols-rounded text-xs text-primary filled">check_circle</span>
-                                </div>
-                                <span class="text-[10px] text-base-content/60 block truncate" x-text="t.badge"></span>
-                            </div>
-                        </button>
-                    </template>
-                </div>
-
-                <div class="pt-1">
-                    <button @click="themeModalOpen = false" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs">
-                        Готово
-                    </button>
-                </div>
-            </div>
-            <form method="dialog" class="modal-backdrop" @click="themeModalOpen = false">
                 <button>close</button>
             </form>
         </dialog>

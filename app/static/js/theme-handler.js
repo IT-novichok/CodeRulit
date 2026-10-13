@@ -4,20 +4,20 @@ const CODERULIT_THEMES = [
     {
         id: 'light',
         name: 'Светлая',
-        badge: 'daisyUI light',
+        badge: 'Городской день',
         desc: 'Классический светлый стиль',
         icon: 'light_mode',
         isDark: false,
-        colors: ['#0ea5e9', '#ffffff', '#f1f5f9']
+        colors: ['#0ea5e9', '#6366f1', '#f59e0b']
     },
     {
         id: 'dark',
         name: 'Тёмная',
-        badge: 'daisyUI dark',
+        badge: 'Ночной город',
         desc: 'Глубокий ночной интерфейс',
         icon: 'dark_mode',
         isDark: true,
-        colors: ['#0ea5e9', '#1d232a', '#15191e']
+        colors: ['#38bdf8', '#818cf8', '#fbbf24']
     },
     {
         id: 'emerald',
@@ -76,23 +76,39 @@ function themeHandler() {
     const validSaved = CODERULIT_THEMES.some(t => t.id === saved) ? saved : null;
     const currentTheme = validSaved ||
         (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const initialMeta = CODERULIT_THEMES.find(t => t.id === currentTheme) || CODERULIT_THEMES[0];
 
     return {
         theme: currentTheme,
+        themeIcon: initialMeta.icon,
+        themeName: initialMeta.name,
         themeModalOpen: false,
         themes: CODERULIT_THEMES,
 
-        get currentThemeMeta() {
-            return this.themes.find(t => t.id === this.theme) || this.themes[0];
+        getThemeMeta(val) {
+            const target = val || this.theme;
+            return this.themes.find(t => t.id === target) || this.themes[0];
+        },
+
+        getThemeIcon(val) {
+            return this.getThemeMeta(val).icon;
+        },
+
+        getThemeName(val) {
+            return this.getThemeMeta(val).name;
         },
 
         setTheme(val) {
-            const found = this.themes.find(t => t.id === val);
-            const target = found ? found.id : 'light';
+            const found = this.themes.find(t => t.id === val) || this.themes[0];
+            const target = found.id;
             this.theme = target;
+            this.themeIcon = found.icon;
+            this.themeName = found.name;
+
             try {
                 localStorage.setItem('coderulit-theme', target);
             } catch (e) {}
+
             document.documentElement.setAttribute('data-theme', target);
             const isDark = (target === 'dark' || target === 'sunset');
             document.documentElement.classList.toggle('dark', isDark);
