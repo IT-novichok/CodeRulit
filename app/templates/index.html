@@ -41,6 +41,8 @@
         settingsModalOpen: false,
         dailyTasks: [],
         achievementsList: [],
+        currentLessonStep: 0,
+        currentLessonTotalSteps: 10,
 
         init() {
             if (typeof this.initTheme === 'function') {
@@ -54,6 +56,9 @@
             this.maxStreak = parseInt(localStorage.getItem('maxStreak') || '0', 10);
             this.completedLessons = parseInt(localStorage.getItem('completedLessons') || '0', 10);
             this.userXp = parseInt(localStorage.getItem('userXp') || '0', 10);
+            const lessonKey = this.completedLessons >= 4 ? 'revision' : (this.completedLessons + 1).toString();
+            const savedStep = parseInt(localStorage.getItem('savedStep_' + lessonKey) || '0', 10);
+            this.currentLessonStep = Math.max(0, Math.min(10, isNaN(savedStep) ? 0 : savedStep));
             if (window.CodeRulitGamification) {
                 this.dailyTasks = window.CodeRulitGamification.loadDailyTasks();
                 this.achievementsList = window.CodeRulitGamification.loadAchievements();
@@ -71,6 +76,9 @@
         get userLevel() { return Math.max(1, Math.floor(this.userXp / 200) + 1); },
         get hasStartedLesson() { return this.completedLessons > 0; },
         get remainingLessonsCount() { return Math.max(0, 4 - this.completedLessons); },
+        get currentLessonProgressPercent() {
+            return Math.round((this.currentLessonStep / this.currentLessonTotalSteps) * 100);
+        },
         get currentLessonName() {
             const names = ['Базовое движение', 'Цикл со счетчиком', 'Условия', 'Условный цикл'];
             if (this.completedLessons >= 4) return 'Повторение (Ревизия)';
@@ -86,6 +94,9 @@
             if (!localStorage.getItem('completedLessons')) localStorage.setItem('completedLessons', '0');
             if (!localStorage.getItem('userXp')) localStorage.setItem('userXp', '0');
 
+            // Очищаем промежуточный шаг, чтобы гарантированно начать урок с лекции
+            ['1', '2', '3', '4', 'revision'].forEach(id => localStorage.removeItem('savedStep_' + id));
+
             if (window.CodeRulitGamification) {
                 window.CodeRulitGamification.initNewAccount();
             }
@@ -97,7 +108,13 @@
             if (window.CodeRulitGamification) {
                 window.CodeRulitGamification.resetAccountProgress();
             } else {
-                localStorage.clear();
+                const theme = localStorage.getItem('coderulit-theme');
+                try {
+                    localStorage.clear();
+                    if (theme) localStorage.setItem('coderulit-theme', theme);
+                } catch (e) {
+                    ['1', '2', '3', '4', 'revision'].forEach(id => localStorage.removeItem('savedStep_' + id));
+                }
                 window.location.reload();
             }
         }
@@ -105,10 +122,8 @@
     <div
         class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
 
-        <!-- Экран регистрации и лаконичного приветствия нового пользователя -->
         <template x-if="isOnboarding">
             <div class="flex-1 flex flex-col justify-between p-5 py-7 text-center h-full overflow-y-auto">
-                <!-- Верхняя плашка -->
                 <div class="flex items-center justify-between text-[11px] text-base-content/60 pb-2">
                     <span class="badge badge-soft badge-primary font-bold text-[10px]">КодРулит</span>
                     <span class="font-bold text-[10px] tracking-wide uppercase text-base-content/60">Городской транспорт</span>
@@ -127,7 +142,6 @@
                         </p>
                     </div>
 
-                    <!-- 3 понятных пункта: Где вы и Что делать -->
                     <div class="card bg-base-200 border border-base-300 p-3.5 rounded-2xl text-left space-y-2.5 max-w-xs mx-auto">
                         <div class="flex items-center gap-2 text-xs font-bold text-primary">
                             <span class="material-symbols-rounded text-lg filled">checklist</span>
@@ -149,7 +163,6 @@
                         </ul>
                     </div>
 
-                    <!-- Ввод имени водителя -->
                     <div class="text-left max-w-xs mx-auto w-full pt-1">
                         <label class="text-[11px] font-bold text-base-content/70 px-1 block">Имя водителя:</label>
                         <input type="text" x-model="inputName" @keydown.enter="completeOnboarding()"
@@ -158,7 +171,6 @@
                     </div>
                 </div>
 
-                <!-- Кнопка начала -->
                 <div class="pt-3 max-w-xs mx-auto w-full">
                     <button @click="completeOnboarding()"
                         class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-lg shadow-primary/25 text-xs sm:text-sm gap-2">
@@ -169,7 +181,6 @@
             </div>
         </template>
 
-        <!-- Верхняя панель -->
         <header x-show="!isOnboarding" class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none">
             <div class="navbar-start">
                 <button @click="settingsModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-base-content" aria-label="Настройки"
@@ -182,16 +193,16 @@
                 <span class="text-[9px] font-semibold text-primary uppercase tracking-wider">Умный транспорт</span>
             </div>
             <div class="navbar-end">
-                <button @click="toggleTheme()" class="btn btn-ghost btn-circle btn-sm text-base-content"
-                    :aria-label="'Выбрать тему: ' + themeName"
-                    :title="'Тема оформления: ' + themeName">
-                    <span class="material-symbols-rounded text-2xl"
-                        x-text="themeIcon"></span>
+                <button type="button" @click="activeTab = 'profile'"
+                    class="badge badge-soft badge-warning font-bold text-xs gap-1.5 py-3 px-2.5 rounded-full border border-warning/20 hover:border-warning/50 hover:bg-warning/20 transition-all cursor-pointer shadow-2xs select-none"
+                    :title="'Опыт игрока: ' + userXp + ' ОП (Уровень ' + userLevel + ')'"
+                    aria-label="Опыт игрока">
+                    <span class="material-symbols-rounded text-base text-amber-500 filled">stars</span>
+                    <span class="font-extrabold text-amber-600 dark:text-amber-400" x-text="userXp + ' ОП'"></span>
                 </button>
             </div>
         </header>
 
-        <!-- Модальное окно выбора темы оформления (6 тем) -->
         <dialog class="modal" :class="{ 'modal-open': themeModalOpen }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-5 space-y-4 max-w-sm">
                 <div class="flex items-center justify-between pb-2 border-b border-base-300">
@@ -218,7 +229,6 @@
                                 : 'bg-base-200 border-base-300 hover:border-primary/40'">
                             <div class="flex items-center justify-between">
                                 <span class="material-symbols-rounded text-lg text-primary" x-text="t.icon"></span>
-                                <!-- Цветовые индикаторы -->
                                 <div class="flex items-center gap-1">
                                     <template x-for="(col, cIdx) in t.colors" :key="cIdx">
                                         <span class="w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs" :style="'background-color: ' + col"></span>
@@ -247,7 +257,6 @@
             </form>
         </dialog>
 
-        <!-- Модальное окно настроек -->
         <div x-show="settingsModalOpen" x-cloak
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity"
             @keydown.escape.window="settingsModalOpen = false">
@@ -280,7 +289,6 @@
             </div>
         </div>
 
-        <!-- Модальное окно повторного просмотра вводного сценария (Критерий 2) -->
         <div x-show="introTutorialModalOpen" x-cloak
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity"
             @keydown.escape.window="introTutorialModalOpen = false">
@@ -322,7 +330,7 @@
                             <span>3. Игровые награды:</span>
                         </div>
                         <p class="text-[11px] text-base-content/80 leading-relaxed">
-                            За правильные решения получайте опыт XP, повышайте уровень, держите непрерывную серию огня (Streak) и завершите модуль для получения Золотого Кубка водителя!
+                            За правильные решения получайте очки опыта (ОП), повышайте уровень, держите непрерывную серию огня (Streak) и завершите модуль для получения Золотого Кубка водителя!
                         </p>
                     </div>
                 </div>
@@ -333,7 +341,6 @@
             </div>
         </div>
 
-        <!-- Модальное окно итогового результата модуля (Критерий 9) -->
         <div x-show="moduleResultModalOpen" x-cloak
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity"
             @keydown.escape.window="moduleResultModalOpen = false">
@@ -356,7 +363,7 @@
                     </div>
                     <div class="flex justify-between items-center text-xs">
                         <span class="text-base-content/70">Набранный опыт:</span>
-                        <span class="font-bold text-amber-500" x-text="userXp + ' XP (Уровень ' + userLevel + ')'"></span>
+                        <span class="font-bold text-amber-500" x-text="userXp + ' ОП (Уровень ' + userLevel + ')'"></span>
                     </div>
                     <div class="flex justify-between items-center text-xs">
                         <span class="text-base-content/70">Рекордная серия:</span>
@@ -380,9 +387,7 @@
             </div>
         </div>
 
-        <!-- Страница -->
         <main x-show="!isOnboarding" class="flex-1 overflow-y-auto px-4 py-5 flex flex-col">
-            <!-- Главная -->
             <div x-show="activeTab === 'home'" class="space-y-4 pb-4">
                 <div class="px-2 py-1 transition-all duration-300">
                     <div class="flex items-center gap-3.5">
@@ -392,7 +397,6 @@
                                 :class="streak > 0 ? 'scale-105' : 'grayscale opacity-30'">
                         </div>
 
-                        <!-- Серия верных ответов -->
                         <div class="flex-1 min-w-0">
                             <div class="flex items-baseline gap-2">
                                 <span class="text-2xl font-black tracking-tight"
@@ -410,7 +414,6 @@
                     </div>
                 </div>
 
-                <!-- Продолжить урок -->
                 <template x-if="hasStartedLesson">
                     <div
                         class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
@@ -433,17 +436,17 @@
 
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs">
-                                    <span class="text-base-content/70 font-medium">Прогресс модуля (4 урока)</span>
-                                    <span class="font-bold text-sky-500" x-text="Math.round((completedLessons / 4) * 100) + '%'"></span>
+                                    <span class="text-base-content/70 font-medium">Прогресс текущего урока</span>
+                                    <span class="font-bold text-sky-500" x-text="currentLessonStep + ' из ' + currentLessonTotalSteps + ' (' + currentLessonProgressPercent + '%)'"></span>
                                 </div>
-                                <progress class="progress progress-primary w-full h-2.5 rounded-full" :value="(completedLessons / 4) * 100"
+                                <progress class="progress progress-primary w-full h-2.5 rounded-full" :value="currentLessonProgressPercent"
                                     max="100"></progress>
                             </div>
 
                             <div class="space-y-2 mt-1">
                                 <button @click="window.location.href = completedLessons >= 4 ? 'lesson.html?lesson=revision' : ('lesson.html?lesson=' + (completedLessons + 1))"
                                     class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2">
-                                    <span x-text="completedLessons >= 4 ? 'Начать повторение (Ревизия)' : 'Продолжить урок'"></span>
+                                    <span x-text="completedLessons >= 4 ? 'Начать повторение (Ревизия)' : (currentLessonStep > 0 ? 'Продолжить урок' : 'Начать урок')"></span>
                                     <span class="material-symbols-rounded text-lg">play_arrow</span>
                                 </button>
                                 <template x-if="completedLessons >= 4">
@@ -458,10 +461,8 @@
                     </div>
                 </template>
 
-                <!-- Лаконичное приветствие нового пользователя и старт первого урока -->
                 <template x-if="!hasStartedLesson">
                     <div class="space-y-3">
-                        <!-- Приветственный баннер-ориентир -->
                         <div class="card rounded-3xl bg-linear-to-br from-primary/15 via-secondary/10 to-accent/10 border border-primary/30 shadow-xs p-4.5 space-y-2">
                             <div class="flex items-center gap-2.5">
                                 <div class="w-10 h-10 rounded-2xl bg-primary text-primary-content flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
@@ -481,7 +482,6 @@
                             </div>
                         </div>
 
-                        <!-- Карточка старта Урока 1 -->
                         <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-primary/40 transition-all">
                             <div class="card-body p-4.5 gap-3.5">
                                 <div class="flex items-center justify-between">
@@ -496,10 +496,10 @@
 
                                 <div class="space-y-1.5">
                                     <div class="flex justify-between items-center text-xs">
-                                        <span class="text-base-content/70 font-medium">Прогресс модуля</span>
-                                        <span class="font-bold text-primary">0%</span>
+                                        <span class="text-base-content/70 font-medium">Прогресс текущего урока</span>
+                                        <span class="font-bold text-primary" x-text="currentLessonStep + ' из ' + currentLessonTotalSteps + ' (' + currentLessonProgressPercent + '%)'"></span>
                                     </div>
-                                    <progress class="progress progress-primary w-full h-2.5 rounded-full" value="0" max="100"></progress>
+                                    <progress class="progress progress-primary w-full h-2.5 rounded-full" :value="currentLessonProgressPercent" max="100"></progress>
                                 </div>
 
                                 <button @click="window.location.href = 'lesson.html?lesson=1'"
@@ -512,7 +512,6 @@
                     </div>
                 </template>
 
-                <!-- Задания дня -->
                 <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
                     <div class="card-body p-4.5 gap-4">
                         <div class="flex items-center justify-between">
@@ -561,7 +560,6 @@
 
             </div>
 
-            <!-- Уроки -->
             <div x-show="activeTab === 'lessons'" class="space-y-4 pb-4">
                 <div class="flex items-center justify-between pt-1">
                     <div>
@@ -575,7 +573,6 @@
                     </div>
                 </div>
 
-                <!-- Карточка тематического модуля (Критерий 3) -->
                 <div class="card bg-primary/10 border border-primary/20 rounded-2xl p-3.5 space-y-1">
                     <div class="flex items-center justify-between text-xs font-bold text-primary">
                         <span class="flex items-center gap-1.5">
@@ -595,7 +592,6 @@
                     </template>
                 </div>
 
-                <!-- Повторение -->
                 <button :disabled="completedLessons < 4"
                     @click="if (completedLessons >= 4) window.location.href = 'lesson.html?lesson=revision'"
                     class="btn w-full rounded-2xl h-auto py-3 px-4 flex items-center justify-between transition-all"
@@ -628,7 +624,6 @@
                     </div>
                 </button>
 
-                <!-- 1. Базовое движение (вперед, направо, налево) -->
                 <div
                     class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-primary/40 transition-all">
                     <div class="card-body p-4.5 gap-3.5">
@@ -674,7 +669,6 @@
                     </div>
                 </div>
 
-                <!-- 2. Цикл со счетчиком (сделать A x раз) -->
                 <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 1 
                         ? 'bg-base-200 border-base-300 shadow-xs hover:border-primary/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
@@ -735,7 +729,6 @@
                     </div>
                 </div>
 
-                <!-- 3. Условия (если A, то сделать Б) -->
                 <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 2 
                         ? 'bg-base-200 border-base-300 shadow-xs hover:border-primary/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
@@ -796,7 +789,6 @@
                     </div>
                 </div>
 
-                <!-- 4. Условный цикл (делать А пока Б) -->
                 <div class="card card-border rounded-3xl transition-all" :class="completedLessons >= 3 
                         ? 'bg-base-200 border-base-300 shadow-xs hover:border-primary/40' 
                         : 'bg-base-200/40 border-base-300/40 opacity-50 shadow-none select-none'">
@@ -858,7 +850,6 @@
                 </div>
             </div>
 
-            <!-- Знания -->
             <div x-show="activeTab === 'knowledge'" class="space-y-4 pb-4">
                 <div class="flex items-center justify-between pt-1">
                     <div>
@@ -871,7 +862,6 @@
                     </span>
                 </div>
 
-                <!-- 0. Что такое алгоритм и программирование? (Основы) -->
                 <details
                     class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
                     <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
@@ -892,7 +882,6 @@
                     <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
                         <div class="divider my-1 border-base-300/60"></div>
 
-                        <!-- Концепт -->
                         <div class="space-y-1.5">
                             <h4 class="font-bold text-base-content flex items-center gap-1.5">
                                 <span class="material-symbols-rounded text-secondary text-base">psychology</span>
@@ -910,7 +899,6 @@
                             </p>
                         </div>
 
-                        <!-- Понятие исполнителя -->
                         <div class="p-3 rounded-2xl bg-base-100/80 border border-base-300/70 space-y-2">
                             <h5
                                 class="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-primary">
@@ -925,7 +913,6 @@
                             </p>
                         </div>
 
-                        <!-- Свойства алгоритма -->
                         <div class="space-y-2">
                             <h4 class="font-bold text-base-content">Главные правила любого алгоритма:</h4>
                             <div class="grid grid-cols-2 gap-2 text-[11px]">
@@ -952,7 +939,6 @@
                             </div>
                         </div>
 
-                        <!-- Ошибки / Баги -->
                         <div
                             class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 space-y-1">
                             <div class="flex items-center gap-1.5 font-bold text-xs">
@@ -968,7 +954,6 @@
                     </div>
                 </details>
 
-                <!-- 1. Базовое движение: Линейные алгоритмы -->
                 <details
                     class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
                     <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
@@ -1063,7 +1048,6 @@
                     </div>
                 </details>
 
-                <!-- 2. Цикл со счетчиком -->
                 <details
                     class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
                     <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
@@ -1156,7 +1140,6 @@
                     </div>
                 </details>
 
-                <!-- 3. Условия и датчики: Ветвление -->
                 <details
                     class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
                     <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
@@ -1337,7 +1320,6 @@
                     </div>
                 </details>
 
-                <!-- 5. Логические операторы и комбинирование -->
                 <details
                     class="collapse collapse-arrow bg-base-200 border border-base-300 rounded-3xl shadow-xs transition-all">
                     <summary class="collapse-title p-4.5 cursor-pointer list-none select-none">
@@ -1429,7 +1411,6 @@
                 </details>
             </div>
 
-            <!-- Профиль -->
             <div x-show="activeTab === 'profile'" class="space-y-4 pb-4">
                 <div class="flex items-center justify-between pt-1">
                     <div>
@@ -1481,7 +1462,6 @@
                     </div>
                 </div>
 
-                <!-- Достижения -->
                 <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs">
                     <div class="card-body p-4.5 gap-4">
                         <div class="flex items-center justify-between">
@@ -1537,11 +1517,9 @@
             </div>
         </main>
 
-        <!-- Навигация -->
         <nav x-show="!isOnboarding" class="p-3 sticky bottom-0 z-40 bg-linear-to-t from-base-100 via-base-100/80 to-transparent">
             <div
                 class="dock dock-sm dock-telegram rounded-2xl shadow-lg border border-base-300 bg-base-200/95 backdrop-blur-md px-1">
-                <!-- Главная -->
                 <button @click="activeTab = 'home'"
                     :class="activeTab === 'home' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Главная">
@@ -1550,7 +1528,6 @@
                     <span class="dock-label text-[11px] font-medium">Главная</span>
                 </button>
 
-                <!-- Уроки -->
                 <button @click="activeTab = 'lessons'"
                     :class="activeTab === 'lessons' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Уроки">
@@ -1559,7 +1536,6 @@
                     <span class="dock-label text-[11px] font-medium">Уроки</span>
                 </button>
 
-                <!-- Знания -->
                 <button @click="activeTab = 'knowledge'"
                     :class="activeTab === 'knowledge' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Знания">
@@ -1568,7 +1544,6 @@
                     <span class="dock-label text-[11px] font-medium">Знания</span>
                 </button>
 
-                <!-- Профиль -->
                 <button @click="activeTab = 'profile'"
                     :class="activeTab === 'profile' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Профиль">

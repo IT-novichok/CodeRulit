@@ -144,14 +144,12 @@ function lessonApp() {
                         const hasW = roadSet.has(`${x - 1},${y}`);
                         const hasE = roadSet.has(`${x + 1},${y}`);
 
-                        // 1. Прямые участки
                         if (hasN && hasS) {
                             tileSvg = 'road.svg';
                             tileAngle = 0;
                         } else if (hasW && hasE) {
                             tileSvg = 'road.svg';
                             tileAngle = 90;
-                        // 2. Повороты за угол (road-turn соединяет Юг и Восток при 0°)
                         } else if (hasS && hasE) {
                             tileSvg = 'road-turn.svg';
                             tileAngle = 0;
@@ -164,7 +162,6 @@ function lessonApp() {
                         } else if (hasN && hasE) {
                             tileSvg = 'road-turn.svg';
                             tileAngle = 270;
-                        // 3. Тупиковые и краевые участки (1 сосед)
                         } else if (hasN || hasS) {
                             tileSvg = 'road.svg';
                             tileAngle = 0;
@@ -572,7 +569,6 @@ function lessonApp() {
         },
 
         finishLesson() {
-            // Сохраняем набранную серию и рекорд только при успешном завершении урока
             localStorage.setItem('streak', this.streak.toString());
             const curMax = Math.max(parseInt(localStorage.getItem('maxStreak') || '0', 10), this.streak);
             localStorage.setItem('maxStreak', curMax.toString());
@@ -597,7 +593,6 @@ function lessonApp() {
                 window.confetti({ particleCount: 100, spread: 100, origin: { y: 0.5 } });
             }
 
-            // Проверка завершения образовательного модуля (Критерий 9)
             if (this.lessonId === '4' || (!this.isRevision && newCompleted >= 4)) {
                 this.moduleCompletedModalOpen = true;
             } else {
@@ -662,18 +657,15 @@ function lessonApp() {
             const car = this.car;
             const isCrashed = car && car.crashed;
 
-            // 1. Проверка на посторонние темы (Критерий: перенаправлять к теме приложения)
             const offTopicKeywords = ['погода', 'фильм', 'музык', 'президент', 'спорт', 'футбол', 'анекдот', 'дота', 'майнкрафт', 'рецепт', 'сочинение', 'любовь', 'поиграй'];
             if (offTopicKeywords.some(k => q.includes(k))) {
                 return 'Я твой виртуальный автоинструктор по программированию 🚗! Моя задача — помочь тебе освоить алгоритмы умного городского транспорта. Давай сосредоточимся на нашей трассе: в чем вопрос по коду машинки?';
             }
 
-            // 2. Защита персональных данных (Критерий: не запрашивать персональные данные)
             if (q.includes('паспорт') || q.includes('телефон') || q.includes('адрес') || q.includes('фамилия') || q.includes('пароль') || q.includes('почта')) {
                 return 'В целях безопасности в «КодРулит» мы никогда не запрашиваем персональные данные. Давай лучше разберем алгоритм для нашей машинки!';
             }
 
-            // 3. Вопросы про ошибки / аварию / почему не едет
             if (q.includes('ошибк') || q.includes('почему') || q.includes('авари') || q.includes('вреза') || q.includes('не едет') || q.includes('не доехал') || q.includes('разобрать')) {
                 if (isCrashed) {
                     return `Автомобиль съехал с серой дороги на газон! 💥 Это происходит, когда машина делает шаг вперед без нужного поворота, либо повернула не в ту сторону. Проверь направление капота: сначала поверни («направо» или «налево»), а затем сделай шаг «вперед». Совет: ${task && task.hint ? task.hint : 'следи за разметкой дороги!'}`;
@@ -684,7 +676,6 @@ function lessonApp() {
                 return `Машина не доехала до финиша — скорее всего, не хватает команд движения или пропущен поворот. ${task && task.hint ? 'Совет штурмана: ' + task.hint : 'Посчитай клетки дороги от старта до финиша!'}`;
             }
 
-            // 4. Запрос подсказки / помощи по текущему заданию
             if (q.includes('подсказ') || q.includes('помоги') || q.includes('как решить') || q.includes('что делать') || q.includes('решение')) {
                 if (task && task.hint) {
                     return `💡 Мой совет штурмана: ${task.hint} Примени эту команду в окне кода и нажми «Запустить код»!`;
@@ -692,7 +683,6 @@ function lessonApp() {
                 return 'Посмотри на карту: посчитай расстояние до перекрестка и выбери правильную последовательность команд!';
             }
 
-            // 5. Объяснение базовых понятий программирования
             if (q.includes('цикл') || q.includes('повтор')) {
                 return '🔄 Цикл позволяет повторять команды без дублирования кода! Цикл со счетчиком («вперед 3 раза») делает строго заданное число шагов, а условный цикл («вперед пока спереди_пусто») шагает вперед до тех пор, пока дорога свободна!';
             }
@@ -703,7 +693,6 @@ function lessonApp() {
                 return '🧭 Команды поворота («направо», «налево») разворачивают корпус машины НА МЕСТЕ на 90°. Сама клетка не меняется! Чтобы продвинуться, после поворота обязательно нужна команда «вперед».';
             }
 
-            // 6. Контекст текущего урока
             if (q.includes('тема') || q.includes('урок') || q.includes('теория')) {
                 if (lessonId === '1') return 'В Уроке 1 мы изучаем линейные алгоритмы: команды выполняются строго сверху вниз по одной («вперед», «направо», «налево»).';
                 if (lessonId === '2') return 'В Уроке 2 мы осваиваем циклы со счетчиком («команда N раз»). Они делают код компактным и удобным!';
@@ -717,8 +706,6 @@ function lessonApp() {
 
         handleQuit() {
             if (this.lessonCompleted) return;
-            // Прогресс шага урока надежно сохранен в localStorage (savedStep_${this.lessonId})
-            // Сохраняем текущую серию при выходе, чтобы пользователь не терял прогресс
             localStorage.setItem('streak', this.streak.toString());
             const curMax = Math.max(parseInt(localStorage.getItem('maxStreak') || '0', 10), this.streak);
             localStorage.setItem('maxStreak', curMax.toString());

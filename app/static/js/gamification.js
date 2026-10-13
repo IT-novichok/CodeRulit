@@ -1,4 +1,3 @@
-// gamification.js - Управление ежедневными заданиями и достижениями КодРулит
 
 (function (root, factory) {
     if (typeof module === 'object' && module.exports) {
@@ -189,7 +188,6 @@
     }
 
     function getDailyTasksForDate(dateStr) {
-        // Детерминированный генератор случайных чисел Mulberry32 на основе даты
         let seed = 0;
         for (let i = 0; i < dateStr.length; i++) {
             seed = ((seed << 5) - seed) + dateStr.charCodeAt(i);
@@ -241,7 +239,6 @@
             }
         }
 
-        // Новый день или первый вход: выбираем 3 свежих случайных задания для сегодняшней даты
         const freshTasks = getDailyTasksForDate(today);
         localStorage.setItem('dailyTasksDate', today);
         localStorage.setItem('dailyTasks', JSON.stringify(freshTasks));
@@ -301,6 +298,7 @@
     }
 
     function initNewAccount() {
+        ['1', '2', '3', '4', 'revision'].forEach(id => localStorage.removeItem('savedStep_' + id));
         const initialAch = {
             algorithmMaster: 0,
             cycleArchitect: 0,
@@ -316,14 +314,23 @@
     }
 
     function resetAccountProgress() {
-        localStorage.removeItem('userName');
-        localStorage.removeItem('streak');
-        localStorage.removeItem('maxStreak');
-        localStorage.removeItem('completedLessons');
-        localStorage.removeItem('userXp');
-        localStorage.removeItem('achievementsProgress');
-        localStorage.removeItem('dailyTasks');
-        localStorage.removeItem('dailyTasksDate');
+        const theme = localStorage.getItem('coderulit-theme');
+        try {
+            localStorage.clear();
+            if (theme) {
+                localStorage.setItem('coderulit-theme', theme);
+            }
+        } catch (e) {
+            localStorage.removeItem('userName');
+            localStorage.removeItem('streak');
+            localStorage.removeItem('maxStreak');
+            localStorage.removeItem('completedLessons');
+            localStorage.removeItem('userXp');
+            localStorage.removeItem('achievementsProgress');
+            localStorage.removeItem('dailyTasks');
+            localStorage.removeItem('dailyTasksDate');
+            ['1', '2', '3', '4', 'revision'].forEach(id => localStorage.removeItem('savedStep_' + id));
+        }
         window.location.reload();
     }
 

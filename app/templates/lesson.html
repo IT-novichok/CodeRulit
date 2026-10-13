@@ -31,9 +31,7 @@
     <div
         class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
 
-        <!-- Верхняя панель (Хэдер) -->
         <header class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none gap-2 shrink-0">
-            <!-- Крестик выхода с подтверждением -->
             <div class="navbar-start w-auto">
                 <button @click="exitModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-base-content"
                     aria-label="Выйти из урока" title="Выйти из урока">
@@ -41,7 +39,6 @@
                 </button>
             </div>
 
-            <!-- Прогресс-бар и счетчик серии -->
             <div class="navbar-center flex-1 flex items-center gap-2 px-1">
                 <progress class="progress progress-primary flex-1 h-2.5 rounded-full"
                     :value="currentStepIndex + 1" :max="totalSteps"></progress>
@@ -55,7 +52,6 @@
                 </div>
             </div>
 
-            <!-- Кнопки: Подсказка, ИИ-Штурман, Теория -->
             <div class="navbar-end w-auto flex items-center gap-1">
                 <button @click="openHint()" class="btn btn-ghost btn-circle btn-sm text-accent hover:bg-accent/10"
                     aria-label="Подсказка к заданию" title="Подсказка к заданию">
@@ -73,7 +69,6 @@
             </div>
         </header>
 
-        <!-- Индикатор образовательного маршрута модуля (Критерий 3) -->
         <div class="px-3 py-1.5 bg-base-200/80 border-b border-base-300 flex items-center justify-between text-[11px] shrink-0">
             <div class="flex items-center gap-1.5 font-bold text-base-content/80 truncate">
                 <span class="material-symbols-rounded text-primary text-sm">alt_route</span>
@@ -90,9 +85,7 @@
             </span>
         </div>
 
-        <!-- Основная скроллируемая зона контента -->
         <main class="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
-            <!-- Состояние загрузки -->
             <template x-if="isLoading">
                 <div class="flex-1 flex flex-col items-center justify-center gap-3 py-16 text-center">
                     <span class="loading loading-spinner loading-lg text-primary"></span>
@@ -100,7 +93,6 @@
                 </div>
             </template>
 
-            <!-- Состояние ошибки загрузки JSON -->
             <template x-if="loadError">
                 <div class="flex-1 flex flex-col items-center justify-center gap-4 py-12 px-2 text-center">
                     <div class="w-14 h-14 rounded-2xl bg-error/10 text-error flex items-center justify-center">
@@ -121,10 +113,8 @@
                 </div>
             </template>
 
-            <!-- Контент задания -->
             <template x-if="!isLoading && currentTask">
                 <div class="space-y-3">
-                    <!-- Заголовок-инструкция (без лишнего описания и без надписи 5х5) -->
                     <div class="space-y-1">
                         <div class="flex items-center gap-2">
                             <span class="badge badge-soft badge-primary font-bold text-[10px] uppercase tracking-wider"
@@ -134,10 +124,8 @@
                             x-text="currentTask.prompt || currentTask.title"></h2>
                     </div>
 
-                    <!-- 0. ВВОДНАЯ ЛЕКЦИЯ УРОКА (СЮЖЕТ, ТЕОРИЯ, ПРИМЕРЫ) -->
                     <template x-if="currentTask.type === 'lecture'">
                         <div class="space-y-3 pt-1">
-                            <!-- Карточка микросюжета рейса -->
                             <div class="rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-accent/10 border border-primary/20 p-3.5 space-y-1.5">
                                 <div class="flex items-center gap-2">
                                     <span class="badge badge-primary font-bold text-[10px] uppercase tracking-wide" x-text="currentTask.storyChapter || 'Бриф рейса'"></span>
@@ -146,7 +134,6 @@
                                 <p class="text-xs leading-relaxed text-base-content/90 font-medium" x-text="currentTask.story"></p>
                             </div>
 
-                            <!-- Карточка понятного объяснения материала -->
                             <div class="rounded-2xl bg-base-200 border border-base-300 p-3.5 space-y-2">
                                 <div class="flex items-center gap-2">
                                     <span class="material-symbols-rounded text-primary text-lg filled">auto_stories</span>
@@ -155,7 +142,6 @@
                                 <p class="text-xs leading-relaxed text-base-content/80" x-text="currentTask.explanation"></p>
                             </div>
 
-                            <!-- Практический пример кода с разбором -->
                             <template x-if="currentTask.example">
                                 <div class="rounded-2xl bg-base-200 border border-base-300 p-3.5 space-y-2">
                                     <div class="flex items-center gap-2">
@@ -167,7 +153,6 @@
                                 </div>
                             </template>
 
-                            <!-- Правило водителя -->
                             <template x-if="currentTask.rule">
                                 <div class="rounded-2xl bg-accent/10 border border-accent/30 p-3 flex items-start gap-2.5">
                                     <span class="material-symbols-rounded text-accent text-xl shrink-0 mt-0.5 filled">verified</span>
@@ -178,18 +163,9 @@
                                 </div>
                             </template>
 
-                            <!-- Кнопка перехода к практике прямо в лекции -->
-                            <div class="pt-1">
-                                <button @click="nextStep()"
-                                    class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-md hover:shadow-lg gap-2 text-xs sm:text-sm">
-                                    <span>Всё понятно, перейти к заданиям!</span>
-                                    <span class="material-symbols-rounded text-lg">arrow_forward</span>
-                                </button>
-                            </div>
                         </div>
                     </template>
 
-                    <!-- 1. ТЕОРЕТИЧЕСКИЙ ВОПРОС -->
                     <template x-if="currentTask.type === 'theory'">
                         <div class="space-y-2 pt-1">
                             <template x-for="(opt, optIdx) in currentTask.options" :key="optIdx">
@@ -207,19 +183,15 @@
                         </div>
                     </template>
 
-                    <!-- 2. ИГРОВОЕ ПОЛЕ 5x5 (НОРМАЛЬНЫЙ РАЗМЕР КЛЕТОК) -->
                     <template x-if="currentTask.type !== 'theory' && currentTask.type !== 'lecture'">
                         <div class="space-y-3">
-                            <!-- Сетка 5x5 с SVG плитками без зазоров -->
                             <div class="mx-auto w-full max-w-[320px] aspect-square rounded-3xl overflow-hidden border border-base-300 shadow-md grid grid-cols-5 gap-0 relative select-none">
                                 <template x-for="cell in gridCells" :key="cell.x + '-' + cell.y">
                                     <div class="aspect-square flex items-center justify-center relative overflow-hidden select-none">
-                                        <!-- Тайл травы -->
                                         <template x-if="cell.type === 'grass'">
                                             <img src="../static/img/field/grass.svg" class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none" alt="grass">
                                         </template>
 
-                                        <!-- Тайл дороги (ориентирован по направлению пути) -->
                                         <template x-if="cell.type === 'road' && !cell.isStart && !cell.isFinish">
                                             <img :src="'../static/img/field/' + (cell.tileSvg || 'road.svg')"
                                                 class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
@@ -227,35 +199,29 @@
                                                 alt="road">
                                         </template>
 
-                                        <!-- Тайл старта -->
                                         <template x-if="cell.isStart">
                                             <img src="../static/img/field/start.svg" class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none" alt="start">
                                         </template>
 
-                                        <!-- Тайл финиша -->
                                         <template x-if="cell.isFinish">
                                             <img src="../static/img/field/finish.svg" class="absolute inset-0 w-full h-full object-cover select-none pointer-events-none" alt="finish">
                                         </template>
 
-                                        <!-- Метка Финиша (пульсирующий флаг) -->
                                         <template x-if="cell.isFinish && taskStatus !== 'success'">
                                             <span class="material-symbols-rounded text-amber-500 text-xl filled animate-pulse z-10 select-none">sports_score</span>
                                         </template>
                                     </div>
                                 </template>
 
-                                <!-- Автомобиль (плавное перемещение по сетке поверх тайлов) -->
                                 <div class="absolute top-0 left-0 w-[20%] h-[20%] flex items-center justify-center pointer-events-none z-20 select-none will-change-transform"
                                     :class="car.animate ? 'transition-transform duration-300 ease-in-out' : 'transition-none'"
                                     :style="'transform: translate(' + (car.x * 100) + '%, ' + (car.y * 100) + '%) rotate(' + car.angle + 'deg);'">
-                                    <!-- Обычное состояние: машина -->
                                     <template x-if="!car.crashed">
                                         <img src="../static/img/field/car.svg"
                                             class="w-[82%] h-[82%] object-contain select-none pointer-events-none drop-shadow-md"
                                             alt="car">
                                     </template>
 
-                                    <!-- Состояние аварии -->
                                     <template x-if="car.crashed">
                                         <div class="relative w-full h-full flex items-center justify-center">
                                             <img src="../static/img/field/car.svg"
@@ -267,7 +233,6 @@
                                 </div>
                             </div>
 
-                            <!-- ПОЛЕ КОДА: 3 ТИПА ИНТЕРАКТИВА -->
                             <div class="card bg-base-200 border border-base-300 rounded-2xl p-3 space-y-2.5">
                                 <div class="flex items-center justify-between text-[11px] font-bold text-base-content/60">
                                     <span class="flex items-center gap-1.5">
@@ -279,7 +244,6 @@
                                     </template>
                                 </div>
 
-                                <!-- ТИП 1: Подставить слово в пропуск (Duolingo style) -->
                                 <template x-if="currentTask.type === 'fill_blank'">
                                     <div class="space-y-2.5">
                                         <div class="font-mono text-xs p-2.5 rounded-xl bg-base-100 border border-base-300 leading-relaxed">
@@ -305,7 +269,6 @@
                                             </template>
                                         </div>
 
-                                        <!-- Банк вариантов слов -->
                                         <div>
                                             <div class="flex flex-wrap gap-1.5">
                                                 <template x-for="word in currentTask.wordBank" :key="word">
@@ -319,10 +282,8 @@
                                     </div>
                                 </template>
 
-                                <!-- ТИП 2: Составить строку из блоков (Block builder) -->
                                 <template x-if="currentTask.type === 'blocks'">
                                     <div class="space-y-2.5">
-                                        <!-- Строка сборки кода -->
                                         <div class="min-h-12 p-2 rounded-xl bg-base-100 border border-base-300 flex flex-wrap gap-1.5 items-center">
                                             <template x-if="assembledBlocks.length === 0">
                                                 <span class="text-[11px] text-base-content/40 font-mono italic px-1">Выберите команды ниже...</span>
@@ -337,7 +298,6 @@
                                             </template>
                                         </div>
 
-                                        <!-- Банк доступных команд -->
                                         <div>
                                             <div class="flex flex-wrap gap-1.5">
                                                 <template x-for="word in currentTask.wordBank" :key="word">
@@ -350,7 +310,6 @@
                                     </div>
                                 </template>
 
-                                <!-- ТИП 3: Написать свое слово (Text Input) -->
                                 <template x-if="currentTask.type === 'text_input'">
                                     <div class="space-y-2.5">
                                         <div class="font-mono text-xs p-2.5 rounded-xl bg-base-100 border border-base-300 leading-relaxed">
@@ -381,9 +340,7 @@
             </template>
         </main>
 
-        <!-- ПРИКРЕПЛЕННАЯ НИЖНЯЯ ПАНЕЛЬ: СТАТУС ВЫПОЛНЕНИЯ И КНОПКА ЗАПУСКА (НЕ НАДО ПРОЛИСТЫВАТЬ) -->
         <footer x-show="!isLoading && currentTask" class="sticky bottom-0 z-30 bg-base-100/95 backdrop-blur-md border-t border-base-300 px-4 py-3 space-y-2 shrink-0">
-            <!-- Оповещения / Предупреждения / Результат запуска -->
             <template x-if="statusMessage">
                 <div class="space-y-1.5">
                     <div class="alert rounded-2xl text-xs font-bold py-2.5 px-3.5 shadow-sm transition-all flex items-center gap-2"
@@ -398,7 +355,6 @@
                         <span class="flex-1 leading-snug" x-text="statusMessage"></span>
                     </div>
 
-                    <!-- Быстрые действия помощи при ошибке (Критерий 6) -->
                     <template x-if="taskStatus === 'fail' || taskStatus === 'syntax_error'">
                         <div class="flex items-center gap-2 pt-0.5">
                             <button @click="openHint()" class="btn btn-warning btn-soft btn-xs rounded-xl font-bold flex-1 gap-1 text-[11px] py-1">
@@ -414,9 +370,7 @@
                 </div>
             </template>
 
-            <!-- Главная кнопка действия -->
             <div>
-                <!-- 1. Запустить или Проверить -->
                 <template x-if="taskStatus === 'idle' || taskStatus === 'syntax_error'">
                     <button @click="runOrCheck()"
                         class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-md hover:shadow-lg gap-2 text-sm">
@@ -425,7 +379,6 @@
                     </button>
                 </template>
 
-                <!-- 2. Выполняется симуляция -->
                 <template x-if="taskStatus === 'running'">
                     <button disabled class="btn btn-primary rounded-2xl w-full font-bold text-white opacity-80 gap-2 text-sm">
                         <span class="loading loading-spinner loading-xs"></span>
@@ -433,7 +386,6 @@
                     </button>
                 </template>
 
-                <!-- 3. Ошибка выполнения -> Попробовать еще раз -->
                 <template x-if="taskStatus === 'fail'">
                     <button @click="resetCarToStart()"
                         class="btn btn-warning rounded-2xl w-full font-bold text-white shadow-md gap-2 text-sm">
@@ -442,7 +394,6 @@
                     </button>
                 </template>
 
-                <!-- 4. Успех -> Следующее задание / Завершить -->
                 <template x-if="taskStatus === 'success'">
                     <button @click="nextStep()"
                         class="btn btn-success rounded-2xl w-full font-bold text-white shadow-md gap-2 text-sm">
@@ -453,7 +404,6 @@
             </div>
         </footer>
 
-        <!-- МОДАЛЬНОЕ ОКНО 1: ПРЕДУПРЕЖДЕНИЕ О ВЫХОДЕ -->
         <dialog class="modal" :class="{ 'modal-open': exitModalOpen }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
                 <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto">
@@ -479,7 +429,6 @@
             </form>
         </dialog>
 
-        <!-- МОДАЛЬНОЕ ОКНО 2: СПРАВКА И ТЕОРИЯ ДЛЯ ТЕЛЕФОНА (УДОБНО ЧИТАТЬ) -->
         <dialog class="modal" :class="{ 'modal-open': theoryModalOpen }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-5 space-y-4 max-w-sm max-h-[85vh] overflow-y-auto">
                 <div class="flex items-center justify-between pb-2 border-b border-base-300">
@@ -528,7 +477,6 @@
             </form>
         </dialog>
 
-        <!-- МОДАЛЬНОЕ ОКНО 3: ПОЗДРАВЛЕНИЕ С ОКОНЧАНИЕМ УРОКА -->
         <dialog class="modal" :class="{ 'modal-open': lessonCompleted }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
                 <div class="w-16 h-16 rounded-3xl bg-accent/15 text-accent flex items-center justify-center mx-auto shadow-inner">
@@ -546,11 +494,10 @@
                     </div>
                 </div>
 
-                <!-- Награды -->
                 <div class="grid grid-cols-2 gap-2 text-center">
                     <div class="p-2.5 rounded-2xl bg-base-200 border border-base-300">
                         <span class="text-[10px] uppercase font-bold text-base-content/50 block">Опыт</span>
-                        <span class="font-black text-accent text-sm" x-text="lessonId === 'revision' ? '+250 XP' : '+150 XP'"></span>
+                        <span class="font-black text-accent text-sm" x-text="lessonId === 'revision' ? '+250 ОП' : '+150 ОП'"></span>
                     </div>
                     <div class="p-2.5 rounded-2xl bg-base-200 border border-base-300">
                         <span class="text-[10px] uppercase font-bold text-base-content/50 block">Серия верных</span>
@@ -577,7 +524,6 @@
             </div>
         </dialog>
 
-        <!-- МОДАЛЬНОЕ ОКНО 4: ПОДСКАЗКА К ЗАДАНИЮ (КРИТЕРИЙ 6) -->
         <dialog class="modal" :class="{ 'modal-open': hintModalOpen }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
                 <div class="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto shadow-inner">
@@ -601,7 +547,6 @@
             </form>
         </dialog>
 
-        <!-- МОДАЛЬНОЕ ОКНО 5: ИТОГОВЫЙ ЭКРАН ЗАВЕРШЕНИЯ МОДУЛЯ (КРИТЕРИЙ 9) -->
         <dialog class="modal" :class="{ 'modal-open': moduleCompletedModalOpen }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
                 <div class="w-20 h-20 rounded-3xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto shadow-inner border border-amber-500/20">
@@ -615,7 +560,6 @@
                     </p>
                 </div>
 
-                <!-- Статистика модуля -->
                 <div class="space-y-2 text-left bg-base-200 p-3 rounded-2xl border border-base-300">
                     <div class="flex justify-between items-center text-xs">
                         <span class="text-base-content/70">Уроки модуля:</span>
@@ -623,7 +567,7 @@
                     </div>
                     <div class="flex justify-between items-center text-xs">
                         <span class="text-base-content/70">Награда за модуль:</span>
-                        <span class="font-bold text-amber-500">+500 XP</span>
+                        <span class="font-bold text-amber-500">+500 ОП</span>
                     </div>
                     <div class="flex justify-between items-center text-xs">
                         <span class="text-base-content/70">Трофей:</span>
@@ -643,10 +587,8 @@
             </div>
         </dialog>
 
-        <!-- МОДАЛЬНОЕ ОКНО 6: ИИ-ЧАТ-БОТ «ШТУРМАН РУЛИТ» (КРИТЕРИЙ 11) -->
         <dialog class="modal" :class="{ 'modal-open': aiChatModalOpen }">
             <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-4 space-y-3 max-w-sm max-h-[85vh] flex flex-col">
-                <!-- Хэдер чата -->
                 <div class="flex items-center justify-between pb-2 border-b border-base-300 shrink-0">
                     <div class="flex items-center gap-2.5">
                         <div class="w-9 h-9 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
@@ -665,7 +607,6 @@
                     </button>
                 </div>
 
-                <!-- Быстрые вопросы-подсказки -->
                 <div class="flex gap-1.5 overflow-x-auto pb-1 shrink-0 scrollbar-none">
                     <button @click="sendAiMessage('Подскажи, как решить это задание?')" class="badge badge-soft badge-primary hover:badge-primary text-[10px] font-semibold py-2 px-2.5 cursor-pointer shrink-0">
                         💡 Подсказка
@@ -681,7 +622,6 @@
                     </button>
                 </div>
 
-                <!-- Сообщения чата (DaisyUI chat) -->
                 <div id="ai-chat-messages" class="flex-1 overflow-y-auto space-y-3 pr-1 min-h-[220px] max-h-[340px]">
                     <template x-for="(msg, mIdx) in aiMessages" :key="mIdx">
                         <div class="chat" :class="msg.role === 'user' ? 'chat-end' : 'chat-start'">
@@ -703,7 +643,6 @@
                     </template>
                 </div>
 
-                <!-- Поле ввода вопроса -->
                 <div class="pt-1 border-t border-base-300 shrink-0 space-y-1">
                     <div class="flex gap-1.5 items-center">
                         <input type="text" x-model="aiInput" @keydown.enter="sendAiMessage()"

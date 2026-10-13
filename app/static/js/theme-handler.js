@@ -1,4 +1,3 @@
-// theme-handler.js - Управление темами оформления (6 тем daisyUI) в КодРулит
 
 const CODERULIT_THEMES = [
     {
@@ -57,7 +56,6 @@ const CODERULIT_THEMES = [
     }
 ];
 
-// Немедленное применение темы до рендера страницы (предотвращение вспышки)
 (function applyInitialTheme() {
     try {
         const saved = localStorage.getItem('coderulit-theme');
@@ -67,7 +65,6 @@ const CODERULIT_THEMES = [
         const isDark = (theme === 'dark' || theme === 'sunset');
         document.documentElement.classList.toggle('dark', isDark);
     } catch (e) {
-        // Защита при ограниченном доступе к localStorage
     }
 })();
 
@@ -115,12 +112,10 @@ function themeHandler() {
         },
 
         toggleTheme() {
-            // Открывает окно выбора темы
             this.themeModalOpen = true;
         },
 
         cycleTheme() {
-            // Переключает следующую тему по списку
             const idx = this.themes.findIndex(t => t.id === this.theme);
             const nextIdx = (idx + 1) % this.themes.length;
             this.setTheme(this.themes[nextIdx].id);
@@ -129,7 +124,6 @@ function themeHandler() {
         initTheme() {
             this.setTheme(this.theme);
 
-            // Подписка на системные изменения темы, если пользователь еще вручную не выбрал тему
             if (window.matchMedia) {
                 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
                     if (!localStorage.getItem('coderulit-theme')) {
