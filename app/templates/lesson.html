@@ -10,10 +10,12 @@
     <script>
         (function() {
             try {
+                const validThemes = ['light', 'dark', 'emerald', 'cyberpunk', 'nord', 'sunset'];
                 const saved = localStorage.getItem('coderulit-theme');
-                const theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                const theme = validThemes.includes(saved) ? saved : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-theme', theme);
-                document.documentElement.classList.toggle('dark', theme === 'dark');
+                const isDark = (theme === 'dark' || theme === 'sunset');
+                document.documentElement.classList.toggle('dark', isDark);
             } catch (e) {}
         })();
     </script>
@@ -41,7 +43,7 @@
 
             <!-- Прогресс-бар и счетчик серии -->
             <div class="navbar-center flex-1 flex items-center gap-2 px-1">
-                <progress class="progress progress-primary flex-1 h-2.5 rounded-full transition-all duration-300"
+                <progress class="progress progress-primary flex-1 h-2.5 rounded-full"
                     :value="currentStepIndex + 1" :max="totalSteps"></progress>
                 <span class="badge badge-soft badge-primary font-bold text-[11px] shrink-0 px-2 py-1"
                     x-text="(currentStepIndex + 1) + ' / ' + totalSteps"></span>
@@ -53,20 +55,46 @@
                 </div>
             </div>
 
-            <!-- Кнопка темы и вызова теории -->
+            <!-- Кнопки: Подсказка, ИИ-Штурман, Теория, Тема -->
             <div class="navbar-end w-auto flex items-center gap-1">
-                <button @click="toggleTheme()" class="btn btn-ghost btn-circle btn-sm text-base-content"
-                    :aria-label="theme === 'dark' ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'"
-                    :title="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'">
-                    <span class="material-symbols-rounded text-2xl"
-                        x-text="theme === 'dark' ? 'light_mode' : 'dark_mode'"></span>
+                <button @click="openHint()" class="btn btn-ghost btn-circle btn-sm text-amber-500 hover:bg-amber-500/10"
+                    aria-label="Подсказка к заданию" title="Подсказка к заданию">
+                    <span class="material-symbols-rounded text-2xl filled">lightbulb</span>
+                </button>
+                <button @click="openAiWithQuestion()" class="btn btn-ghost btn-circle btn-sm text-sky-500 hover:bg-sky-500/10 relative"
+                    aria-label="ИИ-Штурман" title="ИИ-ассистент Штурман">
+                    <span class="material-symbols-rounded text-2xl filled">smart_toy</span>
+                    <span class="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
                 </button>
                 <button @click="theoryModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-sky-500 hover:bg-sky-500/10"
                     aria-label="Справка и теория" title="Теория к уроку">
                     <span class="material-symbols-rounded text-2xl filled">menu_book</span>
                 </button>
+                <button @click="toggleTheme()" class="btn btn-ghost btn-circle btn-sm text-base-content"
+                    :aria-label="'Выбрать тему: ' + currentThemeMeta.name"
+                    :title="'Тема оформления: ' + currentThemeMeta.name">
+                    <span class="material-symbols-rounded text-2xl"
+                        x-text="currentThemeMeta.icon"></span>
+                </button>
             </div>
         </header>
+
+        <!-- Индикатор образовательного маршрута модуля (Критерий 3) -->
+        <div class="px-3 py-1.5 bg-base-200/80 border-b border-base-300 flex items-center justify-between text-[11px] shrink-0">
+            <div class="flex items-center gap-1.5 font-bold text-base-content/80 truncate">
+                <span class="material-symbols-rounded text-sky-500 text-sm">alt_route</span>
+                <span x-show="!isRevision" x-text="'Модуль: «Основы алгоритмов» • Урок ' + moduleLessonNum + ' из ' + moduleLessonsTotal"></span>
+                <span x-show="isRevision">Модуль: «Основы алгоритмов» • Итоговая ревизия</span>
+            </div>
+            <span class="badge badge-soft badge-primary font-bold text-[10px] shrink-0"
+                  x-show="!isRevision"
+                  x-text="lessonsLeftInModule === 0 ? 'Финал модуля!' : ('Осталось: ' + lessonsLeftInModule + (lessonsLeftInModule === 1 ? ' урок' : ' урока'))">
+            </span>
+            <span class="badge badge-soft badge-accent font-bold text-[10px] shrink-0"
+                  x-show="isRevision">
+                Закрепление
+            </span>
+        </div>
 
         <!-- Основная скроллируемая зона контента -->
         <main class="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
@@ -112,6 +140,61 @@
                             x-text="currentTask.prompt || currentTask.title"></h2>
                     </div>
 
+                    <!-- 0. ВВОДНАЯ ЛЕКЦИЯ УРОКА (СЮЖЕТ, ТЕОРИЯ, ПРИМЕРЫ) -->
+                    <template x-if="currentTask.type === 'lecture'">
+                        <div class="space-y-3 pt-1">
+                            <!-- Карточка микросюжета рейса -->
+                            <div class="rounded-2xl bg-gradient-to-r from-sky-500/10 via-primary/10 to-indigo-500/10 border border-sky-500/20 p-3.5 space-y-1.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-primary font-bold text-[10px] uppercase tracking-wide" x-text="currentTask.storyChapter || 'Бриф рейса'"></span>
+                                    <span class="text-xs font-bold text-sky-600 dark:text-sky-400">Служба доставки «КодРулит»</span>
+                                </div>
+                                <p class="text-xs leading-relaxed text-base-content/90 font-medium" x-text="currentTask.story"></p>
+                            </div>
+
+                            <!-- Карточка понятного объяснения материала -->
+                            <div class="rounded-2xl bg-base-200 border border-base-300 p-3.5 space-y-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="material-symbols-rounded text-sky-500 text-lg filled">auto_stories</span>
+                                    <h3 class="text-xs font-bold uppercase tracking-wide text-base-content/80">Как это устроено</h3>
+                                </div>
+                                <p class="text-xs leading-relaxed text-base-content/80" x-text="currentTask.explanation"></p>
+                            </div>
+
+                            <!-- Практический пример кода с разбором -->
+                            <template x-if="currentTask.example">
+                                <div class="rounded-2xl bg-base-200 border border-base-300 p-3.5 space-y-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-rounded text-emerald-500 text-lg">terminal</span>
+                                        <h3 class="text-xs font-bold uppercase tracking-wide text-base-content/80">Пример программы</h3>
+                                    </div>
+                                    <pre class="bg-base-100 rounded-xl p-3 border border-base-300 font-mono text-xs text-sky-500 font-bold whitespace-pre-wrap leading-relaxed" x-text="currentTask.example.code"></pre>
+                                    <p class="text-[11px] text-base-content/70 italic leading-snug" x-text="currentTask.example.desc"></p>
+                                </div>
+                            </template>
+
+                            <!-- Правило водителя -->
+                            <template x-if="currentTask.rule">
+                                <div class="rounded-2xl bg-amber-500/10 border border-amber-500/30 p-3 flex items-start gap-2.5">
+                                    <span class="material-symbols-rounded text-amber-500 text-xl shrink-0 mt-0.5 filled">verified</span>
+                                    <div>
+                                        <span class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 block tracking-wide">Правило водителя</span>
+                                        <p class="text-xs text-base-content/90 font-semibold leading-snug mt-0.5" x-text="currentTask.rule"></p>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Кнопка перехода к практике прямо в лекции -->
+                            <div class="pt-1">
+                                <button @click="nextStep()"
+                                    class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-md hover:shadow-lg gap-2 text-xs sm:text-sm">
+                                    <span>Всё понятно, перейти к заданиям!</span>
+                                    <span class="material-symbols-rounded text-lg">arrow_forward</span>
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+
                     <!-- 1. ТЕОРЕТИЧЕСКИЙ ВОПРОС -->
                     <template x-if="currentTask.type === 'theory'">
                         <div class="space-y-2 pt-1">
@@ -131,7 +214,7 @@
                     </template>
 
                     <!-- 2. ИГРОВОЕ ПОЛЕ 5x5 (НОРМАЛЬНЫЙ РАЗМЕР КЛЕТОК) -->
-                    <template x-if="currentTask.type !== 'theory'">
+                    <template x-if="currentTask.type !== 'theory' && currentTask.type !== 'lecture'">
                         <div class="space-y-3">
                             <!-- Сетка 5x5 с SVG плитками без зазоров -->
                             <div class="mx-auto w-full max-w-[320px] aspect-square rounded-3xl overflow-hidden border border-base-300 shadow-md grid grid-cols-5 gap-0 relative select-none">
@@ -195,7 +278,7 @@
                                 <div class="flex items-center justify-between text-[11px] font-bold text-base-content/60">
                                     <span class="flex items-center gap-1.5">
                                         <span class="material-symbols-rounded text-sky-500 text-sm">code</span>
-                                        <span>Программа автопилота</span>
+                                        <span>Программа бортового компьютера</span>
                                     </span>
                                     <template x-if="currentTask.type === 'blocks'">
                                         <button @click="clearBlocks()" class="text-xs text-base-content/40 hover:text-error" title="Очистить">Сброс</button>
@@ -308,16 +391,32 @@
         <footer x-show="!isLoading && currentTask" class="sticky bottom-0 z-30 bg-base-100/95 backdrop-blur-md border-t border-base-300 px-4 py-3 space-y-2 shrink-0">
             <!-- Оповещения / Предупреждения / Результат запуска -->
             <template x-if="statusMessage">
-                <div class="alert rounded-2xl text-xs font-bold py-2.5 px-3.5 shadow-sm transition-all flex items-center gap-2"
-                    :class="{
-                        'alert-warning bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-300': taskStatus === 'syntax_error',
-                        'alert-error bg-error/10 border-error/30 text-error': taskStatus === 'fail',
-                        'alert-success bg-success/10 border-success/30 text-success': taskStatus === 'success',
-                        'alert-info bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-300': taskStatus === 'running'
-                    }">
-                    <span class="material-symbols-rounded text-lg shrink-0"
-                        x-text="taskStatus === 'syntax_error' ? 'warning' : (taskStatus === 'fail' ? 'error' : (taskStatus === 'success' ? 'check_circle' : 'hourglass_top'))"></span>
-                    <span class="flex-1 leading-snug" x-text="statusMessage"></span>
+                <div class="space-y-1.5">
+                    <div class="alert rounded-2xl text-xs font-bold py-2.5 px-3.5 shadow-sm transition-all flex items-center gap-2"
+                        :class="{
+                            'alert-warning bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-300': taskStatus === 'syntax_error',
+                            'alert-error bg-error/10 border-error/30 text-error': taskStatus === 'fail',
+                            'alert-success bg-success/10 border-success/30 text-success': taskStatus === 'success',
+                            'alert-info bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-300': taskStatus === 'running'
+                        }">
+                        <span class="material-symbols-rounded text-lg shrink-0"
+                            x-text="taskStatus === 'syntax_error' ? 'warning' : (taskStatus === 'fail' ? 'error' : (taskStatus === 'success' ? 'check_circle' : 'hourglass_top'))"></span>
+                        <span class="flex-1 leading-snug" x-text="statusMessage"></span>
+                    </div>
+
+                    <!-- Быстрые действия помощи при ошибке (Критерий 6) -->
+                    <template x-if="taskStatus === 'fail' || taskStatus === 'syntax_error'">
+                        <div class="flex items-center gap-2 pt-0.5">
+                            <button @click="openHint()" class="btn btn-warning btn-soft btn-xs rounded-xl font-bold flex-1 gap-1 text-[11px] py-1">
+                                <span class="material-symbols-rounded text-sm filled">lightbulb</span>
+                                <span>Открыть подсказку</span>
+                            </button>
+                            <button @click="openAiWithQuestion('Помоги разобрать ошибку в этом задании')" class="btn btn-info btn-soft btn-xs rounded-xl font-bold flex-1 gap-1 text-[11px] py-1">
+                                <span class="material-symbols-rounded text-sm filled">smart_toy</span>
+                                <span>Спросить ИИ-Штурмана</span>
+                            </button>
+                        </div>
+                    </template>
                 </div>
             </template>
 
@@ -327,8 +426,8 @@
                 <template x-if="taskStatus === 'idle' || taskStatus === 'syntax_error'">
                     <button @click="runOrCheck()"
                         class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-md hover:shadow-lg gap-2 text-sm">
-                        <span class="material-symbols-rounded text-lg">play_arrow</span>
-                        <span x-text="currentTask && currentTask.type === 'theory' ? 'Проверить ответ' : 'Запустить код'"></span>
+                        <span class="material-symbols-rounded text-lg" x-text="currentTask && currentTask.type === 'lecture' ? 'arrow_forward' : 'play_arrow'"></span>
+                        <span x-text="currentTask && currentTask.type === 'lecture' ? 'Перейти к заданиям' : (currentTask && currentTask.type === 'theory' ? 'Проверить ответ' : 'Запустить код')"></span>
                     </button>
                 </template>
 
@@ -336,7 +435,7 @@
                 <template x-if="taskStatus === 'running'">
                     <button disabled class="btn btn-primary rounded-2xl w-full font-bold text-white opacity-80 gap-2 text-sm">
                         <span class="loading loading-spinner loading-xs"></span>
-                        <span>Выполнение автопилота...</span>
+                        <span>Выполнение программы...</span>
                     </button>
                 </template>
 
@@ -369,7 +468,7 @@
                 <div>
                     <h3 class="text-base font-black text-base-content">Покинуть урок?</h3>
                     <p class="text-xs text-base-content/70 mt-1 leading-relaxed">
-                        Прогресс текущего урока не сохранится. Вы точно хотите выйти в главное меню?
+                        Ваш текущий шаг урока надёжно сохранён. Вы сможете продолжить его в любое удобное время!
                     </p>
                 </div>
                 <div class="flex gap-2 pt-1">
@@ -447,6 +546,10 @@
                     <p class="text-xs text-base-content/70 mt-1 leading-relaxed">
                         Вы успешно освоили материал и решили все задания маршрута.
                     </p>
+                    <div class="mt-2 text-[11px] font-semibold text-sky-600 dark:text-sky-400 bg-sky-500/10 py-1.5 px-2.5 rounded-xl border border-sky-500/20"
+                         x-show="!isRevision">
+                        <span x-text="'Пройдено уроков модуля: ' + moduleLessonNum + ' из ' + moduleLessonsTotal + ' (Осталось: ' + lessonsLeftInModule + ')'"></span>
+                    </div>
                 </div>
 
                 <!-- Награды -->
@@ -464,12 +567,220 @@
                     </div>
                 </div>
 
-                <div class="pt-1">
-                    <a href="index.html" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs shadow-md">
-                        Вернуться к урокам
+                <div class="space-y-2 pt-1">
+                    <template x-if="!isRevision && moduleLessonNum < moduleLessonsTotal">
+                        <a :href="'lesson.html?lesson=' + (moduleLessonNum + 1)"
+                           class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs shadow-md gap-1.5">
+                            <span>Следующий урок модуля</span>
+                            <span class="material-symbols-rounded text-base">arrow_forward</span>
+                        </a>
+                    </template>
+                    <a href="index.html"
+                       class="btn btn-ghost border border-base-300 rounded-2xl w-full font-bold text-base-content text-xs">
+                        Вернуться в меню
                     </a>
                 </div>
             </div>
+        </dialog>
+
+        <!-- МОДАЛЬНОЕ ОКНО 4: ПОДСКАЗКА К ЗАДАНИЮ (КРИТЕРИЙ 6) -->
+        <dialog class="modal" :class="{ 'modal-open': hintModalOpen }">
+            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
+                <div class="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto shadow-inner">
+                    <span class="material-symbols-rounded text-3xl filled">lightbulb</span>
+                </div>
+                <div>
+                    <span class="badge badge-soft badge-warning font-bold text-[10px] uppercase px-2.5 py-1 mb-1">Совет инструктора</span>
+                    <h3 class="text-base font-black text-base-content">Подсказка к заданию</h3>
+                    <div class="text-xs text-base-content/85 mt-2.5 p-3 rounded-2xl bg-base-200 border border-base-300/80 leading-relaxed text-left">
+                        <p x-text="currentTask && currentTask.hint ? currentTask.hint : 'Внимательно посмотрите на карту и посчитайте шаги!'"></p>
+                    </div>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button @click="hintModalOpen = false" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs shadow-sm">
+                        Понятно, пробую!
+                    </button>
+                </div>
+            </div>
+            <form method="dialog" class="modal-backdrop" @click="hintModalOpen = false">
+                <button>close</button>
+            </form>
+        </dialog>
+
+        <!-- МОДАЛЬНОЕ ОКНО 5: ИТОГОВЫЙ ЭКРАН ЗАВЕРШЕНИЯ МОДУЛЯ (КРИТЕРИЙ 9) -->
+        <dialog class="modal" :class="{ 'modal-open': moduleCompletedModalOpen }">
+            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-6 space-y-4 max-w-xs text-center">
+                <div class="w-20 h-20 rounded-3xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto shadow-inner border border-amber-500/20">
+                    <span class="material-symbols-rounded text-5xl filled text-amber-500">workspace_premium</span>
+                </div>
+                <div>
+                    <span class="badge badge-soft badge-warning font-bold text-[11px] uppercase px-2.5 py-1 mb-1">Модуль освоен!</span>
+                    <h3 class="text-xl font-black text-base-content tracking-tight">Поздравляем с победой!</h3>
+                    <p class="text-xs text-base-content/70 mt-1 leading-relaxed">
+                        Вы успешно завершили все 4 урока модуля «Основы алгоритмов умного транспорта».
+                    </p>
+                </div>
+
+                <!-- Статистика модуля -->
+                <div class="space-y-2 text-left bg-base-200 p-3 rounded-2xl border border-base-300">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-base-content/70">Уроки модуля:</span>
+                        <span class="font-bold text-success">4 из 4 (100%)</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-base-content/70">Награда за модуль:</span>
+                        <span class="font-bold text-amber-500">+500 XP</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-base-content/70">Трофей:</span>
+                        <span class="font-bold text-sky-500">Золотой кубок водителя 🏆</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-1">
+                    <a href="lesson.html?lesson=revision" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs shadow-md gap-1.5">
+                        <span class="material-symbols-rounded text-base">psychology</span>
+                        <span>Закрепление (Ревизия)</span>
+                    </a>
+                    <a href="index.html" class="btn btn-ghost border border-base-300 rounded-2xl w-full font-bold text-xs text-base-content">
+                        В главное меню
+                    </a>
+                </div>
+            </div>
+        </dialog>
+
+        <!-- МОДАЛЬНОЕ ОКНО 6: ИИ-ЧАТ-БОТ «ШТУРМАН РУЛИТ» (КРИТЕРИЙ 11) -->
+        <dialog class="modal" :class="{ 'modal-open': aiChatModalOpen }">
+            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-4 space-y-3 max-w-sm max-h-[85vh] flex flex-col">
+                <!-- Хэдер чата -->
+                <div class="flex items-center justify-between pb-2 border-b border-base-300 shrink-0">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-2xl bg-sky-500/10 text-sky-500 flex items-center justify-center">
+                            <span class="material-symbols-rounded text-xl filled">smart_toy</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <h3 class="text-sm font-bold text-base-content">ИИ-Штурман</h3>
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            </div>
+                            <p class="text-[10px] text-base-content/60">Контекстный автоинструктор по коду</p>
+                        </div>
+                    </div>
+                    <button @click="aiChatModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
+                        <span class="material-symbols-rounded text-base">close</span>
+                    </button>
+                </div>
+
+                <!-- Быстрые вопросы-подсказки -->
+                <div class="flex gap-1.5 overflow-x-auto pb-1 shrink-0 scrollbar-none">
+                    <button @click="sendAiMessage('Подскажи, как решить это задание?')" class="badge badge-soft badge-primary hover:badge-primary text-[10px] font-semibold py-2 px-2.5 cursor-pointer shrink-0">
+                        💡 Подсказка
+                    </button>
+                    <button @click="sendAiMessage('Почему машина попадает в аварию?')" class="badge badge-soft badge-warning hover:badge-warning text-[10px] font-semibold py-2 px-2.5 cursor-pointer shrink-0">
+                        ⚠️ Почему авария?
+                    </button>
+                    <button @click="sendAiMessage('Объясни тему этого урока простыми словами')" class="badge badge-soft badge-info hover:badge-info text-[10px] font-semibold py-2 px-2.5 cursor-pointer shrink-0">
+                        📖 Тема урока
+                    </button>
+                    <button @click="sendAiMessage('Как работают команды поворота?')" class="badge badge-soft badge-neutral hover:badge-neutral text-[10px] font-semibold py-2 px-2.5 cursor-pointer shrink-0">
+                        🧭 Повороты
+                    </button>
+                </div>
+
+                <!-- Сообщения чата (DaisyUI chat) -->
+                <div id="ai-chat-messages" class="flex-1 overflow-y-auto space-y-3 pr-1 min-h-[220px] max-h-[340px]">
+                    <template x-for="(msg, mIdx) in aiMessages" :key="mIdx">
+                        <div class="chat" :class="msg.role === 'user' ? 'chat-end' : 'chat-start'">
+                            <div class="chat-header text-[10px] text-base-content/50 mb-0.5" x-text="msg.role === 'user' ? 'Вы' : 'Штурман'"></div>
+                            <div class="chat-bubble text-xs leading-relaxed rounded-2xl"
+                                 :class="msg.role === 'user' ? 'chat-bubble-primary text-white font-medium' : 'bg-base-200 border border-base-300 text-base-content'">
+                                <span x-text="msg.text"></span>
+                            </div>
+                            <div class="chat-footer text-[9px] text-base-content/40 mt-0.5" x-text="msg.time"></div>
+                        </div>
+                    </template>
+                    <template x-if="isAiThinking">
+                        <div class="chat chat-start">
+                            <div class="chat-bubble bg-base-200 border border-base-300 rounded-2xl text-xs py-2 px-3 flex items-center gap-1.5 text-base-content/60">
+                                <span class="loading loading-dots loading-xs text-sky-500"></span>
+                                <span>Штурман анализирует трассу...</span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Поле ввода вопроса -->
+                <div class="pt-1 border-t border-base-300 shrink-0 space-y-1">
+                    <div class="flex gap-1.5 items-center">
+                        <input type="text" x-model="aiInput" @keydown.enter="sendAiMessage()"
+                               placeholder="Задайте вопрос штурману..."
+                               class="input input-bordered input-sm rounded-xl flex-1 text-xs bg-base-200 border-base-300 focus:border-sky-500">
+                        <button @click="sendAiMessage()" class="btn btn-primary btn-sm btn-circle text-white shadow-xs" :disabled="!aiInput.trim()">
+                            <span class="material-symbols-rounded text-lg">send</span>
+                        </button>
+                    </div>
+                    <p class="text-[9px] text-center text-base-content/50">ИИ не запрашивает персональные данные и помогает только по программированию</p>
+                </div>
+            </div>
+            <form method="dialog" class="modal-backdrop" @click="aiChatModalOpen = false">
+                <button>close</button>
+            </form>
+        </dialog>
+
+        <!-- МОДАЛЬНОЕ ОКНО 7: ВЫБОР ТЕМЫ ОФОРМЛЕНИЯ (6 ТЕМ DAISYUI) -->
+        <dialog class="modal" :class="{ 'modal-open': themeModalOpen }">
+            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-5 space-y-4 max-w-sm">
+                <div class="flex items-center justify-between pb-2 border-b border-base-300">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                            <span class="material-symbols-rounded text-xl filled">palette</span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-base-content leading-tight">Тема оформления</h3>
+                            <p class="text-[10px] text-base-content/60">6 цветовых стилей daisyUI</p>
+                        </div>
+                    </div>
+                    <button @click="themeModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
+                        <span class="material-symbols-rounded text-base">close</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <template x-for="t in themes" :key="t.id">
+                        <button @click="setTheme(t.id)"
+                            class="p-3 rounded-2xl border text-left flex flex-col justify-between gap-2 transition-all relative overflow-hidden"
+                            :class="theme === t.id 
+                                ? 'bg-primary/10 border-primary ring-2 ring-primary/30 shadow-xs' 
+                                : 'bg-base-200 border-base-300 hover:border-primary/40'">
+                            <div class="flex items-center justify-between">
+                                <span class="material-symbols-rounded text-lg text-primary" x-text="t.icon"></span>
+                                <!-- Цветовые индикаторы -->
+                                <div class="flex items-center gap-1">
+                                    <template x-for="(col, cIdx) in t.colors" :key="cIdx">
+                                        <span class="w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs" :style="'background-color: ' + col"></span>
+                                    </template>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1">
+                                    <span class="font-bold text-xs text-base-content" x-text="t.name"></span>
+                                    <span x-show="theme === t.id" class="material-symbols-rounded text-xs text-primary filled">check_circle</span>
+                                </div>
+                                <span class="text-[10px] text-base-content/60 block truncate" x-text="t.badge"></span>
+                            </div>
+                        </button>
+                    </template>
+                </div>
+
+                <div class="pt-1">
+                    <button @click="themeModalOpen = false" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs">
+                        Готово
+                    </button>
+                </div>
+            </div>
+            <form method="dialog" class="modal-backdrop" @click="themeModalOpen = false">
+                <button>close</button>
+            </form>
         </dialog>
 
     </div>

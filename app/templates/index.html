@@ -10,10 +10,12 @@
     <script>
         (function() {
             try {
+                const validThemes = ['light', 'dark', 'emerald', 'cyberpunk', 'nord', 'sunset'];
                 const saved = localStorage.getItem('coderulit-theme');
-                const theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                const theme = validThemes.includes(saved) ? saved : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-theme', theme);
-                document.documentElement.classList.toggle('dark', theme === 'dark');
+                const isDark = (theme === 'dark' || theme === 'sunset');
+                document.documentElement.classList.toggle('dark', isDark);
             } catch (e) {}
         })();
     </script>
@@ -32,6 +34,9 @@
         userName: localStorage.getItem('userName') || '',
         userXp: parseInt(localStorage.getItem('userXp') || '0', 10),
         isOnboarding: !localStorage.getItem('userName'),
+        onboardingStep: 0,
+        introTutorialModalOpen: false,
+        moduleResultModalOpen: false,
         inputName: '',
         settingsModalOpen: false,
         dailyTasks: [],
@@ -65,6 +70,7 @@
 
         get userLevel() { return Math.max(1, Math.floor(this.userXp / 200) + 1); },
         get hasStartedLesson() { return this.completedLessons > 0; },
+        get remainingLessonsCount() { return Math.max(0, 4 - this.completedLessons); },
         get currentLessonName() {
             const names = ['Базовое движение', 'Цикл со счетчиком', 'Условия', 'Условный цикл'];
             if (this.completedLessons >= 4) return 'Повторение (Ревизия)';
@@ -72,7 +78,7 @@
         },
         completeOnboarding() {
             const trimmed = (this.inputName || '').trim();
-            const name = trimmed || 'Александр';
+            const name = trimmed || 'Водитель';
             this.userName = name;
             localStorage.setItem('userName', name);
             if (!localStorage.getItem('streak')) localStorage.setItem('streak', '0');
@@ -85,6 +91,7 @@
             }
             this.refreshGamification();
             this.isOnboarding = false;
+            this.activeTab = 'home';
         },
         resetAccount() {
             if (window.CodeRulitGamification) {
@@ -98,34 +105,65 @@
     <div
         class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
 
-        <!-- Экран первого входа (Онбординг) -->
+        <!-- Экран регистрации и лаконичного приветствия нового пользователя -->
         <template x-if="isOnboarding">
-            <div class="flex-1 flex flex-col justify-between p-6 py-10 text-center h-full">
-                <div class="my-auto space-y-6">
-                    <div class="w-24 h-24 rounded-3xl bg-sky-500/10 text-sky-500 flex items-center justify-center mx-auto shadow-inner border border-sky-500/20">
-                        <span class="material-symbols-rounded text-6xl filled">directions_car</span>
+            <div class="flex-1 flex flex-col justify-between p-5 py-7 text-center h-full overflow-y-auto">
+                <!-- Верхняя плашка -->
+                <div class="flex items-center justify-between text-[11px] text-base-content/60 pb-2">
+                    <span class="badge badge-soft badge-primary font-bold text-[10px]">КодРулит</span>
+                    <span class="font-bold text-[10px] tracking-wide uppercase text-base-content/60">Городской транспорт</span>
+                </div>
+
+                <div class="my-auto space-y-4 py-2">
+                    <div class="w-20 h-20 rounded-3xl bg-sky-500/10 text-sky-500 flex items-center justify-center mx-auto shadow-inner border border-sky-500/20">
+                        <span class="material-symbols-rounded text-5xl filled">directions_car</span>
                     </div>
 
-                    <div class="space-y-2">
-                        <h2 class="text-2xl font-black text-base-content tracking-tight">Добро пожаловать в КодРулит!</h2>
+                    <div class="space-y-1.5">
+                        <span class="badge badge-soft badge-primary text-[10px] font-bold uppercase tracking-wider">Добро пожаловать в «КодРулит»</span>
+                        <h2 class="text-2xl font-black text-base-content tracking-tight">Тренажёр программирования</h2>
                         <p class="text-xs text-base-content/70 max-w-xs mx-auto leading-relaxed">
-                            Интерактивный тренажер алгоритмов. Управляйте беспилотным автомобилем и изучайте программирование с нуля!
+                            Вы — водитель службы доставки умного транспорта. Ваша задача — составлять программы и алгоритмы движения, чтобы машина безопасно доставляла грузы по городским кварталам!
                         </p>
                     </div>
 
-                    <div class="space-y-2 text-left max-w-xs mx-auto w-full pt-4">
-                        <label class="text-xs font-bold text-base-content/70 px-1 block">Как вас зовут?</label>
+                    <!-- 3 понятных пункта: Где вы и Что делать -->
+                    <div class="card bg-base-200 border border-base-300 p-3.5 rounded-2xl text-left space-y-2.5 max-w-xs mx-auto">
+                        <div class="flex items-center gap-2 text-xs font-bold text-sky-500">
+                            <span class="material-symbols-rounded text-lg filled">checklist</span>
+                            <span>Что предстоит делать:</span>
+                        </div>
+                        <ul class="text-[11px] text-base-content/85 space-y-2 leading-snug">
+                            <li class="flex items-start gap-2">
+                                <span class="material-symbols-rounded text-sky-500 text-sm mt-0.5">navigation</span>
+                                <span><b>Строить маршруты:</b> отдавать команды движения и поворотов.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="material-symbols-rounded text-amber-500 text-sm mt-0.5">repeat</span>
+                                <span><b>Автоматизировать:</b> применять циклы и сенсоры препятствий.</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <span class="material-symbols-rounded text-emerald-500 text-sm mt-0.5">timer</span>
+                                <span><b>Быстро учиться:</b> каждый рейс занимает всего 3–5 минут практики.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Ввод имени водителя -->
+                    <div class="text-left max-w-xs mx-auto w-full pt-1">
+                        <label class="text-[11px] font-bold text-base-content/70 px-1 block">Имя водителя:</label>
                         <input type="text" x-model="inputName" @keydown.enter="completeOnboarding()"
-                            placeholder="Ваше имя"
-                            class="input input-bordered w-full rounded-2xl bg-base-200 text-sm font-semibold focus:border-sky-500">
+                            placeholder="Водитель"
+                            class="input input-bordered input-sm w-full rounded-xl bg-base-200 text-xs font-semibold focus:border-sky-500 mt-1">
                     </div>
                 </div>
 
-                <div class="pt-4 max-w-xs mx-auto w-full">
+                <!-- Кнопка начала -->
+                <div class="pt-3 max-w-xs mx-auto w-full">
                     <button @click="completeOnboarding()"
-                        class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-lg shadow-primary/25 gap-2">
-                        <span>Начать</span>
-                        <span class="material-symbols-rounded text-lg">arrow_forward</span>
+                        class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-lg shadow-primary/25 text-xs sm:text-sm gap-2">
+                        <span>Начать первый рейс!</span>
+                        <span class="material-symbols-rounded text-lg">rocket_launch</span>
                     </button>
                 </div>
             </div>
@@ -139,18 +177,75 @@
                     <span class="material-symbols-rounded text-2xl">settings</span>
                 </button>
             </div>
-            <div class="navbar-center">
-                <h1 class="text-lg font-bold tracking-tight text-base-content select-none">КодРулит</h1>
+            <div class="navbar-center flex flex-col items-center">
+                <h1 class="text-base font-bold tracking-tight text-base-content select-none leading-tight">КодРулит</h1>
+                <span class="text-[9px] font-semibold text-sky-500 uppercase tracking-wider">Умный транспорт</span>
             </div>
             <div class="navbar-end">
                 <button @click="toggleTheme()" class="btn btn-ghost btn-circle btn-sm text-base-content"
-                    :aria-label="theme === 'dark' ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'"
-                    :title="theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'">
+                    :aria-label="'Выбрать тему: ' + currentThemeMeta.name"
+                    :title="'Тема оформления: ' + currentThemeMeta.name">
                     <span class="material-symbols-rounded text-2xl"
-                        x-text="theme === 'dark' ? 'light_mode' : 'dark_mode'"></span>
+                        x-text="currentThemeMeta.icon"></span>
                 </button>
             </div>
         </header>
+
+        <!-- Модальное окно выбора темы оформления (6 тем daisyUI) -->
+        <dialog class="modal" :class="{ 'modal-open': themeModalOpen }">
+            <div class="modal-box rounded-3xl bg-base-100 border border-base-300 p-5 space-y-4 max-w-sm">
+                <div class="flex items-center justify-between pb-2 border-b border-base-300">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                            <span class="material-symbols-rounded text-xl filled">palette</span>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-base-content leading-tight">Тема оформления</h3>
+                            <p class="text-[10px] text-base-content/60">6 цветовых стилей daisyUI</p>
+                        </div>
+                    </div>
+                    <button @click="themeModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
+                        <span class="material-symbols-rounded text-base">close</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2.5">
+                    <template x-for="t in themes" :key="t.id">
+                        <button @click="setTheme(t.id)"
+                            class="p-3 rounded-2xl border text-left flex flex-col justify-between gap-2 transition-all relative overflow-hidden"
+                            :class="theme === t.id 
+                                ? 'bg-primary/10 border-primary ring-2 ring-primary/30 shadow-xs' 
+                                : 'bg-base-200 border-base-300 hover:border-primary/40'">
+                            <div class="flex items-center justify-between">
+                                <span class="material-symbols-rounded text-lg text-primary" x-text="t.icon"></span>
+                                <!-- Цветовые индикаторы -->
+                                <div class="flex items-center gap-1">
+                                    <template x-for="(col, cIdx) in t.colors" :key="cIdx">
+                                        <span class="w-2.5 h-2.5 rounded-full border border-black/15 shadow-2xs" :style="'background-color: ' + col"></span>
+                                    </template>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1">
+                                    <span class="font-bold text-xs text-base-content" x-text="t.name"></span>
+                                    <span x-show="theme === t.id" class="material-symbols-rounded text-xs text-primary filled">check_circle</span>
+                                </div>
+                                <span class="text-[10px] text-base-content/60 block truncate" x-text="t.badge"></span>
+                            </div>
+                        </button>
+                    </template>
+                </div>
+
+                <div class="pt-1">
+                    <button @click="themeModalOpen = false" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs">
+                        Готово
+                    </button>
+                </div>
+            </div>
+            <form method="dialog" class="modal-backdrop" @click="themeModalOpen = false">
+                <button>close</button>
+            </form>
+        </dialog>
 
         <!-- Модальное окно настроек -->
         <div x-show="settingsModalOpen" x-cloak
@@ -162,14 +257,123 @@
                 </div>
                 <div>
                     <h3 class="text-base font-bold text-base-content">Настройки профиля</h3>
-                    <p class="text-xs text-base-content/60 mt-1" x-text="'Игрок: ' + (userName || 'Новый игрок')"></p>
+                    <p class="text-xs text-base-content/60 mt-1" x-text="'Водитель: ' + (userName || 'Новый водитель')"></p>
+                    <p class="text-[10px] text-sky-500 font-semibold mt-0.5">Тренажёр программирования «КодРулит»</p>
                 </div>
                 <div class="space-y-2 pt-1">
-                    <button @click="resetAccount()" class="btn btn-error btn-soft btn-sm rounded-xl w-full font-bold gap-1.5">
+                    <button @click="themeModalOpen = true; settingsModalOpen = false" class="btn btn-outline border-base-300 btn-sm rounded-xl w-full font-bold gap-1.5 text-xs text-base-content">
+                        <span class="material-symbols-rounded text-base text-primary" x-text="currentThemeMeta.icon"></span>
+                        <span x-text="'Тема: ' + currentThemeMeta.name + ' (выбрать)'"></span>
+                    </button>
+                    <button @click="introTutorialModalOpen = true; settingsModalOpen = false" class="btn btn-primary btn-soft btn-sm rounded-xl w-full font-bold gap-1.5 text-xs">
+                        <span class="material-symbols-rounded text-base">school</span>
+                        <span>Вводный инструктаж (Как играть)</span>
+                    </button>
+                    <button @click="resetAccount()" class="btn btn-error btn-soft btn-sm rounded-xl w-full font-bold gap-1.5 text-xs">
                         <span class="material-symbols-rounded text-base">restart_alt</span>
                         <span>Сбросить весь прогресс</span>
                     </button>
-                    <button @click="settingsModalOpen = false" class="btn btn-ghost btn-sm rounded-xl w-full font-bold text-base-content/60">
+                    <button @click="settingsModalOpen = false" class="btn btn-ghost btn-sm rounded-xl w-full font-bold text-base-content/60 text-xs">
+                        Закрыть
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно повторного просмотра вводного сценария (Критерий 2) -->
+        <div x-show="introTutorialModalOpen" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity"
+            @keydown.escape.window="introTutorialModalOpen = false">
+            <div class="card bg-base-100 border border-base-300 rounded-3xl shadow-2xl max-w-sm w-full p-5 space-y-4 text-center max-h-[85vh] overflow-y-auto">
+                <div class="flex items-center justify-between pb-2 border-b border-base-300">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-rounded text-sky-500 text-xl filled">school</span>
+                        <h3 class="text-sm font-bold text-base-content">Вводный сценарий «КодРулит»</h3>
+                    </div>
+                    <button @click="introTutorialModalOpen = false" class="btn btn-ghost btn-circle btn-xs">
+                        <span class="material-symbols-rounded text-base">close</span>
+                    </button>
+                </div>
+
+                <div class="space-y-3 text-left">
+                    <div class="p-3 rounded-2xl bg-base-200 border border-base-300 space-y-1">
+                        <div class="flex items-center gap-2 text-xs font-bold text-sky-500">
+                            <span class="material-symbols-rounded text-base filled">directions_car</span>
+                            <span>1. Как проходить уроки:</span>
+                        </div>
+                        <p class="text-[11px] text-base-content/80 leading-relaxed">
+                            Тематический модуль состоит из 4 последовательных коротких уроков по 3–5 минут. Каждый урок объясняет новую тему (линейные команды, циклы, условия, условные циклы) с наглядными примерами.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-base-200 border border-base-300 space-y-1">
+                        <div class="flex items-center gap-2 text-xs font-bold text-amber-500">
+                            <span class="material-symbols-rounded text-base filled">extension</span>
+                            <span>2. Как выполнять задания:</span>
+                        </div>
+                        <p class="text-[11px] text-base-content/80 leading-relaxed">
+                            Решайте задачи разных форматов: собирайте код из блоков, дополняйте пропуски, вводите команды. Запускайте бортовой компьютер на карте 5×5! Если машинка ошиблась — жмите «Подсказка» или советуйтесь с ИИ-Штурманом.
+                        </p>
+                    </div>
+
+                    <div class="p-3 rounded-2xl bg-base-200 border border-base-300 space-y-1">
+                        <div class="flex items-center gap-2 text-xs font-bold text-emerald-500">
+                            <span class="material-symbols-rounded text-base filled">emoji_events</span>
+                            <span>3. Игровые награды:</span>
+                        </div>
+                        <p class="text-[11px] text-base-content/80 leading-relaxed">
+                            За правильные решения получайте опыт XP, повышайте уровень, держите непрерывную серию огня (Streak) и завершите модуль для получения Золотого Кубка водителя!
+                        </p>
+                    </div>
+                </div>
+
+                <button @click="introTutorialModalOpen = false" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs">
+                    Понятно, к урокам!
+                </button>
+            </div>
+        </div>
+
+        <!-- Модальное окно итогового результата модуля (Критерий 9) -->
+        <div x-show="moduleResultModalOpen" x-cloak
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-opacity"
+            @keydown.escape.window="moduleResultModalOpen = false">
+            <div class="card bg-base-100 border border-base-300 rounded-3xl shadow-2xl max-w-xs w-full p-6 space-y-4 text-center">
+                <div class="w-20 h-20 rounded-3xl bg-amber-500/15 text-amber-500 flex items-center justify-center mx-auto shadow-inner border border-amber-500/20">
+                    <span class="material-symbols-rounded text-5xl filled text-amber-500">workspace_premium</span>
+                </div>
+                <div>
+                    <span class="badge badge-soft badge-warning font-bold text-[10px] uppercase px-2.5 py-1 mb-1">Сертификат модуля</span>
+                    <h3 class="text-lg font-black text-base-content tracking-tight">Модуль «Основы алгоритмов»</h3>
+                    <p class="text-xs text-base-content/70 mt-1 leading-relaxed">
+                        Поздравляем! Полный образовательный маршрут водителя пройден.
+                    </p>
+                </div>
+
+                <div class="space-y-2 text-left bg-base-200 p-3.5 rounded-2xl border border-base-300">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-base-content/70">Уроки модуля:</span>
+                        <span class="font-bold text-success" x-text="Math.min(completedLessons, 4) + ' из 4 (100%)'"></span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-base-content/70">Набранный опыт:</span>
+                        <span class="font-bold text-amber-500" x-text="userXp + ' XP (Уровень ' + userLevel + ')'"></span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-base-content/70">Рекордная серия:</span>
+                        <span class="font-bold text-orange-500" x-text="maxStreak + ' верных подряд'"></span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs pt-1 border-t border-base-300/80">
+                        <span class="text-base-content/70">Награда:</span>
+                        <span class="font-bold text-sky-500">Кубок водителя 🏆</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2 pt-1">
+                    <a href="lesson.html?lesson=revision" class="btn btn-primary rounded-2xl w-full font-bold text-white text-xs shadow-md gap-1.5">
+                        <span class="material-symbols-rounded text-base">psychology</span>
+                        <span>Пройти повторение (Ревизия)</span>
+                    </a>
+                    <button @click="moduleResultModalOpen = false" class="btn btn-ghost border border-base-300 rounded-2xl w-full font-bold text-xs text-base-content">
                         Закрыть
                     </button>
                 </div>
@@ -216,58 +420,94 @@
                                     <span
                                         class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Текущий урок</span>
                                 </div>
+                                <span class="badge badge-soft font-bold text-[10px] rounded-full"
+                                    :class="completedLessons >= 4 ? 'badge-success' : 'badge-primary'"
+                                    x-text="completedLessons >= 4 ? 'Модуль завершен! 🏆' : ('Осталось: ' + remainingLessonsCount + ' ур.')">
+                                </span>
                             </div>
 
                             <div>
                                 <h3 class="text-base font-bold text-base-content tracking-tight" x-text="currentLessonName"></h3>
+                                <p class="text-[11px] text-base-content/60 mt-0.5">Модуль «Основы алгоритмов умного транспорта»</p>
                             </div>
 
                             <div class="space-y-1.5">
                                 <div class="flex justify-between items-center text-xs">
-                                    <span class="text-base-content/70 font-medium">Общий прогресс</span>
+                                    <span class="text-base-content/70 font-medium">Прогресс модуля (4 урока)</span>
                                     <span class="font-bold text-sky-500" x-text="Math.round((completedLessons / 4) * 100) + '%'"></span>
                                 </div>
                                 <progress class="progress progress-primary w-full h-2.5 rounded-full" :value="(completedLessons / 4) * 100"
                                     max="100"></progress>
                             </div>
 
-                            <button @click="window.location.href = completedLessons >= 4 ? 'lesson.html?lesson=revision' : ('lesson.html?lesson=' + (completedLessons + 1))"
-                                class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1">
-                                <span x-text="completedLessons >= 4 ? 'Начать повторение' : 'Продолжить урок'"></span>
-                                <span class="material-symbols-rounded text-lg">play_arrow</span>
-                            </button>
+                            <div class="space-y-2 mt-1">
+                                <button @click="window.location.href = completedLessons >= 4 ? 'lesson.html?lesson=revision' : ('lesson.html?lesson=' + (completedLessons + 1))"
+                                    class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2">
+                                    <span x-text="completedLessons >= 4 ? 'Начать повторение (Ревизия)' : 'Продолжить урок'"></span>
+                                    <span class="material-symbols-rounded text-lg">play_arrow</span>
+                                </button>
+                                <template x-if="completedLessons >= 4">
+                                    <button @click="moduleResultModalOpen = true"
+                                        class="btn btn-outline border-base-300 rounded-2xl w-full font-bold text-xs gap-1.5 text-base-content">
+                                        <span class="material-symbols-rounded text-base text-amber-500 filled">workspace_premium</span>
+                                        <span>Сертификат и результат модуля</span>
+                                    </button>
+                                </template>
+                            </div>
                         </div>
                     </div>
                 </template>
 
-                <!-- Начать урок -->
+                <!-- Лаконичное приветствие нового пользователя и старт первого урока -->
                 <template x-if="!hasStartedLesson">
-                    <div
-                        class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
-                        <div class="card-body p-4.5 gap-3.5">
-                            <div class="flex items-center justify-between">
-                                <span
-                                    class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Начало</span>
-                            </div>
-
-                            <div>
-                                <h3 class="text-base font-bold text-base-content tracking-tight">Базовое движение</h3>
-                            </div>
-
-                            <div class="space-y-1.5">
-                                <div class="flex justify-between items-center text-xs">
-                                    <span class="text-base-content/70 font-medium">Общий прогресс</span>
-                                    <span class="font-bold text-sky-500">0%</span>
+                    <div class="space-y-3">
+                        <!-- Приветственный баннер-ориентир -->
+                        <div class="card rounded-3xl bg-linear-to-br from-sky-500/15 via-primary/10 to-indigo-500/10 border border-sky-500/30 shadow-xs p-4.5 space-y-2">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-10 h-10 rounded-2xl bg-sky-500 text-white flex items-center justify-center font-bold text-lg shadow-sm shrink-0">
+                                    <span class="material-symbols-rounded text-2xl filled">local_shipping</span>
                                 </div>
-                                <progress class="progress progress-primary w-full h-2.5 rounded-full" value="0"
-                                    max="100"></progress>
+                                <div>
+                                    <h3 class="text-sm sm:text-base font-black text-base-content leading-tight" x-text="'Добро пожаловать, ' + (userName || 'водитель') + '!'"></h3>
+                                    <p class="text-[11px] text-sky-600 dark:text-sky-400 font-semibold">Диспетчерская служба «КодРулит»</p>
+                                </div>
                             </div>
+                            <p class="text-xs text-base-content/85 leading-relaxed">
+                                Вы находитесь в интерактивном тренажёре алгоритмов городского транспорта. Ваша задача — программировать маршруты и безопасно доставлять посылки по кварталам города!
+                            </p>
+                            <div class="p-2.5 rounded-2xl bg-base-100/80 border border-sky-500/20 text-[11px] text-base-content/75 flex items-center gap-2">
+                                <span class="material-symbols-rounded text-sky-500 text-base shrink-0">info</span>
+                                <span>Начните с <b>Урока 1</b>: изучите базовые команды и совершите первый успешный рейс.</span>
+                            </div>
+                        </div>
 
-                            <button @click="window.location.href = 'lesson.html?lesson=1'"
-                                class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1">
-                                <span>Начать урок</span>
-                                <span class="material-symbols-rounded text-lg">flag</span>
-                            </button>
+                        <!-- Карточка старта Урока 1 -->
+                        <div class="card card-border rounded-3xl bg-base-200 border-base-300 shadow-xs hover:border-sky-500/40 transition-all">
+                            <div class="card-body p-4.5 gap-3.5">
+                                <div class="flex items-center justify-between">
+                                    <span class="badge badge-soft badge-primary font-bold text-[11px] px-2 rounded-full">Первый рейс</span>
+                                    <span class="badge badge-soft badge-neutral font-bold text-[10px] rounded-full">4 урока в модуле</span>
+                                </div>
+
+                                <div>
+                                    <h3 class="text-base font-bold text-base-content tracking-tight">Урок 1: Первый рейс водителя</h3>
+                                    <p class="text-[11px] text-base-content/60 mt-0.5">Линейные алгоритмы и базовые команды движения</p>
+                                </div>
+
+                                <div class="space-y-1.5">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="text-base-content/70 font-medium">Прогресс модуля</span>
+                                        <span class="font-bold text-sky-500">0%</span>
+                                    </div>
+                                    <progress class="progress progress-primary w-full h-2.5 rounded-full" value="0" max="100"></progress>
+                                </div>
+
+                                <button @click="window.location.href = 'lesson.html?lesson=1'"
+                                    class="btn btn-primary rounded-2xl w-full font-bold text-white gap-2 mt-1 shadow-md hover:shadow-lg">
+                                    <span>Начать первый рейс!</span>
+                                    <span class="material-symbols-rounded text-lg">arrow_forward</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </template>
@@ -333,6 +573,26 @@
                         <span class="material-symbols-rounded text-base text-sky-500 filled">school</span>
                         <span x-text="completedLessons + ' / 4 пройдено'"></span>
                     </div>
+                </div>
+
+                <!-- Карточка тематического модуля (Критерий 3) -->
+                <div class="card bg-sky-500/10 border border-sky-500/20 rounded-2xl p-3.5 space-y-1">
+                    <div class="flex items-center justify-between text-xs font-bold text-sky-600 dark:text-sky-400">
+                        <span class="flex items-center gap-1.5">
+                            <span class="material-symbols-rounded text-sm">route</span>
+                            <span>Модуль: «Основы алгоритмов»</span>
+                        </span>
+                        <span x-text="completedLessons >= 4 ? 'Пройден! 🏆' : ('Осталось: ' + remainingLessonsCount + ' ур.')"></span>
+                    </div>
+                    <p class="text-[11px] text-base-content/70">
+                        Последовательный образовательный маршрут из 4 уроков с постепенным усложнением.
+                    </p>
+                    <template x-if="completedLessons >= 4">
+                        <button @click="moduleResultModalOpen = true" class="btn btn-primary btn-xs rounded-xl font-bold text-white mt-1 gap-1">
+                            <span class="material-symbols-rounded text-sm">workspace_premium</span>
+                            <span>Сертификат и результат модуля</span>
+                        </button>
+                    </template>
                 </div>
 
                 <!-- Повторение -->
@@ -639,8 +899,8 @@
                                 <span>Суть концепции: Язык инструкций</span>
                             </h4>
                             <p class="leading-relaxed">
-                                Компьютер или автопилот автомобиля не умеют думать самостоятельно. Они не обладают
-                                интуицией и не могут «догадаться», чего от них хотят. Чтобы машина выполнила задачу,
+                                Бортовой компьютер автомобиля не умеет думать самостоятельно. Он не обладает
+                                интуицией и не может «догадаться», чего от него хотят. Чтобы машина выполнила задачу,
                                 программист составляет для неё <b class="text-base-content">алгоритм</b>.
                             </p>
                             <p class="leading-relaxed">
@@ -701,7 +961,7 @@
                             </div>
                             <p class="text-[11px] leading-relaxed">
                                 Ошибку в программе программисты называют <b>багом (bug)</b>. Если вы забыли повернуть
-                                или указали лишний шаг, автопилот врежется в ограждение. Поиск и исправление ошибок
+                                или указали лишний шаг, машина съедет с дороги. Поиск и исправление ошибок
                                 называется <b>отладкой (debugging)</b>.
                             </p>
                         </div>
@@ -911,7 +1171,7 @@
                             <h3 class="text-base font-bold text-base-content tracking-tight">Ветвление: Условия и
                                 принятие решений</h3>
                             <p class="text-xs text-base-content/60 mt-0.5">Логика «Если... то... иначе» и сенсоры
-                                автопилота</p>
+                                бортового компьютера</p>
                         </div>
                     </summary>
                     <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
@@ -953,7 +1213,7 @@
 
                         <div>
                             <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider mb-2">Датчики
-                                пространства автопилота</p>
+                                пространства автомобиля</p>
                             <div class="grid grid-cols-2 gap-2 text-xs">
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
                                     <code
@@ -1091,7 +1351,7 @@
                             <h3 class="text-base font-bold text-base-content tracking-tight">Логические связки и
                                 комбинирование</h3>
                             <p class="text-xs text-base-content/60 mt-0.5">Сложные условия и вложенность циклов для
-                                автопилота</p>
+                                бортового компьютера</p>
                         </div>
                     </summary>
                     <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
@@ -1145,7 +1405,7 @@
                                 <span>Вложенные конструкции: Условия внутри циклов</span>
                             </h4>
                             <p class="leading-relaxed">
-                                Настоящие автопилоты строятся из комбинаций: вы можете поместить условие <code
+                                Умные системы управления транспортом строятся из комбинаций: вы можете поместить условие <code
                                     class="font-mono text-sky-500 font-bold">если</code> внутрь цикла <code
                                     class="font-mono text-sky-500 font-bold">пока</code>. Машина будет ехать и на каждом
                                 перекрёстке самостоятельно оценивать обстановку по датчикам!
@@ -1154,7 +1414,7 @@
 
                         <div class="space-y-1">
                             <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример
-                                автопилота с вложенностью</p>
+                                программы с вложенностью</p>
                             <pre
                                 class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">пока спереди_свободно выполнить:
     вперед

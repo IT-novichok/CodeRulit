@@ -5,10 +5,10 @@
 @source "../../templates/**/*.html";
 @source "../js/**/*.js";
 
-@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *, .dark, .dark *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *, [data-theme=sunset], [data-theme=sunset] *, [data-theme=cyberpunk], [data-theme=cyberpunk] *, .dark, .dark *));
 
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
+  themes: light --default, dark --prefersdark, emerald, cyberpunk, nord, sunset;
 }
 
 @plugin "daisyui/theme" {
@@ -53,4 +53,11 @@
   position: relative !important;
   inset: auto !important;
   width: 100% !important;
+}
+
+progress,
+progress::-webkit-progress-value,
+progress::-moz-progress-bar {
+  transition: none !important;
+  animation: none !important;
 }

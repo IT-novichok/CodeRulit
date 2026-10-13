@@ -19,10 +19,22 @@ function lessonApp() {
 
         exitModalOpen: false,
         theoryModalOpen: false,
+        hintModalOpen: false,
+        aiChatModalOpen: false,
+        moduleCompletedModalOpen: false,
         lessonCompleted: false,
+
+        aiMessages: [],
+        aiInput: '',
+        isAiThinking: false,
+        moduleLessonsTotal: 4,
 
         taskStatus: 'idle',
         statusMessage: '',
+
+        get isRevision() { return this.lessonId === 'revision'; },
+        get moduleLessonNum() { return this.lessonId === 'revision' ? 4 : (parseInt(this.lessonId, 10) || 1); },
+        get lessonsLeftInModule() { return this.lessonId === 'revision' ? 0 : Math.max(0, 4 - (parseInt(this.lessonId, 10) || 1)); },
 
         selectedOption: null,
         filledBlank: null,
@@ -76,7 +88,11 @@ function lessonApp() {
             this.totalSteps = this.lessonData.tasks.length;
             this.isLoading = false;
 
-            this.loadTask(0);
+            this.initAiChat();
+
+            const savedStep = parseInt(localStorage.getItem('savedStep_' + this.lessonId) || '0', 10);
+            const validStep = (!isNaN(savedStep) && savedStep >= 0 && savedStep < this.totalSteps) ? savedStep : 0;
+            this.loadTask(validStep);
         },
 
         loadTask(index) {
@@ -86,9 +102,11 @@ function lessonApp() {
             }
 
             this.currentStepIndex = index;
+            localStorage.setItem('savedStep_' + this.lessonId, index.toString());
             this.currentTask = this.lessonData ? this.lessonData.tasks[index] : null;
             this.taskStatus = 'idle';
             this.statusMessage = '';
+            this.hintModalOpen = false;
 
             this.selectedOption = null;
             this.filledBlank = null;
@@ -235,6 +253,11 @@ function lessonApp() {
             const task = this.currentTask;
             if (!task) return;
 
+            if (task.type === 'lecture') {
+                this.nextStep();
+                return;
+            }
+
             if (this.taskStatus === 'success') {
                 this.nextStep();
                 return;
@@ -316,7 +339,7 @@ function lessonApp() {
             this.car.crashed = false;
 
             this.taskStatus = 'running';
-            this.statusMessage = 'Автопилот выполняет программу...';
+            this.statusMessage = 'Бортовой компьютер выполняет программу...';
 
             setTimeout(() => {
                 this.car.animate = true;
@@ -549,8 +572,6 @@ function lessonApp() {
         },
 
         finishLesson() {
-            this.lessonCompleted = true;
-
             // Сохраняем набранную серию и рекорд только при успешном завершении урока
             localStorage.setItem('streak', this.streak.toString());
             const curMax = Math.max(parseInt(localStorage.getItem('maxStreak') || '0', 10), this.streak);
@@ -558,8 +579,9 @@ function lessonApp() {
 
             const currCompleted = parseInt(localStorage.getItem('completedLessons') || '0', 10);
             const numLessonId = parseInt(this.lessonId, 10);
+            let newCompleted = currCompleted;
             if (!isNaN(numLessonId)) {
-                const newCompleted = Math.max(currCompleted, numLessonId);
+                newCompleted = Math.max(currCompleted, numLessonId);
                 localStorage.setItem('completedLessons', newCompleted.toString());
             }
 
@@ -574,18 +596,132 @@ function lessonApp() {
             if (window.confetti) {
                 window.confetti({ particleCount: 100, spread: 100, origin: { y: 0.5 } });
             }
+
+            // Проверка завершения образовательного модуля (Критерий 9)
+            if (this.lessonId === '4' || (!this.isRevision && newCompleted >= 4)) {
+                this.moduleCompletedModalOpen = true;
+            } else {
+                this.lessonCompleted = true;
+            }
+
+            localStorage.removeItem('savedStep_' + this.lessonId);
+        },
+
+        initAiChat() {
+            const lessonTitle = this.lessonData ? this.lessonData.title : ('Урок ' + this.lessonId);
+            this.aiMessages = [
+                {
+                    role: 'assistant',
+                    text: `Привет! Я твой ИИ-штурман бортового компьютера 🤖. Сейчас ты проходишь «${lessonTitle}». Если запутаешься в командах, попадёшь в затруднение или захочешь подсказку — напиши мне, разберём вместе!`,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                }
+            ];
+        },
+
+        openHint() {
+            this.hintModalOpen = true;
+        },
+
+        openAiWithQuestion(questionText) {
+            this.aiChatModalOpen = true;
+            if (questionText) {
+                setTimeout(() => {
+                    this.sendAiMessage(questionText);
+                }, 200);
+            }
+        },
+
+        sendAiMessage(customText) {
+            const text = (customText || this.aiInput || '').trim();
+            if (!text) return;
+            this.aiInput = '';
+
+            const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            this.aiMessages.push({ role: 'user', text, time: now });
+            this.isAiThinking = true;
+
+            setTimeout(() => {
+                const reply = this.generateAiResponse(text);
+                this.aiMessages.push({
+                    role: 'assistant',
+                    text: reply,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                });
+                this.isAiThinking = false;
+                this.$nextTick(() => {
+                    const el = document.getElementById('ai-chat-messages');
+                    if (el) el.scrollTop = el.scrollHeight;
+                });
+            }, 400);
+        },
+
+        generateAiResponse(userMsg) {
+            const q = (userMsg || '').toLowerCase().trim();
+            const task = this.currentTask;
+            const lessonId = this.lessonId;
+            const car = this.car;
+            const isCrashed = car && car.crashed;
+
+            // 1. Проверка на посторонние темы (Критерий: перенаправлять к теме приложения)
+            const offTopicKeywords = ['погода', 'фильм', 'музык', 'президент', 'спорт', 'футбол', 'анекдот', 'дота', 'майнкрафт', 'рецепт', 'сочинение', 'любовь', 'поиграй'];
+            if (offTopicKeywords.some(k => q.includes(k))) {
+                return 'Я твой виртуальный автоинструктор по программированию 🚗! Моя задача — помочь тебе освоить алгоритмы умного городского транспорта. Давай сосредоточимся на нашей трассе: в чем вопрос по коду машинки?';
+            }
+
+            // 2. Защита персональных данных (Критерий: не запрашивать персональные данные)
+            if (q.includes('паспорт') || q.includes('телефон') || q.includes('адрес') || q.includes('фамилия') || q.includes('пароль') || q.includes('почта')) {
+                return 'В целях безопасности в «КодРулит» мы никогда не запрашиваем персональные данные. Давай лучше разберем алгоритм для нашей машинки!';
+            }
+
+            // 3. Вопросы про ошибки / аварию / почему не едет
+            if (q.includes('ошибк') || q.includes('почему') || q.includes('авари') || q.includes('вреза') || q.includes('не едет') || q.includes('не доехал') || q.includes('разобрать')) {
+                if (isCrashed) {
+                    return `Автомобиль съехал с серой дороги на газон! 💥 Это происходит, когда машина делает шаг вперед без нужного поворота, либо повернула не в ту сторону. Проверь направление капота: сначала поверни («направо» или «налево»), а затем сделай шаг «вперед». Совет: ${task && task.hint ? task.hint : 'следи за разметкой дороги!'}`;
+                }
+                if (task && task.type === 'theory') {
+                    return `В теоретическом вопросе опирайся на логику урока. ${task.hint || 'Перечитай варианты: один из них в точности описывает поведение бортового компьютера!'}`;
+                }
+                return `Машина не доехала до финиша — скорее всего, не хватает команд движения или пропущен поворот. ${task && task.hint ? 'Совет штурмана: ' + task.hint : 'Посчитай клетки дороги от старта до финиша!'}`;
+            }
+
+            // 4. Запрос подсказки / помощи по текущему заданию
+            if (q.includes('подсказ') || q.includes('помоги') || q.includes('как решить') || q.includes('что делать') || q.includes('решение')) {
+                if (task && task.hint) {
+                    return `💡 Мой совет штурмана: ${task.hint} Примени эту команду в окне кода и нажми «Запустить код»!`;
+                }
+                return 'Посмотри на карту: посчитай расстояние до перекрестка и выбери правильную последовательность команд!';
+            }
+
+            // 5. Объяснение базовых понятий программирования
+            if (q.includes('цикл') || q.includes('повтор')) {
+                return '🔄 Цикл позволяет повторять команды без дублирования кода! Цикл со счетчиком («вперед 3 раза») делает строго заданное число шагов, а условный цикл («вперед пока спереди_пусто») шагает вперед до тех пор, пока дорога свободна!';
+            }
+            if (q.includes('услови') || q.includes('если') || q.includes('датчик') || q.includes('пусто')) {
+                return '⚡ Условие «если спереди_пусто то вперед» проверяет сенсоры автомобиля. Если датчик видит дорогу — команда выполняется. Если впереди препятствие — бортовой компьютер остановит машину, предотвратив инцидент!';
+            }
+            if (q.includes('поворот') || q.includes('направо') || q.includes('налево')) {
+                return '🧭 Команды поворота («направо», «налево») разворачивают корпус машины НА МЕСТЕ на 90°. Сама клетка не меняется! Чтобы продвинуться, после поворота обязательно нужна команда «вперед».';
+            }
+
+            // 6. Контекст текущего урока
+            if (q.includes('тема') || q.includes('урок') || q.includes('теория')) {
+                if (lessonId === '1') return 'В Уроке 1 мы изучаем линейные алгоритмы: команды выполняются строго сверху вниз по одной («вперед», «направо», «налево»).';
+                if (lessonId === '2') return 'В Уроке 2 мы осваиваем циклы со счетчиком («команда N раз»). Они делают код компактным и удобным!';
+                if (lessonId === '3') return 'В Уроке 3 мы учим бортовой компьютер «видеть» дорогу через условия «если ... то ...» и сенсоры «спереди_пусто», «справа_пусто», «слева_пусто».';
+                if (lessonId === '4') return 'В Уроке 4 мы применяем условные циклы «вперед пока спереди_пусто». Машина сама едет до упора и безопасно тормозит!';
+                return 'В этом уроке мы объединяем все концепции: циклы, условия и повороты для прохождения комплексного лабиринта!';
+            }
+
+            return `Я на связи! В текущем задании: «${task ? (task.prompt || task.title) : 'Урок'}». Ты можешь спросить у меня подсказку, узнать, почему случилась авария, или как работает любая команда. О чем рассказать?`;
         },
 
         handleQuit() {
             if (this.lessonCompleted) return;
-            if (this.streakLostInLesson) {
-                // Если серия была потеряна/сброшена из-за ошибки в этом уроке, она остается 0
-                localStorage.setItem('streak', '0');
-            } else {
-                // При выходе без завершения урока прогресс серии не сохраняется
-                localStorage.setItem('streak', this.initialStreak.toString());
-                localStorage.setItem('maxStreak', this.initialMaxStreak.toString());
-            }
+            // Прогресс шага урока надежно сохранен в localStorage (savedStep_${this.lessonId})
+            // Сохраняем текущую серию при выходе, чтобы пользователь не терял прогресс
+            localStorage.setItem('streak', this.streak.toString());
+            const curMax = Math.max(parseInt(localStorage.getItem('maxStreak') || '0', 10), this.streak);
+            localStorage.setItem('maxStreak', curMax.toString());
         },
 
         confirmExit() {
