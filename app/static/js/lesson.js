@@ -34,6 +34,16 @@ function lessonApp() {
 
         get isRevision() { return this.lessonId === 'revision'; },
         get moduleLessonNum() { return this.lessonId === 'revision' ? 4 : (parseInt(this.lessonId, 10) || 1); },
+        get lessonName() {
+            const names = {
+                '1': 'Базовое движение',
+                '2': 'Цикл со счетчиком',
+                '3': 'Условия',
+                '4': 'Условный цикл',
+                'revision': 'Повторение'
+            };
+            return names[this.lessonId] || ('Урок ' + this.moduleLessonNum);
+        },
         get lessonsLeftInModule() { return this.lessonId === 'revision' ? 0 : Math.max(0, 4 - (parseInt(this.lessonId, 10) || 1)); },
 
         selectedOption: null,
@@ -113,6 +123,10 @@ function lessonApp() {
             this.assembledBlocks = [];
             this.typedInput = '';
 
+            if (this.currentTask && this.currentTask.type === 'blocks' && Array.isArray(this.currentTask.wordBank)) {
+                this.currentTask.wordBank = [...new Set(this.currentTask.wordBank)];
+            }
+
             if (this.currentTask && this.currentTask.grid) {
                 this.setupGrid(this.currentTask.grid);
             }
@@ -174,6 +188,18 @@ function lessonApp() {
                         }
                     }
 
+                    let grassSvg = 'grass.svg';
+                    if (!isRoad) {
+                        const grassPattern = [
+                            ['grass.svg',          'grass-flowers.svg',  'grass.svg',         'grass-house.svg',    'grass.svg'],
+                            ['grass-fountain.svg', 'grass.svg',          'grass-building.svg','grass.svg',          'grass-flowers.svg'],
+                            ['grass.svg',          'grass-house.svg',    'grass.svg',         'grass-fountain.svg', 'grass.svg'],
+                            ['grass-flowers.svg',  'grass.svg',          'grass-house.svg',   'grass.svg',          'grass-building.svg'],
+                            ['grass.svg',          'grass-building.svg', 'grass.svg',         'grass-flowers.svg',  'grass-fountain.svg']
+                        ];
+                        grassSvg = (grassPattern[y] && grassPattern[y][x]) || 'grass.svg';
+                    }
+
                     cells.push({
                         x,
                         y,
@@ -181,7 +207,8 @@ function lessonApp() {
                         isStart,
                         isFinish,
                         tileSvg,
-                        tileAngle
+                        tileAngle,
+                        grassSvg
                     });
                 }
             }
@@ -607,7 +634,7 @@ function lessonApp() {
             this.aiMessages = [
                 {
                     role: 'assistant',
-                    text: `Привет! Я твой ИИ-штурман бортового компьютера 🤖. Сейчас ты проходишь «${lessonTitle}». Если запутаешься в командах, попадёшь в затруднение или захочешь подсказку — напиши мне, разберём вместе!`,
+                    text: `Привет! Я твой ИИ-штурман бортового компьютера 🤖. Сейчас ты проходишь «${lessonTitle}». Если запутаешься в командах, попадёшь в аварию или захочешь подсказку — нажимай на кнопки шаблонов ниже, разберём вместе!`,
                     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 }
             ];
