@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="description" content="КодРулит — Интерактивный мобильный тренажёр алгоритмов и программирования">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="КодРулит">
+    <title>КодРулит</title>
+    <link rel="shortcut icon" href="app/static/img/icons/favicon.svg" type="image/x-icon">
+    <link rel="apple-touch-icon" href="app/static/img/icons/favicon.svg">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta http-equiv="refresh" content="0; url=app/templates/index.html">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(() => {});
+            });
+        }
+        window.location.replace('app/templates/index.html');
+    </script>
+</head>
+<body>
+    <p>Перенаправление в <a href="app/templates/index.html">главное меню</a>...</p>
+</body>
+</html>
