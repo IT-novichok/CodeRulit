@@ -1,5 +1,5 @@
 // CodeRulit Progressive Web App Service Worker
-const CACHE_NAME = 'coderulit-v1.0.0';
+const CACHE_NAME = 'coderulit-v1.0.1';
 
 const PRECACHE_ASSETS = [
   './',
@@ -13,13 +13,10 @@ const PRECACHE_ASSETS = [
   './app/static/js/lesson.js',
   './app/static/js/gamification.js',
   './app/static/js/theme-handler.js',
+  './app/static/js/pwa.js',
   './app/static/data/lessons.json',
   './app/static/img/icons/favicon.svg',
   './app/static/img/icons/streak.svg',
-  './app/static/img/icons/icon-192.png',
-  './app/static/img/icons/icon-512.png',
-  './app/static/img/icons/icon-maskable-512.png',
-  './app/static/img/icons/apple-touch-icon.png',
   './app/static/img/field/car.svg',
   './app/static/img/field/start.svg',
   './app/static/img/field/finish.svg',
