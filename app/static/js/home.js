@@ -19,16 +19,35 @@ function homeApp() {
         achievementsList: [],
         currentLessonStep: 0,
         currentLessonTotalSteps: 10,
+        pwaInstallable: false,
+        pwaInstalled: false,
 
         init() {
             if (typeof this.initTheme === 'function') {
                 this.initTheme();
             }
             this.refreshGamification();
+            
+            // PWA integration
+            if (window.CodeRulitPWA) {
+                this.pwaInstallable = window.CodeRulitPWA.isInstallable;
+                this.pwaInstalled = window.CodeRulitPWA.isInstalled;
+            }
+            window.addEventListener('coderulit-pwa-state', (e) => {
+                if (e && e.detail) {
+                    this.pwaInstallable = !!e.detail.isInstallable;
+                    this.pwaInstalled = !!e.detail.isInstalled;
+                }
+            });
+
             this.$watch('settingsModalOpen', (val) => {
                 if (val) {
                     this.editUserNameInput = this.userName || '';
                     this.nameSavedAlert = false;
+                    if (window.CodeRulitPWA) {
+                        this.pwaInstallable = window.CodeRulitPWA.isInstallable;
+                        this.pwaInstalled = window.CodeRulitPWA.isInstalled;
+                    }
                 }
             });
         },
@@ -127,6 +146,16 @@ function homeApp() {
             setTimeout(() => {
                 this.nameSavedAlert = false;
             }, 2000);
+        },
+
+        async installPwa() {
+            if (window.CodeRulitPWA && typeof window.CodeRulitPWA.promptInstall === 'function') {
+                const installed = await window.CodeRulitPWA.promptInstall();
+                if (installed) {
+                    this.pwaInstalled = true;
+                    this.pwaInstallable = false;
+                }
+            }
         }
     };
 }

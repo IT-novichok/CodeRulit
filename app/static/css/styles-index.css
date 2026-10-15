@@ -82,4 +82,27 @@ progress::-moz-progress-bar {
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(150, 150, 150, 0.25) transparent;
-}
+}
+
+/* Mobile screen & viewport adaptation */
+html, body {
+  height: 100%;
+  overscroll-behavior-y: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app-phone-container {
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100vh;
+  max-height: 100dvh;
+}
+
+@media (min-width: 640px) {
+  .app-phone-container {
+    height: 50rem !important;
+    max-height: 50rem !important;
+    min-height: 50rem !important;
+  }
+}
+

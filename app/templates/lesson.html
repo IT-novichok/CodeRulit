@@ -4,8 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="description" content="КодРулит — Интерактивный мобильный тренажёр алгоритмов и программирования">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="КодРулит">
     <title>КодРулит — Урок</title>
     <link rel="shortcut icon" href="../static/img/icons/favicon.svg" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../static/img/icons/apple-touch-icon.png">
+    <link rel="manifest" href="../../manifest.webmanifest">
     <link rel="stylesheet" href="../static/css/output-index.css">
     <script>
         (function() {
@@ -21,17 +29,18 @@
     </script>
     <script defer src="../static/js/theme-handler.js"></script>
     <script defer src="../static/js/gamification.js"></script>
+    <script defer src="../static/js/pwa.js"></script>
     <script defer src="../static/js/lesson.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 
-<body class="bg-base-200 min-h-screen flex items-center justify-center font-sans antialiased"
+<body class="bg-base-200 h-dvh max-h-dvh sm:min-h-screen flex items-center justify-center font-sans antialiased overflow-hidden sm:overflow-auto"
     x-data="lessonApp()">
     <div
-        class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
+        class="app-phone-container w-full max-w-105 h-dvh max-h-dvh sm:min-h-200 sm:h-200 sm:max-h-200 rounded-none sm:rounded-[36px] border-0 sm:border sm:border-base-300 shadow-none sm:shadow-2xl bg-base-100 text-base-content flex flex-col relative overflow-hidden">
 
-        <header class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none gap-2 shrink-0">
+        <header class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 shrink-0 z-40 rounded-none gap-2 pt-[env(safe-area-inset-top)]">
             <div class="navbar-start w-auto">
                 <button @click="exitModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-base-content"
                     aria-label="Выйти из урока" title="Выйти из урока">
@@ -85,7 +94,7 @@
             </span>
         </div>
 
-        <main class="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-3">
+        <main class="flex-1 min-h-0 overflow-y-auto px-3.5 sm:px-4 py-3 flex flex-col gap-3">
             <template x-if="isLoading">
                 <div class="flex-1 flex flex-col items-center justify-center gap-3 py-16 text-center">
                     <span class="loading loading-spinner loading-lg text-primary"></span>
@@ -185,7 +194,7 @@
 
                     <template x-if="currentTask.type !== 'theory' && currentTask.type !== 'lecture'">
                         <div class="space-y-3">
-                            <div class="mx-auto w-full max-w-[320px] aspect-square rounded-3xl overflow-hidden border border-base-300 shadow-md grid grid-cols-5 gap-0 relative select-none">
+                            <div class="mx-auto w-full max-w-[270px] sm:max-w-[320px] aspect-square rounded-3xl overflow-hidden border border-base-300 shadow-md grid grid-cols-5 gap-0 relative select-none">
                                 <template x-for="cell in gridCells" :key="cell.x + '-' + cell.y">
                                     <div class="aspect-square flex items-center justify-center relative overflow-hidden select-none">
                                         <template x-if="cell.type === 'grass'">
@@ -340,7 +349,7 @@
             </template>
         </main>
 
-        <footer x-show="!isLoading && currentTask" class="sticky bottom-0 z-30 bg-base-100/95 backdrop-blur-md border-t border-base-300 px-4 py-3 space-y-2 shrink-0">
+        <footer x-show="!isLoading && currentTask" class="shrink-0 z-30 bg-base-100/95 backdrop-blur-md border-t border-base-300 px-4 py-2.5 sm:py-3 space-y-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <template x-if="statusMessage">
                 <div class="space-y-1.5">
                     <div class="alert rounded-2xl text-xs font-bold py-2.5 px-3.5 shadow-sm transition-all flex items-center gap-2"

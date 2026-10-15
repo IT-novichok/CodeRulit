@@ -4,8 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0ea5e9">
+    <meta name="description" content="КодРулит — Интерактивный мобильный тренажёр алгоритмов и программирования">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="КодРулит">
     <title>КодРулит</title>
     <link rel="shortcut icon" href="../static/img/icons/favicon.svg" type="image/x-icon">
+    <link rel="apple-touch-icon" href="../static/img/icons/apple-touch-icon.png">
+    <link rel="manifest" href="../../manifest.webmanifest">
     <link rel="stylesheet" href="../static/css/output-index.css">
     <script>
         (function() {
@@ -21,75 +29,76 @@
     </script>
     <script defer src="../static/js/theme-handler.js"></script>
     <script defer src="../static/js/gamification.js"></script>
+    <script defer src="../static/js/pwa.js"></script>
     <script defer src="../static/js/home.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="bg-base-200 min-h-screen flex items-center justify-center font-sans antialiased"
+<body class="bg-base-200 h-dvh max-h-dvh sm:min-h-screen flex items-center justify-center font-sans antialiased overflow-hidden sm:overflow-auto"
     x-data="homeApp()">
     <div
-        class="w-full max-w-105 min-h-screen sm:min-h-200 sm:h-200 sm:max-h-200 sm:rounded-[36px] sm:border sm:border-base-300 sm:shadow-2xl bg-base-100 text-base-content flex flex-col justify-between relative overflow-hidden">
+        class="app-phone-container w-full max-w-105 h-dvh max-h-dvh sm:min-h-200 sm:h-200 sm:max-h-200 rounded-none sm:rounded-[36px] border-0 sm:border sm:border-base-300 shadow-none sm:shadow-2xl bg-base-100 text-base-content flex flex-col relative overflow-hidden">
 
         <template x-if="isOnboarding">
-            <div class="flex-1 flex flex-col justify-between p-5 py-7 text-center h-full overflow-y-auto">
-                <div class="flex items-center justify-between text-[11px] text-base-content/60 pb-2">
+            <div class="flex-1 flex flex-col justify-between p-3.5 sm:p-5 text-center h-full overflow-hidden select-none">
+                <div class="flex items-center justify-between text-[11px] text-base-content/60 shrink-0 pb-1">
                     <span class="badge badge-soft badge-primary font-bold text-[10px]">КодРулит</span>
                     <span class="font-bold text-[10px] tracking-wide uppercase text-base-content/60">Городской транспорт</span>
                 </div>
 
-                <div class="my-auto space-y-4 py-2">
-                    <div class="w-20 h-20 rounded-3xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner border border-primary/20">
-                        <span class="material-symbols-rounded text-5xl filled">directions_car</span>
+                <div class="my-auto space-y-2 sm:space-y-3.5 py-1 min-h-0 flex-1 flex flex-col justify-center">
+                    <div class="w-13 h-13 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-inner border border-primary/20 shrink-0">
+                        <span class="material-symbols-rounded text-3xl sm:text-4xl filled">directions_car</span>
                     </div>
 
-                    <div class="space-y-1.5">
-                        <span class="badge badge-soft badge-primary text-[10px] font-bold uppercase tracking-wider">Добро пожаловать в «КодРулит»</span>
-                        <h2 class="text-2xl font-black text-base-content tracking-tight">Тренажёр программирования</h2>
-                        <p class="text-xs text-base-content/70 max-w-xs mx-auto leading-relaxed">
-                            Вы — водитель службы доставки умного транспорта. Ваша задача — составлять программы и алгоритмы движения, чтобы машина безопасно доставляла грузы по городским кварталам!
+                    <div class="space-y-0.5 sm:space-y-1 shrink-0">
+                        <span class="badge badge-soft badge-primary text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">Добро пожаловать в «КодРулит»</span>
+                        <h2 class="text-xl sm:text-2xl font-black text-base-content tracking-tight leading-tight">Тренажёр программирования</h2>
+                        <p class="text-[11px] sm:text-xs text-base-content/70 max-w-xs mx-auto leading-snug">
+                            Программируйте маршруты умного транспорта и доставляйте грузы по городским кварталам!
                         </p>
                     </div>
 
-                    <div class="card bg-base-200 border border-base-300 p-3.5 rounded-2xl text-left space-y-2.5 max-w-xs mx-auto">
-                        <div class="flex items-center gap-2 text-xs font-bold text-primary">
-                            <span class="material-symbols-rounded text-lg filled">checklist</span>
+                    <div class="card bg-base-200 border border-base-300 p-2.5 sm:p-3 rounded-2xl text-left space-y-1.5 max-w-xs mx-auto w-full shrink-0">
+                        <div class="flex items-center gap-1.5 text-[11px] sm:text-xs font-bold text-primary">
+                            <span class="material-symbols-rounded text-base filled">checklist</span>
                             <span>Что предстоит делать:</span>
                         </div>
-                        <ul class="text-[11px] text-base-content/85 space-y-2 leading-snug">
-                            <li class="flex items-start gap-2">
-                                <span class="material-symbols-rounded text-primary text-sm mt-0.5">navigation</span>
-                                <span><b>Строить маршруты:</b> отдавать команды движения и поворотов.</span>
+                        <ul class="text-[10px] sm:text-[11px] text-base-content/85 space-y-1 sm:space-y-1.5 leading-snug">
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-rounded text-primary text-sm shrink-0">navigation</span>
+                                <span><b>Строить маршруты:</b> команды движения и поворотов.</span>
                             </li>
-                            <li class="flex items-start gap-2">
-                                <span class="material-symbols-rounded text-secondary text-sm mt-0.5">repeat</span>
-                                <span><b>Автоматизировать:</b> применять циклы и сенсоры препятствий.</span>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-rounded text-secondary text-sm shrink-0">repeat</span>
+                                <span><b>Автоматизировать:</b> циклы и сенсоры препятствий.</span>
                             </li>
-                            <li class="flex items-start gap-2">
-                                <span class="material-symbols-rounded text-accent text-sm mt-0.5">timer</span>
-                                <span><b>Быстро учиться:</b> каждый рейс занимает всего 3–5 минут практики.</span>
+                            <li class="flex items-center gap-2">
+                                <span class="material-symbols-rounded text-accent text-sm shrink-0">timer</span>
+                                <span><b>Быстро учиться:</b> каждый рейс длится 3–5 минут.</span>
                             </li>
                         </ul>
                     </div>
 
-                    <div class="text-left max-w-xs mx-auto w-full pt-1">
-                        <label class="text-[11px] font-bold text-base-content/70 px-1 block">Имя водителя:</label>
+                    <div class="text-left max-w-xs mx-auto w-full shrink-0">
+                        <label class="text-[10px] sm:text-[11px] font-bold text-base-content/70 px-1 block">Имя водителя:</label>
                         <input type="text" x-model="inputName" @keydown.enter="completeOnboarding()"
                             placeholder="Водитель"
-                            class="input input-bordered input-sm w-full rounded-xl bg-base-200 text-xs font-semibold focus:border-primary mt-1">
+                            class="input input-bordered input-xs sm:input-sm w-full rounded-xl bg-base-200 text-xs font-semibold focus:border-primary mt-0.5">
                     </div>
                 </div>
 
-                <div class="pt-3 max-w-xs mx-auto w-full">
+                <div class="pt-2 sm:pt-3 max-w-xs mx-auto w-full shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
                     <button @click="completeOnboarding()"
-                        class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-lg shadow-primary/25 text-xs sm:text-sm gap-2">
+                        class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-lg shadow-primary/25 text-xs sm:text-sm gap-2 min-h-10 h-10 sm:h-11">
                         <span>Начать первый рейс!</span>
-                        <span class="material-symbols-rounded text-lg">rocket_launch</span>
+                        <span class="material-symbols-rounded text-base sm:text-lg">rocket_launch</span>
                     </button>
                 </div>
             </div>
         </template>
 
-        <header x-show="!isOnboarding" class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 sticky top-0 z-40 rounded-none">
+        <header x-show="!isOnboarding" class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 shrink-0 z-40 rounded-none pt-[env(safe-area-inset-top)]">
             <div class="navbar-start">
                 <button @click="openSettings()" class="btn btn-ghost btn-circle btn-sm text-base-content" aria-label="Настройки"
                     title="Настройки">
@@ -221,6 +230,19 @@
                 </div>
 
                 <div class="space-y-2 pt-1">
+                    <template x-if="pwaInstallable && !pwaInstalled">
+                        <button @click="installPwa()"
+                            class="btn btn-primary btn-soft btn-sm rounded-xl w-full font-bold justify-start h-auto py-2.5 gap-2.5 text-xs text-primary shadow-xs">
+                            <span class="material-symbols-rounded text-base shrink-0">install_mobile</span>
+                            <span class="truncate">Установить на телефон (PWA)</span>
+                        </button>
+                    </template>
+                    <template x-if="pwaInstalled">
+                        <div class="p-2 rounded-xl bg-success/10 border border-success/20 text-success text-[11px] font-bold flex items-center gap-2">
+                            <span class="material-symbols-rounded text-base shrink-0 filled">check_circle</span>
+                            <span class="truncate">Приложение установлено (PWA)</span>
+                        </div>
+                    </template>
                     <button @click="themeModalOpen = true; settingsModalOpen = false"
                         class="btn btn-outline border-base-300 btn-sm rounded-xl w-full font-bold justify-start h-auto py-2.5 gap-2.5 text-xs text-base-content hover:bg-base-200">
                         <span class="material-symbols-rounded text-base text-primary shrink-0" x-text="themeIcon"></span>
@@ -342,7 +364,7 @@
             </div>
         </div>
 
-        <main x-show="!isOnboarding" class="flex-1 overflow-y-auto px-4 py-5 flex flex-col">
+        <main x-show="!isOnboarding" class="flex-1 min-h-0 overflow-y-auto px-3.5 sm:px-4 py-4 flex flex-col">
             <div x-show="activeTab === 'home'" class="space-y-4 pb-4">
                 <div class="px-2 py-1 transition-all duration-300">
                     <div class="flex items-center gap-3.5">
@@ -1472,9 +1494,9 @@
             </div>
         </main>
 
-        <nav x-show="!isOnboarding" class="p-3 sticky bottom-0 z-40 bg-linear-to-t from-base-100 via-base-100/80 to-transparent">
+        <nav x-show="!isOnboarding" class="px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shrink-0 z-40 bg-base-100/95 backdrop-blur-md border-t border-base-300/80">
             <div
-                class="dock dock-sm dock-telegram rounded-2xl shadow-lg border border-base-300 bg-base-200/95 backdrop-blur-md px-1">
+                class="dock dock-sm dock-telegram rounded-2xl shadow-sm border border-base-300 bg-base-200/90 backdrop-blur-md px-1">
                 <button @click="activeTab = 'home'"
                     :class="activeTab === 'home' ? 'dock-active text-primary' : 'text-base-content/60 hover:text-base-content'"
                     class="transition-colors" aria-label="Главная">

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+  "name": "КодРулит — Тренажёр программирования",
+  "short_name": "КодРулит",
+  "description": "Интерактивный мобильный тренажёр алгоритмов и программирования для службы умного городского транспорта",
+  "id": "coderulit-pwa",
+  "start_url": "./app/templates/index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#0ea5e9",
+  "lang": "ru",
+  "dir": "ltr",
+  "categories": [
+    "education",
+    "games",
+    "kids"
+  ],
+  "icons": [
+    {
+      "src": "app/static/img/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "app/static/img/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "app/static/img/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "app/static/img/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Первый рейс",
+      "short_name": "Урок 1",
+      "description": "Начать практический урок 1",
+      "url": "./app/templates/lesson.html?lesson=1",
+      "icons": [
+        {
+          "src": "app/static/img/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Главное меню",
+      "short_name": "Меню",
+      "description": "Перейти в главное меню тренажёра",
+      "url": "./app/templates/index.html",
+      "icons": [
+        {
+          "src": "app/static/img/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
