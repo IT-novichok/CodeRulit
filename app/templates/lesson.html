@@ -35,70 +35,73 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 
-<body class="bg-base-200 h-dvh max-h-dvh sm:min-h-screen flex items-center justify-center font-sans antialiased overflow-hidden sm:overflow-auto"
+<body class="bg-base-200 h-full sm:min-h-screen flex sm:items-center sm:justify-center font-sans antialiased overflow-hidden sm:overflow-auto"
     x-data="lessonApp()">
     <div
-        class="app-phone-container w-full max-w-105 h-dvh max-h-dvh sm:min-h-200 sm:h-200 sm:max-h-200 rounded-none sm:rounded-[36px] border-0 sm:border sm:border-base-300 shadow-none sm:shadow-2xl bg-base-100 text-base-content flex flex-col relative overflow-hidden">
+        class="app-phone-container w-full max-w-105 h-full sm:h-200 sm:max-h-200 rounded-none sm:rounded-[36px] border-0 sm:border sm:border-base-300 shadow-none sm:shadow-2xl bg-base-100 text-base-content flex flex-col relative overflow-hidden">
 
-        <header class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 shrink-0 z-40 rounded-none gap-2 pt-[env(safe-area-inset-top)]">
-            <div class="navbar-start w-auto">
-                <button @click="exitModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-base-content"
-                    aria-label="Выйти из урока" title="Выйти из урока">
-                    <span class="material-symbols-rounded text-2xl">close</span>
-                </button>
-            </div>
-
-            <div class="navbar-center flex-1 flex items-center gap-2 px-1">
-                <progress class="progress progress-primary flex-1 h-2.5 rounded-full"
-                    :value="currentStepIndex + 1" :max="totalSteps"></progress>
-                <span class="badge badge-soft badge-primary font-bold text-[11px] shrink-0 px-2 py-1"
-                    x-text="(currentStepIndex + 1) + ' / ' + totalSteps"></span>
-                <div class="flex items-center gap-0.5 font-bold text-xs shrink-0 px-1.5 py-0.5 rounded-lg transition-colors"
-                    :class="streak > 0 ? 'text-orange-500 bg-orange-500/10' : 'text-base-content/40 bg-base-200'"
-                    title="Серия верных ответов подряд">
-                    <span class="material-symbols-rounded text-base filled">local_fire_department</span>
-                    <span x-text="streak"></span>
+        <!-- Pinned Top Header & Subheader -->
+        <div class="sticky top-0 z-40 shrink-0 w-full bg-base-100 shadow-2xs">
+            <header class="navbar bg-base-100 border-b border-base-300/80 px-3 min-h-14 shrink-0 rounded-none gap-2 pt-[env(safe-area-inset-top)]">
+                <div class="navbar-start w-auto">
+                    <button @click="exitModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-base-content"
+                        aria-label="Выйти из урока" title="Выйти из урока">
+                        <span class="material-symbols-rounded text-2xl">close</span>
+                    </button>
                 </div>
-            </div>
 
-            <div class="navbar-end w-auto flex items-center gap-1">
-                <button @click="openHint()" class="btn btn-ghost btn-circle btn-sm text-accent hover:bg-accent/10"
-                    aria-label="Подсказка к заданию" title="Подсказка к заданию">
-                    <span class="material-symbols-rounded text-2xl filled">lightbulb</span>
-                </button>
-                <button @click="openAiWithQuestion()" class="btn btn-ghost btn-circle btn-sm text-primary hover:bg-primary/10 relative"
-                    aria-label="ИИ-Штурман" title="ИИ-ассистент Штурман">
-                    <span class="material-symbols-rounded text-2xl filled">smart_toy</span>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                </button>
-                <button @click="theoryModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-secondary hover:bg-secondary/10"
-                    aria-label="Справка и теория" title="Теория к уроку">
-                    <span class="material-symbols-rounded text-2xl filled">menu_book</span>
-                </button>
-            </div>
-        </header>
+                <div class="navbar-center flex-1 flex items-center gap-2 px-1">
+                    <progress class="progress progress-primary flex-1 h-2.5 rounded-full"
+                        :value="currentStepIndex + 1" :max="totalSteps"></progress>
+                    <span class="badge badge-soft badge-primary font-bold text-[11px] shrink-0 px-2 py-1"
+                        x-text="(currentStepIndex + 1) + ' / ' + totalSteps"></span>
+                    <div class="flex items-center gap-0.5 font-bold text-xs shrink-0 px-1.5 py-0.5 rounded-lg transition-colors"
+                        :class="streak > 0 ? 'text-orange-500 bg-orange-500/10' : 'text-base-content/40 bg-base-200'"
+                        title="Серия верных ответов подряд">
+                        <span class="material-symbols-rounded text-base filled">local_fire_department</span>
+                        <span x-text="streak"></span>
+                    </div>
+                </div>
 
-        <div class="px-3 py-1.5 bg-base-200/80 border-b border-base-300 flex items-center justify-between text-[11px] shrink-0">
-            <div class="flex items-center gap-1.5 font-bold text-base-content/80 truncate">
-                <span class="material-symbols-rounded text-primary text-sm">alt_route</span>
-                <span x-show="!isRevision" x-text="'Урок ' + moduleLessonNum + ': ' + lessonName"></span>
-                <span x-show="isRevision">Итоговое повторение</span>
+                <div class="navbar-end w-auto flex items-center gap-1">
+                    <button @click="openHint()" class="btn btn-ghost btn-circle btn-sm text-accent hover:bg-accent/10"
+                        aria-label="Подсказка к заданию" title="Подсказка к заданию">
+                        <span class="material-symbols-rounded text-2xl filled">lightbulb</span>
+                    </button>
+                    <button @click="openAiWithQuestion()" class="btn btn-ghost btn-circle btn-sm text-primary hover:bg-primary/10 relative"
+                        aria-label="ИИ-Штурман" title="ИИ-ассистент Штурман">
+                        <span class="material-symbols-rounded text-2xl filled">smart_toy</span>
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    </button>
+                    <button @click="theoryModalOpen = true" class="btn btn-ghost btn-circle btn-sm text-secondary hover:bg-secondary/10"
+                        aria-label="Справка и теория" title="Теория к уроку">
+                        <span class="material-symbols-rounded text-2xl filled">menu_book</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="px-3 py-1.5 bg-base-200/80 border-b border-base-300 flex items-center justify-between text-[11px] shrink-0">
+                <div class="flex items-center gap-1.5 font-bold text-base-content/80 truncate">
+                    <span class="material-symbols-rounded text-primary text-sm">alt_route</span>
+                    <span x-show="!isRevision" x-text="'Урок ' + moduleLessonNum + ': ' + lessonName"></span>
+                    <span x-show="isRevision">Итоговое повторение</span>
+                </div>
+                <span class="badge badge-soft badge-primary font-bold text-[10px] shrink-0"
+                      x-show="!isRevision"
+                      x-text="lessonsLeftInModule === 0 ? 'Финал!' : ('Осталось: ' + lessonsLeftInModule + (lessonsLeftInModule === 1 ? ' урок' : ' урока'))">
+                </span>
+                <span class="badge badge-soft badge-accent font-bold text-[10px] shrink-0"
+                      x-show="isRevision">
+                    Закрепление
+                </span>
             </div>
-            <span class="badge badge-soft badge-primary font-bold text-[10px] shrink-0"
-                  x-show="!isRevision"
-                  x-text="lessonsLeftInModule === 0 ? 'Финал!' : ('Осталось: ' + lessonsLeftInModule + (lessonsLeftInModule === 1 ? ' урок' : ' урока'))">
-            </span>
-            <span class="badge badge-soft badge-accent font-bold text-[10px] shrink-0"
-                  x-show="isRevision">
-                Закрепление
-            </span>
         </div>
 
-        <main class="flex-1 min-h-0 overflow-y-auto px-3.5 sm:px-4 py-3 flex flex-col gap-3">
+        <main class="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3.5 sm:px-4 py-3 flex flex-col gap-3">
             <template x-if="isLoading">
                 <div class="flex-1 flex flex-col items-center justify-center gap-3 py-16 text-center">
                     <span class="loading loading-spinner loading-lg text-primary"></span>
-                    <p class="text-xs text-base-content/60 font-semibold tracking-wide">Загрузка урока...</p>
+                    <p class="text-xs text-base-content/60 font-semibold tracking-wide">Подготовка урока...</p>
                 </div>
             </template>
 
@@ -108,7 +111,7 @@
                         <span class="material-symbols-rounded text-3xl">error</span>
                     </div>
                     <div>
-                        <h3 class="text-sm font-bold text-base-content">Ошибка загрузки</h3>
+                        <h3 class="text-sm font-bold text-base-content">Ошибка открытия урока</h3>
                         <p class="text-xs text-base-content/70 mt-1 max-w-xs leading-relaxed" x-text="loadError"></p>
                     </div>
                     <div class="flex gap-2">
@@ -349,7 +352,7 @@
             </template>
         </main>
 
-        <footer x-show="!isLoading && currentTask" class="shrink-0 z-30 bg-base-100/95 backdrop-blur-md border-t border-base-300 px-4 py-2.5 sm:py-3 space-y-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <footer x-show="!isLoading && currentTask" class="sticky bottom-0 z-40 shrink-0 w-full bg-base-100/95 backdrop-blur-md border-t border-base-300 px-4 py-2.5 sm:py-3 space-y-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-xs">
             <template x-if="statusMessage">
                 <div class="space-y-1.5">
                     <div class="alert rounded-2xl text-xs font-bold py-2.5 px-3.5 shadow-sm transition-all flex items-center gap-2"

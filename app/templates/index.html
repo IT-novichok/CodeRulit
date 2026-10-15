@@ -34,13 +34,13 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="bg-base-200 h-dvh max-h-dvh sm:min-h-screen flex items-center justify-center font-sans antialiased overflow-hidden sm:overflow-auto"
+<body class="bg-base-200 h-full sm:min-h-screen flex sm:items-center sm:justify-center font-sans antialiased overflow-hidden sm:overflow-auto"
     x-data="homeApp()">
     <div
-        class="app-phone-container w-full max-w-105 h-dvh max-h-dvh sm:min-h-200 sm:h-200 sm:max-h-200 rounded-none sm:rounded-[36px] border-0 sm:border sm:border-base-300 shadow-none sm:shadow-2xl bg-base-100 text-base-content flex flex-col relative overflow-hidden">
+        class="app-phone-container w-full max-w-105 h-full sm:h-200 sm:max-h-200 rounded-none sm:rounded-[36px] border-0 sm:border sm:border-base-300 shadow-none sm:shadow-2xl bg-base-100 text-base-content flex flex-col relative overflow-hidden">
 
         <template x-if="isOnboarding">
-            <div class="flex-1 flex flex-col justify-between p-3.5 sm:p-5 text-center h-full overflow-hidden select-none">
+            <div class="flex-1 min-h-0 flex flex-col justify-between p-3.5 sm:p-5 text-center h-full overflow-y-auto sm:overflow-hidden select-none pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
                 <div class="flex items-center justify-between text-[11px] text-base-content/60 shrink-0 pb-1">
                     <span class="badge badge-soft badge-primary font-bold text-[10px]">КодРулит</span>
                     <span class="font-bold text-[10px] tracking-wide uppercase text-base-content/60">Городской транспорт</span>
@@ -55,7 +55,7 @@
                         <span class="badge badge-soft badge-primary text-[9px] sm:text-[10px] font-bold uppercase tracking-wider">Добро пожаловать в «КодРулит»</span>
                         <h2 class="text-xl sm:text-2xl font-black text-base-content tracking-tight leading-tight">Тренажёр программирования</h2>
                         <p class="text-[11px] sm:text-xs text-base-content/70 max-w-xs mx-auto leading-snug">
-                            Программируйте маршруты умного транспорта и доставляйте грузы по городским кварталам!
+                            Программируйте маршруты умного транспорта и безопасно перемещайтесь по городским кварталам!
                         </p>
                     </div>
 
@@ -88,7 +88,7 @@
                     </div>
                 </div>
 
-                <div class="pt-2 sm:pt-3 max-w-xs mx-auto w-full shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+                <div class="pt-2 sm:pt-3 max-w-xs mx-auto w-full shrink-0">
                     <button @click="completeOnboarding()"
                         class="btn btn-primary rounded-2xl w-full font-bold text-white shadow-lg shadow-primary/25 text-xs sm:text-sm gap-2 min-h-10 h-10 sm:h-11">
                         <span>Начать первый рейс!</span>
@@ -98,7 +98,7 @@
             </div>
         </template>
 
-        <header x-show="!isOnboarding" class="navbar bg-base-100 border-b border-base-300 px-3 min-h-14 shrink-0 z-40 rounded-none pt-[env(safe-area-inset-top)]">
+        <header x-show="!isOnboarding" class="navbar bg-base-100/95 backdrop-blur-md border-b border-base-300 px-3 min-h-14 shrink-0 z-40 rounded-none pt-[env(safe-area-inset-top)] sticky top-0">
             <div class="navbar-start">
                 <button @click="openSettings()" class="btn btn-ghost btn-circle btn-sm text-base-content" aria-label="Настройки"
                     title="Настройки">
@@ -451,7 +451,7 @@
                                 </div>
                             </div>
                             <p class="text-xs text-base-content/85 leading-relaxed">
-                                Вы находитесь в интерактивном тренажёре алгоритмов городского транспорта. Ваша задача — программировать маршруты и безопасно доставлять посылки по кварталам города!
+                                Вы находитесь в интерактивном тренажёре алгоритмов городского транспорта. Ваша задача — программировать маршруты и безопасно доезжать до цели по кварталам города!
                             </p>
                             <div class="p-2.5 rounded-2xl bg-base-100/80 border border-primary/20 text-[11px] text-base-content/75 flex items-center gap-2">
                                 <span class="material-symbols-rounded text-primary text-base shrink-0">info</span>
@@ -991,35 +991,19 @@
                                     <span class="text-base-content/70 text-[11px]">Разворот корпуса на 90° против
                                         часовой стрелки</span>
                                 </div>
-                                <div
-                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
-                                    <code
-                                        class="font-mono font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-md w-fit">загрузить</code>
-                                    <span class="text-base-content/70 text-[11px]">Посадить пассажира или забрать
-                                        контейнер с грузом</span>
-                                </div>
-                                <div
-                                    class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex flex-col gap-1">
-                                    <code
-                                        class="font-mono font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded-md w-fit">выгрузить</code>
-                                    <span class="text-base-content/70 text-[11px]">Высадить пассажира в точке
-                                        назначения</span>
-                                </div>
                             </div>
                         </div>
 
                         <div class="space-y-1.5">
                             <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример:
-                                Маршрут такси</p>
+                                Маршрут движения</p>
                             <pre
                                 class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">вперед
 вперед
 направо
-вперед
-загрузить</pre>
+вперед</pre>
                             <p class="text-[11px] text-base-content/60 italic">
-                                Программа проезжает 2 квартала вперед, поворачивает направо, доезжает до пассажира и
-                                сажает его в салон.
+                                Программа проезжает 2 квартала вперед, поворачивает направо и доезжает до целевой точки финиша.
                             </p>
                         </div>
                     </div>
@@ -1130,7 +1114,7 @@
                         <div class="mt-2 pr-5">
                             <h3 class="text-base font-bold text-base-content tracking-tight">Ветвление: Условия и
                                 принятие решений</h3>
-                            <p class="text-xs text-base-content/60 mt-0.5">Логика «Если... то... иначе» и сенсоры
+                            <p class="text-xs text-base-content/60 mt-0.5">Логика «Если... то» и сенсоры
                                 бортового компьютера</p>
                         </div>
                     </summary>
@@ -1156,17 +1140,9 @@
 
                         <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 space-y-2 text-xs">
                             <div class="space-y-1">
-                                <span class="font-bold text-base-content">1. Неполное ветвление (только действие при
-                                    успехе):</span>
+                                <span class="font-bold text-base-content">Синтаксис условия (действие при успехе):</span>
                                 <div class="bg-base-200/80 p-2 rounded-xl font-mono text-primary font-bold">
                                     если &lt;условие&gt; то: &lt;команда&gt;
-                                </div>
-                            </div>
-                            <div class="space-y-1">
-                                <span class="font-bold text-base-content">2. Полное ветвление (с альтернативным планом
-                                    «иначе»):</span>
-                                <div class="bg-base-200/80 p-2 rounded-xl font-mono text-primary font-bold">
-                                    если &lt;условие&gt; то: &lt;команда 1&gt; иначе: &lt;команда 2&gt;
                                 </div>
                             </div>
                         </div>
@@ -1174,18 +1150,12 @@
                         <div>
                             <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider mb-2">Датчики
                                 пространства автомобиля</p>
-                            <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
                                     <code
                                         class="font-mono font-bold text-accent block text-[11px]">спереди_свободно</code>
                                     <span class="text-[10px] text-base-content/60 mt-0.5 block">Впереди нет стены или
-                                        машины</span>
-                                </div>
-                                <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
-                                    <code
-                                        class="font-mono font-bold text-accent block text-[11px]">сзади_свободно</code>
-                                    <span class="text-[10px] text-base-content/60 mt-0.5 block">Сзади свободная
-                                        клетка</span>
+                                        препятствия</span>
                                 </div>
                                 <div class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60">
                                     <code
@@ -1204,15 +1174,12 @@
 
                         <div class="space-y-1">
                             <p class="text-[11px] font-bold text-base-content/50 uppercase tracking-wider">Пример
-                                объезда препятствия</p>
+                                проверки пути</p>
                             <pre
                                 class="bg-base-100 border border-base-300/70 rounded-2xl p-3 font-mono text-xs text-base-content leading-relaxed select-all">если спереди_свободно то:
-    вперед
-иначе:
-    направо</pre>
+    вперед</pre>
                             <p class="text-[11px] text-base-content/60 italic">
-                                Машина едет прямо только тогда, когда путь чист. Если впереди препятствие, машина
-                                сворачивает в объезд.
+                                Машина делает шаг вперед только тогда, когда путь впереди свободен.
                             </p>
                         </div>
                     </div>
@@ -1307,56 +1274,14 @@
                             </div>
                         </div>
                         <div class="mt-2 pr-5">
-                            <h3 class="text-base font-bold text-base-content tracking-tight">Логические связки и
-                                комбинирование</h3>
-                            <p class="text-xs text-base-content/60 mt-0.5">Сложные условия и вложенность циклов для
+                            <h3 class="text-base font-bold text-base-content tracking-tight">Комбинирование
+                                конструкций</h3>
+                            <p class="text-xs text-base-content/60 mt-0.5">Вложенные условия и циклы для
                                 бортового компьютера</p>
                         </div>
                     </summary>
                     <div class="collapse-content px-4.5 pb-4.5 pt-0 space-y-3.5 text-xs text-base-content/80">
                         <div class="divider my-1 border-base-300/60"></div>
-
-                        <div class="space-y-1.5">
-                            <h4 class="font-bold text-base-content flex items-center gap-1.5">
-                                <span class="material-symbols-rounded text-accent text-base">hub</span>
-                                <span>Концепция: Булева алгебра и связки</span>
-                            </h4>
-                            <p class="leading-relaxed">
-                                В реальном мире решение часто зависит от нескольких обстоятельств сразу: «Мы
-                                поворачиваем, если справа свободно <b class="text-base-content">И</b> горит зеленый
-                                свет». Для объединения условий в программировании используются логические связки:
-                            </p>
-                        </div>
-
-                        <div class="space-y-2 text-xs">
-                            <div
-                                class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
-                                <code
-                                    class="font-mono font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-lg shrink-0">И</code>
-                                <div class="text-base-content/70">
-                                    <b class="text-base-content">Конъюнкция:</b> всё выражение истинно только тогда,
-                                    когда <span class="underline">оба</span> условия верны одновременно.
-                                </div>
-                            </div>
-                            <div
-                                class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
-                                <code
-                                    class="font-mono font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-lg shrink-0">ИЛИ</code>
-                                <div class="text-base-content/70">
-                                    <b class="text-base-content">Дизъюнкция:</b> истинно, если выполняется <span
-                                        class="underline">хотя бы одно</span> из условий (любое или оба).
-                                </div>
-                            </div>
-                            <div
-                                class="p-2.5 rounded-2xl bg-base-100/70 border border-base-300/60 flex items-start gap-2.5">
-                                <code
-                                    class="font-mono font-bold text-accent bg-accent/10 px-2 py-0.5 rounded-lg shrink-0">НЕ</code>
-                                <div class="text-base-content/70">
-                                    <b class="text-base-content">Отрицание:</b> инвертирует результат (было «Истина» —
-                                    стало «Ложь», и наоборот).
-                                </div>
-                            </div>
-                        </div>
 
                         <div class="space-y-1.5">
                             <h4 class="font-bold text-base-content flex items-center gap-1.5">
@@ -1494,7 +1419,7 @@
             </div>
         </main>
 
-        <nav x-show="!isOnboarding" class="px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shrink-0 z-40 bg-base-100/95 backdrop-blur-md border-t border-base-300/80">
+        <nav x-show="!isOnboarding" class="sticky bottom-0 z-40 shrink-0 w-full px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-base-100/95 backdrop-blur-md border-t border-base-300/80">
             <div
                 class="dock dock-sm dock-telegram rounded-2xl shadow-sm border border-base-300 bg-base-200/90 backdrop-blur-md px-1">
                 <button @click="activeTab = 'home'"

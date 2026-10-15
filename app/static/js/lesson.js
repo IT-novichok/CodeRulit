@@ -88,7 +88,7 @@ function lessonApp() {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 this.allLessonsData = await res.json();
             } catch (err) {
-                this.loadError = 'Не удалось загрузить данные уроков из lessons.json.';
+                this.loadError = 'Не удалось получить данные уроков из lessons.json.';
                 this.isLoading = false;
                 return;
             }
